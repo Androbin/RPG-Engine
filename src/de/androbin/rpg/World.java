@@ -6,11 +6,11 @@ import java.util.List;
 
 public class World
 {
-	public final int				width;
-	public final int				height;
+	public final int			width;
+	public final int			height;
 	
-	protected final Tile[]			tiles;
-	protected final List<Entity>	entities;
+	private final Tile[]		tiles;
+	private final List<Entity>	entities;
 	
 	public World( final int width, final int height )
 	{

@@ -1,6 +1,7 @@
 package de.androbin.rpg;
 
 import java.awt.event.*;
+import java.util.*;
 
 public enum Direction
 {
@@ -8,6 +9,21 @@ public enum Direction
 	LEFT( -1, 0 ),
 	DOWN( 0, 1 ),
 	RIGHT( 1, 0 );
+	
+	public final static Map<Integer,Direction> KEY_MAPPINGS = new HashMap<Integer,Direction>();
+	
+	static
+	{
+		KEY_MAPPINGS.put( KeyEvent.VK_W, Direction.UP );
+		KEY_MAPPINGS.put( KeyEvent.VK_A, Direction.LEFT );
+		KEY_MAPPINGS.put( KeyEvent.VK_S, Direction.DOWN );
+		KEY_MAPPINGS.put( KeyEvent.VK_D, Direction.RIGHT );
+		
+		KEY_MAPPINGS.put( KeyEvent.VK_UP, Direction.UP );
+		KEY_MAPPINGS.put( KeyEvent.VK_DOWN, Direction.DOWN );
+		KEY_MAPPINGS.put( KeyEvent.VK_RIGHT, Direction.RIGHT );
+		KEY_MAPPINGS.put( KeyEvent.VK_LEFT, Direction.LEFT );
+	}
 	
 	public final int	dx;
 	public final int	dy;
@@ -40,26 +56,7 @@ public enum Direction
 	
 	public static Direction byKeyCode( final int keycode )
 	{
-		switch ( keycode )
-		{
-			case KeyEvent.VK_UP :
-			case KeyEvent.VK_W :
-				return UP;
-			
-			case KeyEvent.VK_LEFT :
-			case KeyEvent.VK_A :
-				return LEFT;
-			
-			case KeyEvent.VK_DOWN :
-			case KeyEvent.VK_S :
-				return DOWN;
-			
-			case KeyEvent.VK_RIGHT :
-			case KeyEvent.VK_D :
-				return RIGHT;
-		}
-		
-		return null;
+		return KEY_MAPPINGS.getOrDefault( keycode, null );
 	}
 	
 	public Direction opposite()

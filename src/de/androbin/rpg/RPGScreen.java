@@ -1,22 +1,23 @@
 package de.androbin.rpg;
 
-import static de.androbin.math.util.floats.FloatMathUtil.*;
 import de.androbin.game.*;
 import java.awt.*;
 import java.awt.event.*;
 
 public class RPGScreen extends Screen
 {
-	protected World		world;
-	private Entity		player;
-	
-	private Direction	requestedDir;
-	
-	private float		dx;
-	private float		dy;
-	
-	protected float		scale;
-	
+	protected World	  world;
+	private Entity	  player;
+					  
+	private Camera  camera;
+					  
+	private Direction requestedDir;
+					  
+	private float	  dx;
+	private float	  dy;
+					  
+	protected float	  scale;
+					  
 	public RPGScreen( final Game game, final float scale )
 	{
 		super( game );
@@ -28,23 +29,18 @@ public class RPGScreen extends Screen
 		final float pw = scale * world.width;
 		final float ph = scale * world.height;
 		
-		if ( pw > getWidth() )
+		if ( camera == null )
 		{
-			dx = bound( getWidth() - pw, 0.5f * getWidth() - scale * player.getPX(), 0f );
-		}
-		else
-		{
-			dx = 0.5f * ( getWidth() - pw );
+			camera = new Camera( player );
 		}
 		
-		if ( ph > getHeight() )
-		{
-			dy = bound( getHeight() - ph, 0.5f * getHeight() - scale * player.getPY(), 0f );
-		}
-		else
-		{
-			dy = 0.5f * ( getHeight() - ph );
-		}
+		dx = camera.calcTranslationX( getWidth(), pw, scale );
+		dy = camera.calcTranslationY( getHeight(), ph, scale );
+	}
+	
+	public Camera getCamera()
+	{
+		return camera;
 	}
 	
 	public Entity getPlayer()
@@ -117,6 +113,11 @@ public class RPGScreen extends Screen
 		}
 	}
 	
+	public void setCamera( final Camera camera )
+	{
+		this.camera = camera;
+	}
+	
 	public void setPlayer( final Entity player )
 	{
 		player.addMoveListener( this::onPlayerMoved );
@@ -151,5 +152,7 @@ public class RPGScreen extends Screen
 		}
 		
 		calcTranslation();
+		
+		camera.update( delta );
 	}
 }
