@@ -13,7 +13,7 @@ public abstract class Renderer implements Renderable
 		this( new Rectangle2D.Float() );
 	}
 	
-	private Renderer( final Rectangle2D.Float bounds )
+	public Renderer( final Rectangle2D.Float bounds )
 	{
 		this.bounds = bounds;
 	}
