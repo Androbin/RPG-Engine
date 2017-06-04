@@ -5,12 +5,9 @@ import java.util.*;
 
 public enum Direction
 {
-	UP( 0, -1 ),
-	LEFT( -1, 0 ),
-	DOWN( 0, 1 ),
-	RIGHT( 1, 0 );
+	UP( 0, -1 ), LEFT( -1, 0 ), DOWN( 0, 1 ), RIGHT( 1, 0 );
 	
-	public final static Map<Integer,Direction> KEY_MAPPINGS = new HashMap<Integer,Direction>();
+	public static final Map<Integer, Direction> KEY_MAPPINGS = new HashMap<>();
 	
 	static
 	{
@@ -25,9 +22,9 @@ public enum Direction
 		KEY_MAPPINGS.put( KeyEvent.VK_LEFT, Direction.LEFT );
 	}
 	
-	public final int	dx;
-	public final int	dy;
-	
+	public final int dx;
+	public final int dy;
+					 
 	private Direction( final int dx, final int dy )
 	{
 		this.dx = dx;

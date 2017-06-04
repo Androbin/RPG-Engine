@@ -1,78 +1,91 @@
 package de.androbin.rpg;
 
 import java.awt.*;
+import java.awt.geom.*;
 import java.util.*;
-import java.util.List;
+import de.androbin.func.consume.*;
+import de.androbin.rpg.gfx.*;
+import de.androbin.rpg.tile.*;
 
-public abstract class Entity implements Interaction
+public abstract class Entity implements Interactable, Sprite
 {
-	private final World					world;
-	
-	private int							x;
-	private int							y;
-	
-	protected Direction					viewDir;
-	
-	protected Renderer					renderer;
-	
-	private final List<MoveListener>	moveListener;
-	
-	private Direction					moveDir;
-	private float						moveProgress;
-	
-	public Entity( final World world, final int x, final int y )
+	// TODO(Saltuk) outsource to SpaceTime
+	private transient World	world;
+							
+	private Point			pos;
+							
+	public Direction		viewDir;
+							
+	public Direction		moveRequestDir;
+	public BooleanConsumer	moveRequestCallback;
+							
+	public Renderer			renderer;
+							
+	private Direction		moveDir;
+	private float			moveProgress;
+							
+	public Entity( final World world, final Point pos )
 	{
 		this.world = world;
-		
-		this.x = x;
-		this.y = y;
-		
+		this.pos = pos;
 		this.viewDir = Direction.DOWN;
-		
-		this.moveListener = new ArrayList<>();
 	}
 	
-	public final void addMoveListener( final MoveListener listener )
+	void reattach( final World world, final Point pos )
 	{
-		moveListener.add( listener );
+		this.pos = pos;
+		this.world = world;
 	}
 	
-	protected final boolean canMove()
+	public final boolean canMove()
 	{
 		return canMove( viewDir );
 	}
 	
-	protected boolean canMove( final Direction dir )
+	public boolean canMove( final Direction dir )
 	{
 		final Tile tile = nextTile( dir );
-		return tile != null && tile.data.passable && tile.reservationType() == null;
+		return tile != null && tile.isPassable();
 	}
 	
-	protected final Object interact( final Object ... args )
+	public final Object interact( final Object ... args )
 	{
 		final Tile tile = nextTile();
 		return tile == null ? null : tile.interact( getClass(), args );
 	}
 	
-	private final void doMove()
+	private final void doMove( final RPGScreen screen )
 	{
-		getTile().reserve( null );
-		
-		x += moveDir.dx;
-		y += moveDir.dy;
+		getTile().release();
+
+		pos = new Point( pos );
+		pos.translate( moveDir.dx, moveDir.dy );
 		
 		moveDir = null;
-		moveListener.forEach( MoveListener::onMoved );
+
+		final Map<String, Object> args = new HashMap<>();
+		args.put( "screen", screen );
+		
+		getTile().trigger( screen.events, args );
 	}
 	
-	public final float getPX()
+	@ Override
+	public Rectangle getBounds()
 	{
-		return moveDir == null ? x : x + moveDir.dx * moveProgress;
+		final Dimension size = new Dimension( 1, 1 );
+		return new Rectangle( pos, size );
 	}
 	
-	public final float getPY()
+	@ Override
+	public Rectangle2D.Float getViewBounds()
 	{
-		return moveDir == null ? y : y + moveDir.dy * moveProgress;
+		final float h = 1f; // TODO(Saltuk) infer from renderer
+		return new Rectangle2D.Float( pos.x, pos.y + 1f - h, 1f, h );
+	}
+	
+	public final Point2D.Float getFloatPos()
+	{
+		return moveDir == null ? new Point2D.Float( pos.x, pos.y ) : new Point2D.Float( pos.x + moveDir.dx * moveProgress, pos.y + moveDir.dy * moveProgress );
 	}
 	
 	public Direction getMoveDir()
@@ -87,7 +100,7 @@ public abstract class Entity implements Interaction
 	
 	private final Tile getTile()
 	{
-		return world.getTile( x, y );
+		return world.getTile( pos );
 	}
 	
 	public Direction getViewDir()
@@ -95,17 +108,12 @@ public abstract class Entity implements Interaction
 		return viewDir;
 	}
 	
-	public final int getX()
+	public final Point getPos()
 	{
-		return x;
+		return pos;
 	}
 	
-	public final int getY()
-	{
-		return y;
-	}
-	
-	protected boolean move( final Direction dir )
+	public boolean move( final Direction dir )
 	{
 		viewDir = dir;
 		
@@ -116,7 +124,7 @@ public abstract class Entity implements Interaction
 		
 		final Tile tile = nextTile();
 		
-		if ( !tile.reserve( this ) )
+		if ( !tile.request( this ) )
 		{
 			return false;
 		}
@@ -127,6 +135,24 @@ public abstract class Entity implements Interaction
 	
 	public abstract float moveSpeed();
 	
+	public boolean moveTo( final Point pos )
+	{
+		final Tile target = world.getTile( pos );
+		
+		if ( target == null || !target.isPassable() || !target.request( this ) )
+		{
+			return false;
+		}
+		
+		viewDir = Direction.DOWN;
+		
+		getTile().release();
+		
+		this.pos = pos;
+		
+		return true;
+	}
+	
 	private final Tile nextTile()
 	{
 		return nextTile( viewDir );
@@ -134,10 +160,9 @@ public abstract class Entity implements Interaction
 	
 	private final Tile nextTile( final Direction dir )
 	{
-		final int tx = x + dir.dx;
-		final int ty = y + dir.dy;
+		final Point tPos = new Point( pos.x + dir.dx, pos.y + dir.dy );
 		
-		return world.getTile( tx, ty );
+		return world.getTile( tPos );
 	}
 	
 	public final void render( final Graphics2D g, final float scale )
@@ -147,28 +172,27 @@ public abstract class Entity implements Interaction
 			return;
 		}
 		
-		final float px = getPX() * scale;
-		final float py = getPY() * scale;
+		final float px = getFloatPos().x * scale;
+		final float py = getFloatPos().y * scale;
 		
 		g.translate( px, py );
-		renderer.bounds.width = scale;
-		renderer.bounds.height = scale;
+		renderer.setScale( scale );
 		renderer.render( g );
 		g.translate( -px, -py );
 	}
 	
-	protected final Class< ? extends Entity> reservationType()
+	public final Class< ? > reservationType()
 	{
 		final Tile tile = nextTile();
 		return tile == null ? null : tile.reservationType();
 	}
 	
-	protected final void turn( final Direction dir )
+	public final void turn( final Direction dir )
 	{
 		viewDir = dir;
 	}
 	
-	protected void update( final float delta )
+	public void update( final float delta, final RPGScreen screen )
 	{
 		if ( moveDir != null )
 		{
@@ -176,7 +200,7 @@ public abstract class Entity implements Interaction
 			
 			while ( moveProgress >= 1f && moveDir != null )
 			{
-				doMove();
+				doMove( screen );
 				moveProgress--;
 			}
 			

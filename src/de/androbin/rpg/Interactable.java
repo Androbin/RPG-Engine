@@ -1,6 +1,6 @@
 package de.androbin.rpg;
 
-public interface Interaction
+public interface Interactable
 {
 	default Object onInteract( final Class< ? extends Entity> type, final Object ... args )
 	{

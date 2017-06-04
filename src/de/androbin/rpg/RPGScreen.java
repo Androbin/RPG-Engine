@@ -1,51 +1,69 @@
 package de.androbin.rpg;
 
-import de.androbin.game.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
+import java.util.*;
+import de.androbin.game.*;
+import de.androbin.rpg.event.EventQueue;
+import de.androbin.rpg.gfx.*;
 
 public class RPGScreen extends Screen
 {
-	protected World	  world;
-	private Entity	  player;
-					  
-	private Camera  camera;
-					  
-	private Direction requestedDir;
-					  
-	private float	  dx;
-	private float	  dy;
-					  
-	protected float	  scale;
-					  
+	private final Map<String, World> worlds	= new HashMap<>();
+											
+	public World					 world;
+	public Entity					 player;
+									 
+	public final Camera				 camera;
+									 
+	public final EventQueue			 events;
+									 
+	private float					 dx;
+	private float					 dy;
+									 
+	public float					 scale;
+									 
 	public RPGScreen( final Game game, final float scale )
 	{
 		super( game );
+		
+		this.camera = new Camera();
+		
+		this.events = new EventQueue();
+		
 		this.scale = scale;
 	}
 	
 	private void calcTranslation()
 	{
-		final float pw = scale * world.width;
-		final float ph = scale * world.height;
-		
-		if ( camera == null )
-		{
-			camera = new Camera( player );
-		}
+		final float pw = scale * world.size.width;
+		final float ph = scale * world.size.height;
 		
 		dx = camera.calcTranslationX( getWidth(), pw, scale );
 		dy = camera.calcTranslationY( getHeight(), ph, scale );
 	}
 	
-	public Camera getCamera()
+	protected void checkMoveRequest( final Entity entity )
 	{
-		return camera;
+		if ( entity.getMoveDir() == null && entity.moveRequestDir != null )
+		{
+			// TODO bundle in Request class
+			
+			final boolean result = entity.move( entity.moveRequestDir );
+			entity.moveRequestDir = null;
+			
+			if ( entity.moveRequestCallback != null )
+			{
+				entity.moveRequestCallback.accept( result );
+				entity.moveRequestCallback = null;
+			}
+		}
 	}
 	
-	public Entity getPlayer()
+	protected World createWorld( final String name )
 	{
-		return player;
+		return null;
 	}
 	
 	@ Override
@@ -61,7 +79,7 @@ public class RPGScreen extends Screen
 				
 				if ( dir != null )
 				{
-					requestDir( dir );
+					player.moveRequestDir = dir;
 				}
 			}
 		};
@@ -77,6 +95,11 @@ public class RPGScreen extends Screen
 		return dy;
 	}
 	
+	private final World getWorld( final String name )
+	{
+		return worlds.computeIfAbsent( name, this::createWorld );
+	}
+	
 	@ Override
 	public void render( final Graphics2D g )
 	{
@@ -90,47 +113,27 @@ public class RPGScreen extends Screen
 		
 		g.translate( dx, dy );
 		
-		final int startY = Math.max( 0, (int) ( -dy / scale ) );
-		final int endY = Math.min( (int) ( ( getHeight() - dy ) / scale ), world.height - 1 );
+		final float startY = Math.max( 0f, -dy / scale );
+		final float endY = Math.min( ( getHeight() - dy ) / scale, world.size.height );
 		
-		final int startX = Math.max( 0, (int) ( -dx / scale ) );
-		final int endX = Math.min( (int) ( ( getWidth() - dx ) / scale ), world.width - 1 );
+		final float startX = Math.max( 0f, -dx / scale );
+		final float endX = Math.min( ( getWidth() - dx ) / scale, world.size.width );
 		
-		world.render( g, new Rectangle( startX, startY, endX - startX, endY - startY ), scale );
+		world.render( g, new Rectangle2D.Float( startX, startY, endX - startX, endY - startY ), scale );
 		
 		g.translate( -dx, -dy );
 	}
 	
-	public void requestDir( final Direction dir )
+	public void switchWorld( final String name, final Point pos )
 	{
-		if ( player.getMoveDir() == null )
+		if ( world != null )
 		{
-			player.move( dir );
+			world.removeEntity( player );
 		}
-		else
-		{
-			this.requestedDir = dir;
-		}
-	}
-	
-	public void setCamera( final Camera camera )
-	{
-		this.camera = camera;
-	}
-	
-	public void setPlayer( final Entity player )
-	{
-		player.addMoveListener( this::onPlayerMoved );
-		this.player = player;
-	}
-	
-	protected void onPlayerMoved()
-	{
-		if ( requestedDir != null )
-		{
-			player.move( requestedDir );
-			requestedDir = null;
-		}
+		
+		world = getWorld( name );
+		player.reattach( world, pos );
+		world.addEntity( player );
 	}
 	
 	@ Override
@@ -146,13 +149,19 @@ public class RPGScreen extends Screen
 			return;
 		}
 		
-		for ( final Entity entity : world.getEntities() )
+		for ( final Entity entity : world.listEntities() )
 		{
-			entity.update( delta );
+			entity.update( delta, this );
 		}
 		
-		calcTranslation();
+		for ( final Entity entity : world.listEntities() )
+		{
+			checkMoveRequest( entity );
+		}
 		
+		events.run();
+		
+		calcTranslation();
 		camera.update( delta );
 	}
 }
