@@ -73,6 +73,6 @@ public class Tile {
   }
   
   public interface Builder {
-    Tile build( final TileData data );
+    Tile build( TileData data );
   }
 }

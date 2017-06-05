@@ -27,6 +27,6 @@ public class GameObjectData {
   }
   
   public interface Builder {
-    GameObjectData build( final String name, final BufferedImage image, final JSONObject props );
+    GameObjectData build( String name, BufferedImage image, JSONObject props );
   }
 }

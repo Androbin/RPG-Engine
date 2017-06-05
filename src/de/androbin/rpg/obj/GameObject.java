@@ -51,6 +51,6 @@ public class GameObject implements Sprite {
   }
   
   public interface Builder {
-    GameObject build( final GameObjectData data, final Point pos );
+    GameObject build( GameObjectData data, Point pos );
   }
 }

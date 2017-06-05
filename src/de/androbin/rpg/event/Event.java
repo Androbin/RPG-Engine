@@ -6,9 +6,9 @@ public interface Event {
   Event NULL = screen -> {
   };
   
-  void run( final Map<String, Object> args );
+  void run( Map<String, Object> args );
   
   interface Builder {
-    Event build( final String[] args );
+    Event build( String[] args );
   }
 }

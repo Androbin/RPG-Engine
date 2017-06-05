@@ -18,6 +18,6 @@ public class TileData {
   }
   
   public interface Builder {
-    TileData build( final String name, final BufferedImage image, final JSONObject props );
+    TileData build( String name, BufferedImage image, JSONObject props );
   }
 }
