@@ -36,14 +36,14 @@ public final class TeleportEvent implements Event {
   public void run( final Map<String, Object> args ) {
     final Entity entity = (Entity) args.get( "entity" );
     
-    if ( world != null ) {
+    if ( world == null ) {
+      entity.moveTo( pos );
+    } else {
       final RPGScreen screen = (RPGScreen) args.get( "screen" );
       
       if ( entity.equals( screen.player ) ) {
         screen.switchWorld( world, pos );
       }
-    } else {
-      entity.moveTo( pos );
     }
   }
   

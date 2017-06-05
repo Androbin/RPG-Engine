@@ -20,7 +20,7 @@ public final class OpacityDecorator extends Decorator {
     return g;
   }
   
-  public final void setOpacity( float opacity ) {
+  public void setOpacity( final float opacity ) {
     this.opacity = opacity;
   }
 }

@@ -29,7 +29,7 @@ public class GameObject implements Sprite {
     final int res = data.image.getWidth() / data.size.width;
     
     final float x = pos.x;
-    final float y = ( pos.y + data.size.height - data.image.getHeight() / res );
+    final float y = pos.y + data.size.height - data.image.getHeight() / res;
     
     final float w = data.size.width;
     final float h = (float) data.image.getHeight() / res;
