@@ -1,6 +1,6 @@
 language: java
 before_install:
-  - sh install-deps.sh
+  - bash install-deps.sh
 jdk:
   - oraclejdk8
 notifications:
