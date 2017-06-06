@@ -1,0 +1,27 @@
+<project default="test" basedir=".">
+  <property name="src" location="src"/>
+  <property name="bin" location="bin"/>
+  <property name="libs" location="libs"/>
+  
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${bin}"/>
+  </target>
+  
+  <target name="compile" depends="init">
+    <javac srcdir="${src}" destdir="${bin}" includeantruntime="false">
+      <classpath>
+        <fileset dir="${libs}">
+          <include name="*.jar" />
+        </fileset>
+      </classpath>
+    </javac>
+  </target>
+  
+  <target name="test" depends="compile">
+  </target>
+  
+  <target name="clean">
+    <delete dir="${bin}"/>
+  </target>
+</project>

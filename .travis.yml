@@ -1,0 +1,7 @@
+language: java
+before_install:
+  - sh install-deps.sh
+jdk:
+  - oraclejdk8
+notifications:
+  email: false
