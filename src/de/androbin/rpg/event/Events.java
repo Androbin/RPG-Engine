@@ -5,7 +5,7 @@ import java.util.*;
 import de.androbin.util.*;
 
 public final class Events {
-  public static final Map<String, Event.Builder> BUILDERS = new HashMap<String, Event.Builder>();
+  public static final Map<String, Event.Builder> BUILDERS = new HashMap<>();
   
   static {
     BUILDERS.put( "teleport", TeleportEvent.BUILDER );
