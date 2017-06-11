@@ -15,11 +15,8 @@ public class RPGScreen extends Screen {
   public Entity player;
   
   public final Camera camera;
-  
   public final EventQueue events;
-  
-  private float dx;
-  private float dy;
+  public final Point2D.Float trans;
   
   public float scale;
   
@@ -27,8 +24,8 @@ public class RPGScreen extends Screen {
     super( game );
     
     this.camera = new Camera();
-    
     this.events = new EventQueue();
+    this.trans = new Point2D.Float();
     
     this.scale = scale;
   }
@@ -37,8 +34,8 @@ public class RPGScreen extends Screen {
     final float pw = scale * world.size.width;
     final float ph = scale * world.size.height;
     
-    dx = camera.calcTranslationX( getWidth(), pw, scale );
-    dy = camera.calcTranslationY( getHeight(), ph, scale );
+    trans.x = camera.calcTranslationX( getWidth(), pw, scale );
+    trans.y = camera.calcTranslationY( getHeight(), ph, scale );
   }
   
   protected void checkMoveRequest( final Entity entity ) {
@@ -74,14 +71,6 @@ public class RPGScreen extends Screen {
     };
   }
   
-  public float getTranslationX() {
-    return dx;
-  }
-  
-  public float getTranslationY() {
-    return dy;
-  }
-  
   private final World getWorld( final String name ) {
     return worlds.computeIfAbsent( name, this::createWorld );
   }
@@ -95,17 +84,17 @@ public class RPGScreen extends Screen {
       return;
     }
     
-    g.translate( dx, dy );
+    g.translate( trans.x, trans.y );
     
-    final float startY = Math.max( 0f, -dy / scale );
-    final float endY = Math.min( ( getHeight() - dy ) / scale, world.size.height );
+    final float startY = Math.max( 0f, -trans.y / scale );
+    final float endY = Math.min( ( getHeight() - trans.y ) / scale, world.size.height );
     
-    final float startX = Math.max( 0f, -dx / scale );
-    final float endX = Math.min( ( getWidth() - dx ) / scale, world.size.width );
+    final float startX = Math.max( 0f, -trans.x / scale );
+    final float endX = Math.min( ( getWidth() - trans.x ) / scale, world.size.width );
     
     world.render( g, new Rectangle2D.Float( startX, startY, endX - startX, endY - startY ), scale );
     
-    g.translate( -dx, -dy );
+    g.translate( -trans.x, -trans.y );
   }
   
   public void switchWorld( final String name, final Point pos ) {
