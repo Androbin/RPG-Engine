@@ -35,7 +35,7 @@ public final class Events {
       builder = BUILDERS.get( func );
       return builder.build( args );
     } else {
-      final String[] events = JSONUtil.toStringArray( JSONUtil.parseJSON( func ) );
+      final String[] events = JSONUtil.toStringArray( JSONUtil.parseJSON( "event/" + func ).get() );
       return new CustomEvent( func,
           fillParallel( new Event[ events.length ], i -> parse( events[ i ] ) ) );
     }

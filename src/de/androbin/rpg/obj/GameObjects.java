@@ -17,9 +17,9 @@ public final class GameObjects {
   }
   
   private static GameObjectData createData( final String type ) {
-    final JSONObject props = (JSONObject) parseJSON( "gameobject/" + type + ".json" )
+    final JSONObject props = (JSONObject) parseJSON( "obj/" + type + ".json" )
         .orElseGet( JSONObject::new );
-    final BufferedImage image = ImageUtil.loadImage( "gameobject/" + type + ".png" );
+    final BufferedImage image = ImageUtil.loadImage( "obj/" + type + ".png" );
     
     return dataBuilder.build( type, image, props );
   }

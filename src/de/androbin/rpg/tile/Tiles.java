@@ -15,12 +15,10 @@ public final class Tiles {
   private Tiles() {
   }
   
-  @ SuppressWarnings( "unchecked" )
   private static TileData createData( final String type ) {
     final JSONObject props = (JSONObject) parseJSON( "tile/" + type + ".json" )
         .orElseGet( JSONObject::new );
-    final BufferedImage image = ImageUtil
-        .loadImage( "tile/" + props.getOrDefault( "image", type ) + ".png" );
+    final BufferedImage image = ImageUtil.loadImage( "tile/" + type + ".png" );
     
     return dataBuilder.build( type, image, props );
   }
