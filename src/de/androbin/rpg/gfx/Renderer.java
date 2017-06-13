@@ -23,9 +23,7 @@ public abstract class Renderer implements Renderable {
       setRenderer( renderer );
     }
     
-    public Rectangle2D.Float getDecoratorBounds() {
-      return null;
-    }
+    public abstract Rectangle2D.Float getDecoratorBounds();
     
     @ Override
     public final Rectangle2D.Float getBounds() {
@@ -55,7 +53,6 @@ public abstract class Renderer implements Renderable {
       renderer.setScale( scale );
     }
     
-    public void postDecorate( final Graphics2D g ) {
-    }
+    public abstract void postDecorate( Graphics2D g );
   }
 }

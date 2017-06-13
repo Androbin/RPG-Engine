@@ -45,20 +45,16 @@ public abstract class RPGScreen extends Screen {
     
     // TODO bundle in Request class
     
-    final boolean result = entity.move( entity.moveRequestDir );
+    final boolean success = entity.move( entity.moveRequestDir );
     entity.moveRequestDir = null;
     
-    if ( entity.moveCallback != null ) {
-      entity.moveCallback.accept( result );
-    }
-    
     if ( entity.moveRequestCallback != null ) {
-      entity.moveRequestCallback.accept( result );
+      entity.moveRequestCallback.accept( success );
       entity.moveRequestCallback = null;
     }
   }
   
-  protected abstract World createWorld( final String name );
+  protected abstract World createWorld( String name );
   
   @ Override
   public KeyListener getKeyListener() {
@@ -109,10 +105,6 @@ public abstract class RPGScreen extends Screen {
     world = getWorld( name );
     player.reattach( world, pos );
     world.addEntity( player );
-  }
-  
-  @ Override
-  protected void onResized( final int width, final int height ) {
   }
   
   @ Override

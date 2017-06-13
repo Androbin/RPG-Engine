@@ -16,8 +16,8 @@ public abstract class Entity implements Interactable, Sprite {
   public Direction viewDir;
   
   public Direction moveRequestDir;
-  public BooleanConsumer moveCallback;
   public BooleanConsumer moveRequestCallback;
+  public Runnable moveCallback;
   
   public Renderer renderer;
   
@@ -35,17 +35,13 @@ public abstract class Entity implements Interactable, Sprite {
     this.world = world;
   }
   
-  public final boolean canMove() {
-    return canMove( viewDir );
-  }
-  
   public boolean canMove( final Direction dir ) {
     final Tile tile = nextTile( dir );
     return tile != null && tile.isPassable();
   }
   
   public final Object interact( final Object ... args ) {
-    final Tile tile = nextTile();
+    final Tile tile = nextTile( viewDir );
     return tile == null ? null : tile.interact( getClass(), args );
   }
   
@@ -61,6 +57,10 @@ public abstract class Entity implements Interactable, Sprite {
     args.put( "screen", screen );
     
     getTile().trigger( screen.events, args );
+    
+    if ( moveCallback != null ) {
+      moveCallback.run();
+    }
   }
   
   @ Override
@@ -103,11 +103,11 @@ public abstract class Entity implements Interactable, Sprite {
   public boolean move( final Direction dir ) {
     viewDir = dir;
     
-    if ( !canMove() ) {
+    if ( !canMove( dir ) ) {
       return false;
     }
     
-    final Tile tile = nextTile();
+    final Tile tile = nextTile( viewDir );
     
     if ( !tile.request( this ) ) {
       return false;
@@ -135,10 +135,6 @@ public abstract class Entity implements Interactable, Sprite {
     return true;
   }
   
-  private final Tile nextTile() {
-    return nextTile( viewDir );
-  }
-  
   private final Tile nextTile( final Direction dir ) {
     final Point tPos = new Point( pos.x + dir.dx, pos.y + dir.dy );
     
@@ -161,12 +157,12 @@ public abstract class Entity implements Interactable, Sprite {
   }
   
   public final Class< ? > reservationType() {
-    final Tile tile = nextTile();
+    final Tile tile = nextTile( viewDir );
     return tile == null ? null : tile.reservationType();
   }
   
-  public final void turn( final Direction dir ) {
-    viewDir = dir;
+  public void setViewDir( final Direction viewDir ) {
+    this.viewDir = viewDir;
   }
   
   public void update( final float delta, final RPGScreen screen ) {

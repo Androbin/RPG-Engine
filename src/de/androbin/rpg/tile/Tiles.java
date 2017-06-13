@@ -34,12 +34,6 @@ public final class Tiles {
   }
   
   public static TileData getData( final String name ) {
-    if ( DATA.containsKey( name ) ) {
-      return DATA.get( name );
-    } else {
-      final TileData data = createData( name );
-      DATA.put( name, data );
-      return data;
-    }
+    return DATA.computeIfAbsent( name, Tiles::createData );
   }
 }

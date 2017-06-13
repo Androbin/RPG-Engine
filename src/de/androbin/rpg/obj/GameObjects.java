@@ -33,12 +33,6 @@ public final class GameObjects {
   }
   
   public static GameObjectData getData( final String name ) {
-    if ( DATA.containsKey( name ) ) {
-      return DATA.get( name );
-    } else {
-      final GameObjectData data = createData( name );
-      DATA.put( name, data );
-      return data;
-    }
+    return DATA.computeIfAbsent( name, GameObjects::createData );
   }
 }
