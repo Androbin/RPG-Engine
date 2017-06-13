@@ -4,3 +4,4 @@ Functions
 GFX
 JSON
 Math-Utils
+String-Utils
