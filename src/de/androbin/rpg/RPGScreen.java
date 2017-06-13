@@ -48,10 +48,13 @@ public abstract class RPGScreen extends Screen {
     final boolean result = entity.move( entity.moveRequestDir );
     entity.moveRequestDir = null;
     
+    if ( entity.moveCallback != null ) {
+      entity.moveCallback.accept( result );
+    }
+    
     if ( entity.moveRequestCallback != null ) {
       entity.moveRequestCallback.accept( result );
-      // TODO(Androbin) Clarify usage of `moveRequestCallback`
-      // entity.moveRequestCallback = null;
+      entity.moveRequestCallback = null;
     }
   }
   

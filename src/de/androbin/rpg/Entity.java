@@ -16,6 +16,7 @@ public abstract class Entity implements Interactable, Sprite {
   public Direction viewDir;
   
   public Direction moveRequestDir;
+  public BooleanConsumer moveCallback;
   public BooleanConsumer moveRequestCallback;
   
   public Renderer renderer;
