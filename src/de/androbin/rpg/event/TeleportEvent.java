@@ -7,11 +7,11 @@ import de.androbin.rpg.*;
 public final class TeleportEvent implements Event {
   public static final Event.Builder BUILDER = args -> {
     switch ( args.length ) {
-      case 3 :
+      case 3:
         return new TeleportEvent( args[ 0 ],
             new Point( Integer.parseInt( args[ 1 ] ), Integer.parseInt( args[ 2 ] ) ) );
       
-      case 2 :
+      case 2:
         return new TeleportEvent(
             new Point( Integer.parseInt( args[ 0 ] ), Integer.parseInt( args[ 1 ] ) ) );
     }

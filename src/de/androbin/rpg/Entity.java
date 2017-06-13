@@ -9,7 +9,7 @@ import de.androbin.rpg.tile.*;
 
 public abstract class Entity implements Interactable, Sprite {
   // TODO(Saltuk) outsource to SpaceTime
-  private transient World world;
+  protected transient World world;
   
   private Point pos;
   
@@ -29,7 +29,7 @@ public abstract class Entity implements Interactable, Sprite {
     this.viewDir = Direction.DOWN;
   }
   
-  void reattach( final World world, final Point pos ) {
+  protected void reattach( final World world, final Point pos ) {
     this.pos = pos;
     this.world = world;
   }

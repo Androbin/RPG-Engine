@@ -1,14 +1,14 @@
 package de.androbin.rpg;
 
+import de.androbin.rpg.gfx.*;
+import de.androbin.rpg.obj.*;
+import de.androbin.rpg.tile.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.List;
 import java.util.logging.*;
 import java.util.stream.*;
-import de.androbin.rpg.gfx.*;
-import de.androbin.rpg.obj.*;
-import de.androbin.rpg.tile.*;
 
 public class World {
   public final String name;
@@ -46,11 +46,24 @@ public class World {
     return new Rectangle( size ).contains( bounds );
   }
   
-  public GameObject getGameObject( final int x, final int y ) {
-    return objects.parallelStream()
-        .filter( o -> o.getBounds().contains( x, y ) )
-        .findAny()
-        .orElse( null );
+  public Entity getEntity( final Point pos ) {
+    for ( final Entity entity : listEntities() ) {
+      if ( entity.getPos().equals( pos ) ) {
+        return entity;
+      }
+    }
+    
+    return null;
+  }
+  
+  public GameObject getGameObject( final Point pos ) {
+    for ( final GameObject object : objects ) {
+      if ( object.getBounds().contains( pos ) ) {
+        return object;
+      }
+    }
+    
+    return null;
   }
   
   public Tile getTile( final Point pos ) {

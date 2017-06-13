@@ -8,7 +8,7 @@ import de.androbin.game.*;
 import de.androbin.rpg.event.EventQueue;
 import de.androbin.rpg.gfx.*;
 
-public class RPGScreen extends Screen {
+public abstract class RPGScreen extends Screen {
   private final Map<String, World> worlds = new HashMap<>();
   
   public World world;
@@ -39,22 +39,23 @@ public class RPGScreen extends Screen {
   }
   
   protected void checkMoveRequest( final Entity entity ) {
-    if ( entity.getMoveDir() == null && entity.moveRequestDir != null ) {
-      // TODO bundle in Request class
-      
-      final boolean result = entity.move( entity.moveRequestDir );
-      entity.moveRequestDir = null;
-      
-      if ( entity.moveRequestCallback != null ) {
-        entity.moveRequestCallback.accept( result );
-        entity.moveRequestCallback = null;
-      }
+    if ( entity.getMoveDir() != null || entity.moveRequestDir == null ) {
+      return;
+    }
+    
+    // TODO bundle in Request class
+    
+    final boolean result = entity.move( entity.moveRequestDir );
+    entity.moveRequestDir = null;
+    
+    if ( entity.moveRequestCallback != null ) {
+      entity.moveRequestCallback.accept( result );
+      // TODO(Androbin) Clarify usage of `moveRequestCallback`
+      // entity.moveRequestCallback = null;
     }
   }
   
-  protected World createWorld( final String name ) {
-    return null;
-  }
+  protected abstract World createWorld( final String name );
   
   @ Override
   public KeyListener getKeyListener() {
@@ -71,7 +72,7 @@ public class RPGScreen extends Screen {
     };
   }
   
-  private final World getWorld( final String name ) {
+  protected final World getWorld( final String name ) {
     return worlds.computeIfAbsent( name, this::createWorld );
   }
   

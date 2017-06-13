@@ -14,7 +14,9 @@ public final class CustomEvent implements Event {
   
   @ Override
   public void run( final Map<String, Object> args ) {
-    Arrays.stream( events ).forEach( event -> event.run( args ) );
+    for ( final Event event : events ) {
+      event.run( args );
+    }
   }
   
   @ Override

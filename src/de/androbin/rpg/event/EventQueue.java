@@ -12,7 +12,7 @@ public final class EventQueue implements Runnable {
   
   @ Override
   public void run() {
-    queue.stream().sorted().forEachOrdered( Item::run );
+    queue.forEach( Item::run );
     queue.clear();
   }
   
