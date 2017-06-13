@@ -1,6 +1,6 @@
 package de.androbin.rpg;
 
-import de.androbin.function.*;
+import de.androbin.func.*;
 import de.androbin.rpg.gfx.*;
 import de.androbin.rpg.tile.*;
 import java.awt.*;
