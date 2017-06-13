@@ -1,6 +1,7 @@
 package de.androbin.rpg.obj;
 
 import static de.androbin.util.JSONUtil.*;
+import java.awt.*;
 import java.util.*;
 import org.json.simple.*;
 
@@ -19,12 +20,12 @@ public final class GameObjects {
     return dataBuilder.build( type, props );
   }
   
-  public static GameObject create( final String name ) {
-    return create( getData( name ) );
+  public static GameObject create( final String name, final Point pos ) {
+    return create( getData( name ), pos );
   }
   
-  public static GameObject create( final GameObjectData data ) {
-    return builder.build( data );
+  public static GameObject create( final GameObjectData data, final Point pos ) {
+    return builder.build( data, pos );
   }
   
   public static GameObjectData getData( final String name ) {

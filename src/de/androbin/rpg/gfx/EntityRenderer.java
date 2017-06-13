@@ -42,7 +42,7 @@ public class EntityRenderer extends Renderer {
   
   @ Override
   public void render( final Graphics2D g ) {
-    final int ordinal = entity.getViewDir().ordinal();
+    final int ordinal = entity.viewDir.ordinal();
     final float moveProgress = entity.getMoveProgress();
     
     final BufferedImage[] direction = images[ ordinal ];

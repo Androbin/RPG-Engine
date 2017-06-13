@@ -7,9 +7,11 @@ import de.androbin.rpg.gfx.*;
 
 public class GameObject implements Sprite {
   public final GameObjectData data;
+  public final Point pos;
   
-  public GameObject( final GameObjectData data ) {
+  public GameObject( final GameObjectData data, final Point pos ) {
     this.data = data;
+    this.pos = pos;
   }
   
   @ Override
@@ -20,13 +22,14 @@ public class GameObject implements Sprite {
   @ Override
   public Rectangle2D.Float getViewBounds() {
     final int res = data.image.getWidth() / data.size.width;
-    
-    final float y = data.size.height - data.image.getHeight() / res;
+
+    final float x = pos.x + data.size.height - data.image.getHeight() / res;
+    final float y = pos.y + data.size.height - data.image.getHeight() / res;
     
     final float w = data.size.width;
     final float h = (float) data.image.getHeight() / res;
     
-    return new Rectangle2D.Float( 0f, y, w, h );
+    return new Rectangle2D.Float( x, y, w, h );
   }
   
   @ Override
@@ -43,6 +46,6 @@ public class GameObject implements Sprite {
   }
   
   public interface Builder {
-    GameObject build( GameObjectData data );
+    GameObject build( GameObjectData data, final Point pos );
   }
 }

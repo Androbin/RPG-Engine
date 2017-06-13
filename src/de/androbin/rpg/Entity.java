@@ -69,12 +69,6 @@ public abstract class Entity implements Interactable, Sprite {
     return new Rectangle( pos, size );
   }
   
-  @ Override
-  public Rectangle2D.Float getViewBounds() {
-    final float h = 1f; // TODO(Saltuk) infer from renderer
-    return new Rectangle2D.Float( pos.x, pos.y + 1f - h, 1f, h );
-  }
-  
   public final Point2D.Float getFloatPos() {
     return moveDir == null ? new Point2D.Float( pos.x, pos.y )
         : new Point2D.Float( pos.x + moveDir.dx * moveProgress, pos.y + moveDir.dy * moveProgress );
@@ -92,8 +86,10 @@ public abstract class Entity implements Interactable, Sprite {
     return world.getTile( pos );
   }
   
-  public Direction getViewDir() {
-    return viewDir;
+  @ Override
+  public Rectangle2D.Float getViewBounds() {
+    final float h = 1f; // TODO(Saltuk) infer from renderer
+    return new Rectangle2D.Float( pos.x, pos.y + 1f - h, 1f, h );
   }
   
   public final Point getPos() {
@@ -159,10 +155,6 @@ public abstract class Entity implements Interactable, Sprite {
   public final Class< ? > reservationType() {
     final Tile tile = nextTile( viewDir );
     return tile == null ? null : tile.reservationType();
-  }
-  
-  public void setViewDir( final Direction viewDir ) {
-    this.viewDir = viewDir;
   }
   
   public void update( final float delta, final RPGScreen screen ) {
