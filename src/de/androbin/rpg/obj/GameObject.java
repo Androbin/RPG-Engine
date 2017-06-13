@@ -16,14 +16,14 @@ public class GameObject implements Sprite {
   
   @ Override
   public Rectangle getBounds() {
-    return new Rectangle( data.size );
+    return new Rectangle( pos, data.size );
   }
   
   @ Override
   public Rectangle2D.Float getViewBounds() {
     final int res = data.image.getWidth() / data.size.width;
-
-    final float x = pos.x + data.size.height - data.image.getHeight() / res;
+    
+    final float x = pos.x;
     final float y = pos.y + data.size.height - data.image.getHeight() / res;
     
     final float w = data.size.width;
