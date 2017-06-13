@@ -62,7 +62,7 @@ public abstract class RPGScreen extends Screen {
       @ Override
       public void keyPressed( final KeyEvent event ) {
         final int keycode = event.getKeyCode();
-        final Direction dir = Direction.byKeyCode( keycode );
+        final Direction dir = Directions.byKeyCode( keycode );
         
         if ( dir != null ) {
           player.moveRequestDir = dir;
