@@ -1,11 +1,11 @@
 package de.androbin.rpg;
 
+import de.androbin.function.*;
+import de.androbin.rpg.gfx.*;
+import de.androbin.rpg.tile.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
-import de.androbin.func.consume.*;
-import de.androbin.rpg.gfx.*;
-import de.androbin.rpg.tile.*;
 
 public abstract class Entity implements Interactable, Sprite {
   // TODO(Saltuk) outsource to SpaceTime

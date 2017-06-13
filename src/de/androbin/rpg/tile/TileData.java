@@ -15,7 +15,7 @@ public class TileData {
     this.name = name;
     this.image = ImageUtil.loadImage( "tile/" + name + ".png" );
     
-    this.passEvent = props == null ? null : Events.parse( (String) props.get( "pass_event" ) );
+    this.passEvent = Events.parse( (String) props.get( "pass_event" ) );
   }
   
   public interface Builder {

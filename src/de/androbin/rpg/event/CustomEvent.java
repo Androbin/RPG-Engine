@@ -3,8 +3,7 @@ package de.androbin.rpg.event;
 import java.util.*;
 
 public final class CustomEvent implements Event {
-  private final String name;
-  
+  public final String name;
   private final Event[] events;
   
   public CustomEvent( final String name, final Event[] events ) {

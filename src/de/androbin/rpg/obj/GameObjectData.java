@@ -14,17 +14,15 @@ public class GameObjectData {
   
   public final Event passEvent;
   
+  @ SuppressWarnings( "unchecked" )
   public GameObjectData( final String name, final JSONObject props ) {
     this.name = name;
     this.image = ImageUtil.loadImage( "obj/" + name + ".png" );
     this.size = new Dimension(
-        ( (Number) props.get( "width" ) ).intValue(),
-        ( (Number) props.get( "height" ) ).intValue() );
+        ( (Number) props.getOrDefault( "width", 1 ) ).intValue(),
+        ( (Number) props.getOrDefault( "height", 1 ) ).intValue() );
+    
     this.passEvent = Events.parse( (String) props.get( "pass_event" ) );
-  }
-  
-  public Dimension getSize() {
-    return size;
   }
   
   public interface Builder {
