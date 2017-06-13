@@ -3,6 +3,7 @@ package de.androbin.rpg.obj;
 import java.awt.*;
 import java.awt.image.*;
 import org.json.simple.*;
+import de.androbin.gfx.util.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.event.Event;
 
@@ -13,9 +14,9 @@ public class GameObjectData {
   
   public final Event passEvent;
   
-  public GameObjectData( final String name, final BufferedImage image, final JSONObject props ) {
+  public GameObjectData( final String name, final JSONObject props ) {
     this.name = name;
-    this.image = image;
+    this.image = ImageUtil.loadImage( "obj/" + name + ".png" );
     this.size = new Dimension(
         ( (Number) props.get( "width" ) ).intValue(),
         ( (Number) props.get( "height" ) ).intValue() );
@@ -27,6 +28,6 @@ public class GameObjectData {
   }
   
   public interface Builder {
-    GameObjectData build( String name, BufferedImage image, JSONObject props );
+    GameObjectData build( String name, JSONObject props );
   }
 }

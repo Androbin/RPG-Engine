@@ -1,8 +1,6 @@
 package de.androbin.rpg.tile;
 
 import static de.androbin.util.JSONUtil.*;
-import de.androbin.gfx.util.*;
-import java.awt.image.*;
 import java.util.*;
 import org.json.simple.*;
 
@@ -18,9 +16,7 @@ public final class Tiles {
   private static TileData createData( final String type ) {
     final JSONObject props = (JSONObject) parseJSON( "tile/" + type + ".json" )
         .orElseGet( JSONObject::new );
-    final BufferedImage image = ImageUtil.loadImage( "tile/" + type + ".png" );
-    
-    return dataBuilder.build( type, image, props );
+    return dataBuilder.build( type, props );
   }
   
   public static Tile create( final String name ) {
