@@ -23,11 +23,21 @@ public final class Events {
       return Event.NULL;
     }
     
-    final int l = text.indexOf( '(' );
-    final int r = text.lastIndexOf( ')' );
+    final String func;
+    final String argString;
     
-    final String func = text.substring( 0, l );
-    final String[] args = text.substring( l + 1, r ).split( ",\\s?" );
+    final int l = text.indexOf( '(' );
+    
+    if ( l == -1 ) {
+      func = text;
+      argString = "";
+    } else {
+      final int r = text.lastIndexOf( ')' );
+      func = text.substring( 0, l );
+      argString = text.substring( l + 1, r );
+    }
+    
+    final String[] args = argString.split( ",\\s?" );
     
     final Event.Builder builder;
     

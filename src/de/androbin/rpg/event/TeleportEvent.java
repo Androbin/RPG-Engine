@@ -20,7 +20,6 @@ public final class TeleportEvent implements Event {
   };
   
   private String world;
-  
   private Point pos;
   
   public TeleportEvent( final Point pos ) {
@@ -30,6 +29,11 @@ public final class TeleportEvent implements Event {
   public TeleportEvent( final String world, final Point pos ) {
     this.world = world;
     this.pos = pos;
+  }
+  
+  @ Override
+  public String getLogMessage() {
+    return "teleport { world: " + world + ", x: " + pos.x + ", y: " + pos.y + " }";
   }
   
   @ Override
@@ -45,10 +49,5 @@ public final class TeleportEvent implements Event {
         screen.switchWorld( world, pos );
       }
     }
-  }
-  
-  @ Override
-  public String toString() {
-    return "teleport { x: " + pos.x + ", y: " + pos.y + " }";
   }
 }

@@ -27,7 +27,7 @@ public final class EventQueue implements Runnable {
     
     @ Override
     public void run() {
-      Logger.getGlobal().log( Level.INFO, event.toString() );
+      Logger.getGlobal().log( Level.INFO, event.getLogMessage() );
       event.run( args );
     }
   }

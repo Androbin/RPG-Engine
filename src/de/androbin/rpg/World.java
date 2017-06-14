@@ -28,14 +28,57 @@ public class World {
     this.entities = new ArrayList<>();
   }
   
-  public final void addEntity( final Entity entity ) {
+  public final boolean addEntity( final Entity entity ) {
     if ( entities.contains( entity ) ) {
       Logger.getGlobal().log( Level.WARNING,
-          "World " + name + " had Entity attached twice: " + entity );
+          "World " + name + " tried to add Entity twice: " + entity );
+      return true;
     }
     
-    getTile( entity.getPos() ).request( entity );
+    final boolean success = getTile( entity.getPos() ).request( entity );
+    
+    if ( !success ) {
+      Logger.getGlobal().log( Level.WARNING,
+          "World " + name + " failed to attach Entity: " + entity );
+      return false;
+    }
+    
     entities.add( entity );
+    return true;
+  }
+  
+  public final boolean addGameObject( final GameObject object ) {
+    if ( objects.contains( object ) ) {
+      Logger.getGlobal().log( Level.WARNING,
+          "World " + name + " tried to add GameObject twice: " + object );
+      return true;
+    }
+    
+    if ( object.data.passEvent == null ) {
+      final Rectangle bounds = object.getBounds();
+      
+      if ( !checkBounds( bounds ) ) {
+        Logger.getGlobal().log( Level.WARNING,
+            "World " + name + " tried to attach GameObject out of bounds: " + object );
+        return false;
+      }
+      
+      for ( int y = bounds.y; y < bounds.y + bounds.height; y++ ) {
+        for ( int x = bounds.x; x < bounds.x + bounds.width; x++ ) {
+          final Point pos = new Point( x, y );
+          final boolean success = getTile( pos ).request( object );
+          
+          if ( !success ) {
+            Logger.getGlobal().log( Level.WARNING,
+                "World " + name + " failed to attach GameObject: " + object );
+            return false;
+          }
+        }
+      }
+    }
+    
+    objects.add( object );
+    return true;
   }
   
   public final boolean checkBounds( final Point pos ) {
@@ -48,7 +91,7 @@ public class World {
   
   public Entity getEntity( final Point pos ) {
     for ( final Entity entity : listEntities() ) {
-      if ( entity.getPos().equals( pos ) ) {
+      if ( entity.getBounds().contains( pos ) ) {
         return entity;
       }
     }
@@ -79,6 +122,21 @@ public class World {
     getTile( entity.getPos() ).release();
   }
   
+  public final void removeGameObject( final GameObject object ) {
+    objects.remove( object );
+    
+    if ( object.data.passEvent == null ) {
+      final Rectangle bounds = object.getBounds();
+      
+      for ( int y = bounds.y; y < bounds.y + bounds.height; y++ ) {
+        for ( int x = bounds.x; x < bounds.x + bounds.width; x++ ) {
+          final Point pos = new Point( x, y );
+          getTile( pos ).release();
+        }
+      }
+    }
+  }
+  
   public final void render( final Graphics2D g, final Rectangle2D.Float view, final float scale ) {
     for ( int y = (int) view.y; y <= view.y + view.height; y++ ) {
       for ( int x = (int) view.x; x <= view.x + view.width; x++ ) {
@@ -96,24 +154,6 @@ public class World {
         .filter( o -> o.getViewBounds().intersects( view ) )
         .sorted( comp )
         .forEachOrdered( o -> o.render( g, scale ) );
-  }
-  
-  public final boolean addGameObject( final GameObject object ) {
-    final Rectangle bounds = object.getBounds();
-    
-    if ( !checkBounds( bounds ) ) {
-      return false;
-    }
-    
-    for ( int y = bounds.y; y < bounds.y + bounds.height; y++ ) {
-      for ( int x = bounds.x; x < bounds.x + bounds.width; x++ ) {
-        final Point pos = new Point( x, y );
-        getTile( pos ).request( object );
-      }
-    }
-    
-    objects.add( object );
-    return true;
   }
   
   public final boolean setTile( final Point pos, final Tile tile ) {

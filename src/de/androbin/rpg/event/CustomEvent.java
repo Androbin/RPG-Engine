@@ -1,6 +1,7 @@
 package de.androbin.rpg.event;
 
 import java.util.*;
+import java.util.logging.*;
 
 public final class CustomEvent implements Event {
   public final String name;
@@ -12,14 +13,15 @@ public final class CustomEvent implements Event {
   }
   
   @ Override
-  public void run( final Map<String, Object> args ) {
-    for ( final Event event : events ) {
-      event.run( args );
-    }
+  public String getLogMessage() {
+    return name;
   }
   
   @ Override
-  public String toString() {
-    return name;
+  public void run( final Map<String, Object> args ) {
+    for ( final Event event : events ) {
+      Logger.getGlobal().log( Level.INFO, event.getLogMessage() );
+      event.run( args );
+    }
   }
 }

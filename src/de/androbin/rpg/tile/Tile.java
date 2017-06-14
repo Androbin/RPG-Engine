@@ -41,15 +41,12 @@ public class Tile {
   public final boolean request( final Object object ) {
     assert object != null;
     
-    if ( reservation != object ) {
-      if ( reservation == null ) {
-        reservation = object;
-      } else {
-        return false;
-      }
+    if ( reservation == null ) {
+      reservation = object;
+      return true;
     }
     
-    return true;
+    return reservation == object;
   }
   
   public final Class< ? > reservationType() {
