@@ -1,24 +1,27 @@
 package de.androbin.rpg;
 
+import de.androbin.game.*;
+import de.androbin.rpg.event.EventQueue;
+import de.androbin.rpg.gfx.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.*;
-import de.androbin.game.*;
-import de.androbin.rpg.event.EventQueue;
-import de.androbin.rpg.gfx.*;
+import java.util.List;
 
 public abstract class RPGScreen extends Screen {
   private final Map<String, World> worlds = new HashMap<>();
   
-  public World world;
+  protected World world;
+  
   public Entity player;
+  private Direction requestDir;
   
-  public final Camera camera;
-  public final EventQueue events;
-  public final Point2D.Float trans;
+  protected final Camera camera;
+  protected final EventQueue events;
+  protected final Point2D.Float trans;
   
-  public float scale;
+  protected float scale;
   
   public RPGScreen( final Game game, final float scale ) {
     super( game );
@@ -38,22 +41,6 @@ public abstract class RPGScreen extends Screen {
     trans.y = camera.calcTranslationY( getHeight(), ph, scale );
   }
   
-  protected void checkMoveRequest( final Entity entity ) {
-    if ( entity.getMoveDir() != null || entity.moveRequestDir == null ) {
-      return;
-    }
-    
-    // TODO bundle in Request class
-    
-    final boolean success = entity.move( entity.moveRequestDir );
-    entity.moveRequestDir = null;
-    
-    if ( entity.moveRequestCallback != null ) {
-      entity.moveRequestCallback.accept( success );
-      entity.moveRequestCallback = null;
-    }
-  }
-  
   protected abstract World createWorld( String name );
   
   @ Override
@@ -65,7 +52,17 @@ public abstract class RPGScreen extends Screen {
         final Direction dir = Directions.byKeyCode( keycode );
         
         if ( dir != null ) {
-          player.moveRequestDir = dir;
+          requestDir = dir;
+        }
+      }
+      
+      @ Override
+      public void keyReleased( final KeyEvent event ) {
+        final int keycode = event.getKeyCode();
+        final Direction dir = Directions.byKeyCode( keycode );
+        
+        if ( dir == requestDir ) {
+          requestDir = null;
         }
       }
     };
@@ -109,21 +106,23 @@ public abstract class RPGScreen extends Screen {
   
   @ Override
   protected void update( final float delta ) {
-    if ( world == null ) {
-      return;
+    if ( player != null ) {
+      player.moveRequestDir = requestDir;
     }
     
-    for ( final Entity entity : world.listEntities() ) {
-      entity.update( delta, this );
+    final List<Entity> entities = world.listEntities();
+    
+    for ( final Entity entity : entities ) {
+      entity.update( delta );
     }
     
-    for ( final Entity entity : world.listEntities() ) {
-      checkMoveRequest( entity );
+    for ( final Entity entity : entities ) {
+      entity.processMove( this );
     }
     
     events.run();
     
-    calcTranslation();
     camera.update( delta );
+    calcTranslation();
   }
 }
