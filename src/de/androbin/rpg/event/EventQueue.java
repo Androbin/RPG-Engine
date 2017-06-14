@@ -1,7 +1,6 @@
 package de.androbin.rpg.event;
 
 import java.util.*;
-import java.util.logging.*;
 
 public final class EventQueue implements Runnable {
   private final Queue<Item> queue = new ArrayDeque<>();
@@ -17,8 +16,8 @@ public final class EventQueue implements Runnable {
   }
   
   private static class Item implements Runnable {
-    public final Event event;
-    public final Map<String, Object> args;
+    private final Event event;
+    private final Map<String, Object> args;
     
     public Item( final Event event, final Map<String, Object> args ) {
       this.event = event;
@@ -27,7 +26,6 @@ public final class EventQueue implements Runnable {
     
     @ Override
     public void run() {
-      Logger.getGlobal().log( Level.INFO, event.getLogMessage() );
       event.run( args );
     }
   }

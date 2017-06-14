@@ -1,12 +1,13 @@
 package de.androbin.rpg.event;
 
 import java.util.*;
+import java.util.function.*;
 
 public interface Event {
-  Event NULL = func( "null", () -> {
+  Event NULL = func( "null", args -> {
   } );
   
-  static Event func( final String name, final Runnable action ) {
+  static Event func( final String name, final Consumer<Map<String, Object>> action ) {
     return new Event() {
       @ Override
       public String getLogMessage() {
@@ -15,7 +16,7 @@ public interface Event {
       
       @ Override
       public void run( final Map<String, Object> args ) {
-        action.run();
+        action.accept( args );
       }
     };
   };
