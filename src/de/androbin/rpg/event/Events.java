@@ -19,7 +19,7 @@ public final class Events {
       return null;
     }
     
-    if ( "none".equals( text ) ) {
+    if ( text.equals( "none" ) ) {
       return Event.NULL;
     }
     
@@ -39,11 +39,8 @@ public final class Events {
     
     final String[] args = argString.split( ",\\s?" );
     
-    final Event.Builder builder;
-    
     if ( BUILDERS.containsKey( func ) ) {
-      builder = BUILDERS.get( func );
-      return builder.build( args );
+      return BUILDERS.get( func ).build( args );
     } else {
       final String[] events = JSONUtil.toStringArray( JSONUtil.parseJSON( "event/" + func ).get() );
       return new CustomEvent( func,

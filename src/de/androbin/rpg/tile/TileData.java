@@ -11,14 +11,14 @@ public class TileData {
   
   public final Event passEvent;
   
-  public TileData( final String name, final JSONObject props ) {
+  public TileData( final String name, final JSONObject data ) {
     this.name = name;
     this.image = ImageUtil.loadImage( "tile/" + name + ".png" );
     
-    this.passEvent = Events.parse( (String) props.get( "pass_event" ) );
+    this.passEvent = Events.parse( (String) data.get( "pass_event" ) );
   }
   
   public interface Builder {
-    TileData build( String name, JSONObject props );
+    TileData build( String name, JSONObject data );
   }
 }

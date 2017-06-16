@@ -14,18 +14,18 @@ public final class GameObjects {
   private GameObjects() {
   }
   
-  private static GameObjectData createData( final String type ) {
-    final JSONObject props = (JSONObject) parseJSON( "obj/" + type + ".json" )
-        .orElseGet( JSONObject::new );
-    return dataBuilder.build( type, props );
-  }
-  
   public static GameObject create( final String name, final Point pos ) {
     return create( getData( name ), pos );
   }
   
-  public static GameObject create( final GameObjectData data, final Point pos ) {
+  private static GameObject create( final GameObjectData data, final Point pos ) {
     return builder.build( data, pos );
+  }
+  
+  private static GameObjectData createData( final String type ) {
+    final JSONObject props = (JSONObject) parseJSON( "obj/" + type + ".json" )
+        .orElseGet( JSONObject::new );
+    return dataBuilder.build( type, props );
   }
   
   public static GameObjectData getData( final String name ) {

@@ -13,18 +13,18 @@ public final class Tiles {
   private Tiles() {
   }
   
-  private static TileData createData( final String type ) {
-    final JSONObject props = (JSONObject) parseJSON( "tile/" + type + ".json" )
-        .orElseGet( JSONObject::new );
-    return dataBuilder.build( type, props );
-  }
-  
   public static Tile create( final String name ) {
     return create( getData( name ) );
   }
   
-  public static Tile create( final TileData data ) {
+  private static Tile create( final TileData data ) {
     return builder.build( data );
+  }
+  
+  private static TileData createData( final String type ) {
+    final JSONObject props = (JSONObject) parseJSON( "tile/" + type + ".json" )
+        .orElseGet( JSONObject::new );
+    return dataBuilder.build( type, props );
   }
   
   public static TileData getData( final String name ) {
