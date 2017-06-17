@@ -7,12 +7,12 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
 
-public abstract class Entity implements Interactable, Sprite {
+public abstract class Entity implements Sprite {
   protected transient World world;
-  
-  protected Renderer renderer;
+  protected transient Renderer renderer;
   
   private Point pos;
+  public final Dimension size;
   
   public Direction viewDir;
   
@@ -26,24 +26,25 @@ public abstract class Entity implements Interactable, Sprite {
   public Entity( final World world, final Point pos ) {
     this.world = world;
     this.pos = pos;
+    this.size = new Dimension( 1, 1 );
     this.viewDir = Direction.DOWN;
   }
   
-  public boolean canMove( final Direction dir ) {
+  public final boolean canMove( final Direction dir ) {
     final Tile tile = nextTile( dir );
     return tile != null && tile.isPassable();
   }
   
   private final void doMove( final RPGScreen screen ) {
-    getTile().release();
-    
-    pos = new Point( pos );
-    pos.translate( moveDir.dx, moveDir.dy );
-    
+    pos = moveDir.from( pos );
     moveDir = null;
+    
+    final Rectangle target = new Rectangle( pos, size );
+    world.spaceTime.set( this, target );
     
     final Map<String, Object> args = new HashMap<>();
     args.put( "screen", screen );
+    args.put( "entity", this );
     
     getTile().trigger( screen.events, args );
     
@@ -53,19 +54,13 @@ public abstract class Entity implements Interactable, Sprite {
   }
   
   @ Override
-  public Rectangle getBounds() {
-    // TODO handle movement for larger sizes
-    final Dimension size = new Dimension( 1, 1 );
+  public final Rectangle getBounds() {
     return new Rectangle( pos, size );
   }
   
   public final Point2D.Float getFloatPos() {
     return moveDir == null ? new Point2D.Float( pos.x, pos.y )
         : new Point2D.Float( pos.x + moveDir.dx * moveProgress, pos.y + moveDir.dy * moveProgress );
-  }
-  
-  public final Direction getMoveDir() {
-    return moveDir;
   }
   
   public final float getMoveProgress() {
@@ -81,14 +76,9 @@ public abstract class Entity implements Interactable, Sprite {
   }
   
   @ Override
-  public Rectangle2D.Float getViewBounds() {
-    final float h = 1f; // TODO(Saltuk) infer from renderer
-    return new Rectangle2D.Float( pos.x, pos.y + 1f - h, 1f, h );
-  }
-  
-  public final Object interact( final Object ... args ) {
-    final Tile tile = nextTile( viewDir );
-    return tile == null ? null : tile.interact( getClass(), args );
+  public final Rectangle2D.Float getViewBounds() {
+    final float h = 1f; // TODO infer from renderer
+    return new Rectangle2D.Float( pos.x, pos.y + 1f - h, size.width, h );
   }
   
   private final boolean move( final Direction dir ) {
@@ -98,9 +88,10 @@ public abstract class Entity implements Interactable, Sprite {
       return false;
     }
     
-    final Tile tile = nextTile( viewDir );
+    final Rectangle target = dir.expand( pos );
+    final boolean success = world.spaceTime.trySet( this, target );
     
-    if ( !tile.request( this ) ) {
+    if ( !success ) {
       return false;
     }
     
@@ -110,24 +101,27 @@ public abstract class Entity implements Interactable, Sprite {
   
   public abstract float moveSpeed();
   
-  public boolean moveTo( final Point pos ) {
-    final Tile target = world.getTile( pos );
+  public final boolean moveTo( final Point pos ) {
+    final Tile tile = world.getTile( pos );
     
-    if ( target == null || !target.isPassable() || !target.request( this ) ) {
+    if ( tile == null || !tile.isPassable() ) {
       return false;
     }
     
-    viewDir = Direction.DOWN;
+    final Rectangle target = new Rectangle( pos, size );
+    final boolean success = world.spaceTime.trySet( this, target );
     
-    getTile().release();
+    if ( !success ) {
+      return false;
+    }
     
+    this.viewDir = Direction.DOWN;
     this.pos = pos;
-    
     return true;
   }
   
   private final Tile nextTile( final Direction dir ) {
-    return world.getTile( new Point( pos.x + dir.dx, pos.y + dir.dy ) );
+    return world.getTile( dir.from( pos ) );
   }
   
   public final void processMove( final RPGScreen screen ) {
@@ -149,7 +143,7 @@ public abstract class Entity implements Interactable, Sprite {
     }
   }
   
-  protected void reattach( final World world, final Point pos ) {
+  protected final void reattach( final World world, final Point pos ) {
     this.pos = pos;
     this.world = world;
   }
@@ -168,11 +162,6 @@ public abstract class Entity implements Interactable, Sprite {
     renderer.setScale( scale );
     renderer.render( g );
     g.translate( -px, -py );
-  }
-  
-  public final Class< ? > reservationType() {
-    final Tile tile = nextTile( viewDir );
-    return tile == null ? null : tile.reservationType();
   }
   
   public void update( final float delta ) {

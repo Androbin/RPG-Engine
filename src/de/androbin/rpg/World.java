@@ -12,12 +12,13 @@ import java.util.stream.*;
 
 public class World {
   public final String name;
-  
   public final Dimension size;
   
   private final Tile[] tiles;
-  private final List<GameObject> objects;
   private final List<Entity> entities;
+  private final List<GameObject> objects;
+  
+  public final SpaceTime spaceTime;
   
   public World( final Dimension size, final String name ) {
     this.name = name;
@@ -26,6 +27,8 @@ public class World {
     this.tiles = new Tile[ size.width * size.height ];
     this.objects = new ArrayList<>();
     this.entities = new ArrayList<>();
+    
+    this.spaceTime = new SpaceTime();
   }
   
   public final boolean addEntity( final Entity entity ) {
@@ -35,7 +38,7 @@ public class World {
       return true;
     }
     
-    final boolean success = getTile( entity.getPos() ).request( entity );
+    final boolean success = spaceTime.tryAdd( entity, entity.getBounds() );
     
     if ( !success ) {
       Logger.getGlobal().log( Level.WARNING,
@@ -55,25 +58,12 @@ public class World {
     }
     
     if ( object.data.passEvent == null ) {
-      final Rectangle bounds = object.getBounds();
+      final boolean success = spaceTime.tryAdd( object, object.getBounds() );
       
-      if ( !checkBounds( bounds ) ) {
+      if ( !success ) {
         Logger.getGlobal().log( Level.WARNING,
-            "World " + name + " tried to attach GameObject out of bounds: " + object );
+            "World " + name + " failed to attach GameObject: " + object );
         return false;
-      }
-      
-      for ( int y = bounds.y; y < bounds.y + bounds.height; y++ ) {
-        for ( int x = bounds.x; x < bounds.x + bounds.width; x++ ) {
-          final Point pos = new Point( x, y );
-          final boolean success = getTile( pos ).request( object );
-          
-          if ( !success ) {
-            Logger.getGlobal().log( Level.WARNING,
-                "World " + name + " failed to attach GameObject: " + object );
-            return false;
-          }
-        }
       }
     }
     
@@ -82,31 +72,18 @@ public class World {
   }
   
   public final boolean checkBounds( final Point pos ) {
-    return new Rectangle( size ).contains( pos );
-  }
-  
-  public final boolean checkBounds( final Rectangle bounds ) {
-    return new Rectangle( size ).contains( bounds );
+    return pos.x >= 0 && pos.x < size.width
+        && pos.y >= 0 && pos.y < size.height;
   }
   
   public Entity getEntity( final Point pos ) {
-    for ( final Entity entity : listEntities() ) {
-      if ( entity.getBounds().contains( pos ) ) {
-        return entity;
-      }
-    }
-    
-    return null;
+    final Object o = spaceTime.tryGet( pos );
+    return o instanceof Entity ? (Entity) o : null;
   }
   
   public GameObject getGameObject( final Point pos ) {
-    for ( final GameObject object : objects ) {
-      if ( object.getBounds().contains( pos ) ) {
-        return object;
-      }
-    }
-    
-    return null;
+    final Object o = spaceTime.tryGet( pos );
+    return o instanceof GameObject ? (GameObject) o : null;
   }
   
   public Tile getTile( final Point pos ) {
@@ -119,22 +96,12 @@ public class World {
   
   public final void removeEntity( final Entity entity ) {
     entities.remove( entity );
-    getTile( entity.getPos() ).release();
+    spaceTime.remove( entity );
   }
   
   public final void removeGameObject( final GameObject object ) {
     objects.remove( object );
-    
-    if ( object.data.passEvent == null ) {
-      final Rectangle bounds = object.getBounds();
-      
-      for ( int y = bounds.y; y < bounds.y + bounds.height; y++ ) {
-        for ( int x = bounds.x; x < bounds.x + bounds.width; x++ ) {
-          final Point pos = new Point( x, y );
-          getTile( pos ).release();
-        }
-      }
-    }
+    spaceTime.remove( object );
   }
   
   public final void render( final Graphics2D g, final Rectangle2D.Float view, final float scale ) {
