@@ -20,9 +20,9 @@ public enum Direction {
       case LEFT:
         return new Rectangle( p.x - 1, p.y, 2, 1 );
       case DOWN:
-        return new Rectangle( p.x, p.y + 1, 1, 2 );
+        return new Rectangle( p.x, p.y, 1, 2 );
       case RIGHT:
-        return new Rectangle( p.x + 1, p.y, 2, 1 );
+        return new Rectangle( p.x, p.y, 2, 1 );
     }
     
     return null;
@@ -49,5 +49,23 @@ public enum Direction {
   
   public Direction opposite() {
     return values()[ ( ordinal() + 2 ) % 4 ];
+  }
+  
+  public static Direction byDistance( final int dx, final int dy ) {
+    switch ( dx ) {
+      case 1:
+        return RIGHT;
+      case -1:
+        return LEFT;
+    }
+    
+    switch ( dy ) {
+      case 1:
+        return DOWN;
+      case -1:
+        return UP;
+    }
+    
+    return null;
   }
 }
