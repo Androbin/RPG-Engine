@@ -1,9 +1,9 @@
 package de.androbin.rpg.obj;
 
 import static de.androbin.gfx.util.GraphicsUtil.*;
+import de.androbin.rpg.*;
 import java.awt.*;
 import java.awt.geom.*;
-import de.androbin.rpg.gfx.*;
 
 public class GameObject implements Sprite {
   public final GameObjectData data;

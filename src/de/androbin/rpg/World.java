@@ -1,6 +1,5 @@
 package de.androbin.rpg;
 
-import de.androbin.rpg.gfx.*;
 import de.androbin.rpg.obj.*;
 import de.androbin.rpg.tile.*;
 import java.awt.*;
@@ -18,7 +17,7 @@ public class World {
   private final List<Entity> entities;
   private final List<GameObject> objects;
   
-  public final SpaceTime spaceTime;
+  public final SpaceTime<Sprite> spaceTime;
   
   public World( final Dimension size, final String name ) {
     this.name = name;
@@ -28,7 +27,7 @@ public class World {
     this.objects = new ArrayList<>();
     this.entities = new ArrayList<>();
     
-    this.spaceTime = new SpaceTime();
+    this.spaceTime = new SpaceTime<>();
   }
   
   public final boolean addEntity( final Entity entity ) {

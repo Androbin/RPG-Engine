@@ -78,7 +78,7 @@ public abstract class Entity implements Sprite {
   @ Override
   public final Rectangle2D.Float getViewBounds() {
     final float h = 1f; // TODO infer from renderer
-    return new Rectangle2D.Float( pos.x, pos.y + 1f - h, size.width, h );
+    return new Rectangle2D.Float( pos.x, pos.y + size.height - h, size.width, h );
   }
   
   private final boolean move( final Direction dir ) {

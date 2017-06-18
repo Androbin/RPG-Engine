@@ -1,4 +1,4 @@
-package de.androbin.rpg.gfx;
+package de.androbin.rpg;
 
 import java.awt.*;
 import java.awt.geom.*;
