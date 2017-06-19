@@ -106,21 +106,21 @@ public abstract class RPGScreen extends Screen {
   
   @ Override
   protected void update( final float delta ) {
-    if ( player != null ) {
-      player.moveRequestDir = requestDir;
+    if ( player != null && requestDir != null ) {
+      player.move.request( requestDir );
     }
     
     final List<Entity> entities = world.listEntities();
     
     for ( final Entity entity : entities ) {
-      entity.update( delta );
+      entity.updateWeak( delta );
     }
     
     for ( final Entity entity : entities ) {
-      entity.processMove( this );
+      entity.updateStrong( this );
     }
     
-    events.run();
+    events.run( this );
     
     camera.update( delta );
     calcTranslation();

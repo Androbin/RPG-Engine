@@ -1,5 +1,6 @@
 package de.androbin.rpg.event;
 
+import de.androbin.rpg.*;
 import java.util.*;
 
 public final class CustomEvent implements Event {
@@ -17,9 +18,9 @@ public final class CustomEvent implements Event {
   }
   
   @ Override
-  public void run( final Map<String, Object> args ) {
+  public void run( final RPGScreen master, final Map<String, Object> args ) {
     for ( final Event event : events ) {
-      event.run( args );
+      event.run( master, args );
     }
   }
 }

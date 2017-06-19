@@ -35,9 +35,9 @@ public enum Direction {
       case LEFT:
         return new Rectangle( p.x - 1, p.y, p.width + 1, p.height );
       case DOWN:
-        return new Rectangle( p.x, p.y + 1, p.width, p.height + 1 );
+        return new Rectangle( p.x, p.y, p.width, p.height + 1 );
       case RIGHT:
-        return new Rectangle( p.x + 1, p.y, p.width + 1, p.height );
+        return new Rectangle( p.x, p.y, p.width + 1, p.height );
     }
     
     return null;

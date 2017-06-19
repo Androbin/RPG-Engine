@@ -1,6 +1,5 @@
 package de.androbin.rpg;
 
-import de.androbin.func.*;
 import de.androbin.rpg.gfx.*;
 import de.androbin.rpg.tile.*;
 import java.awt.*;
@@ -16,41 +15,48 @@ public abstract class Entity implements Sprite {
   
   public Direction viewDir;
   
-  private Direction moveDir;
-  private float moveProgress;
-  public Runnable moveCallback;
-  
-  public Direction moveRequestDir;
-  public BooleanConsumer moveRequestCallback;
+  public final Handle<Direction, Void> move;
   
   public Entity( final World world, final Point pos ) {
     this.world = world;
     this.pos = pos;
     this.size = new Dimension( 1, 1 );
     this.viewDir = Direction.DOWN;
+    
+    move = new Handle<Direction, Void>() {
+      @ Override
+      protected boolean canHandle( final Direction dir ) {
+        return canMove( dir );
+      }
+      
+      @ Override
+      protected Void doHandle( final RPGScreen master, final Direction dir ) {
+        doMove( master, dir );
+        return null;
+      }
+      
+      @ Override
+      protected boolean handle( final Direction dir ) {
+        return move( dir );
+      }
+    };
   }
   
-  public final boolean canMove( final Direction dir ) {
+  public boolean canMove( final Direction dir ) {
     final Tile tile = nextTile( dir );
     return tile != null && tile.isPassable();
   }
   
-  private final void doMove( final RPGScreen screen ) {
-    pos = moveDir.from( pos );
-    moveDir = null;
+  private void doMove( final RPGScreen master, final Direction dir ) {
+    pos = dir.from( pos );
     
     final Rectangle target = new Rectangle( pos, size );
-    world.spaceTime.set( this, target );
+    world.strong.set( this, target );
     
     final Map<String, Object> args = new HashMap<>();
-    args.put( "screen", screen );
     args.put( "entity", this );
     
-    getTile().trigger( screen.events, args );
-    
-    if ( moveCallback != null ) {
-      moveCallback.run();
-    }
+    getTile().trigger( master.events, args );
   }
   
   @ Override
@@ -59,19 +65,20 @@ public abstract class Entity implements Sprite {
   }
   
   public final Point2D.Float getFloatPos() {
-    return moveDir == null ? new Point2D.Float( pos.x, pos.y )
-        : new Point2D.Float( pos.x + moveDir.dx * moveProgress, pos.y + moveDir.dy * moveProgress );
-  }
-  
-  public final float getMoveProgress() {
-    return moveProgress;
+    if ( move.hasCurrent() ) {
+      final Direction dir = move.getCurrent();
+      final float progress = move.getProgress();
+      return new Point2D.Float( pos.x + dir.dx * progress, pos.y + dir.dy * progress );
+    } else {
+      return new Point2D.Float( pos.x, pos.y );
+    }
   }
   
   public final Point getPos() {
     return pos;
   }
   
-  private final Tile getTile() {
+  private Tile getTile() {
     return world.getTile( pos );
   }
   
@@ -81,7 +88,7 @@ public abstract class Entity implements Sprite {
     return new Rectangle2D.Float( pos.x, pos.y + size.height - h, size.width, h );
   }
   
-  private final boolean move( final Direction dir ) {
+  private boolean move( final Direction dir ) {
     viewDir = dir;
     
     if ( !canMove( dir ) ) {
@@ -89,14 +96,7 @@ public abstract class Entity implements Sprite {
     }
     
     final Rectangle target = dir.expand( pos );
-    final boolean success = world.spaceTime.trySet( this, target );
-    
-    if ( !success ) {
-      return false;
-    }
-    
-    moveDir = dir;
-    return true;
+    return world.strong.trySet( this, target );
   }
   
   public abstract float moveSpeed();
@@ -109,7 +109,7 @@ public abstract class Entity implements Sprite {
     }
     
     final Rectangle target = new Rectangle( pos, size );
-    final boolean success = world.spaceTime.trySet( this, target );
+    final boolean success = world.strong.trySet( this, target );
     
     if ( !success ) {
       return false;
@@ -120,27 +120,8 @@ public abstract class Entity implements Sprite {
     return true;
   }
   
-  private final Tile nextTile( final Direction dir ) {
+  private Tile nextTile( final Direction dir ) {
     return world.getTile( dir.from( pos ) );
-  }
-  
-  public final void processMove( final RPGScreen screen ) {
-    if ( moveDir == null ) {
-      if ( moveRequestDir == null ) {
-        moveProgress = 0f;
-      } else {
-        final boolean success = move( moveRequestDir );
-        moveRequestDir = null;
-        
-        if ( moveRequestCallback != null ) {
-          moveRequestCallback.accept( success );
-          moveRequestCallback = null;
-        }
-      }
-    } else if ( moveProgress >= 1f ) {
-      doMove( screen );
-      moveProgress--;
-    }
   }
   
   protected final void reattach( final World world, final Point pos ) {
@@ -149,7 +130,7 @@ public abstract class Entity implements Sprite {
   }
   
   @ Override
-  public final void render( final Graphics2D g, final float scale ) {
+  public void render( final Graphics2D g, final float scale ) {
     if ( renderer == null ) {
       return;
     }
@@ -164,9 +145,11 @@ public abstract class Entity implements Sprite {
     g.translate( -px, -py );
   }
   
-  public void update( final float delta ) {
-    if ( moveDir != null ) {
-      moveProgress += delta * moveSpeed();
-    }
+  public void updateStrong( final RPGScreen master ) {
+    move.updateStrong( master );
+  }
+  
+  public void updateWeak( final float delta ) {
+    move.updateWeak( delta * moveSpeed() );
   }
 }

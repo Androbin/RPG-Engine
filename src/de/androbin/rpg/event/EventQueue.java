@@ -1,21 +1,21 @@
 package de.androbin.rpg.event;
 
+import de.androbin.rpg.*;
 import java.util.*;
 
-public final class EventQueue implements Runnable {
+public final class EventQueue {
   private final Queue<Item> queue = new ArrayDeque<>();
   
   public void enqueue( final Event event, final Map<String, Object> args ) {
     queue.add( new Item( event, args ) );
   }
   
-  @ Override
-  public void run() {
-    queue.forEach( Item::run );
+  public void run( final RPGScreen master ) {
+    queue.forEach( item -> item.run( master ) );
     queue.clear();
   }
   
-  private static class Item implements Runnable {
+  private static class Item {
     private final Event event;
     private final Map<String, Object> args;
     
@@ -24,9 +24,8 @@ public final class EventQueue implements Runnable {
       this.args = args;
     }
     
-    @ Override
-    public void run() {
-      event.run( args );
+    public void run( final RPGScreen master ) {
+      event.run( master, args );
     }
   }
 }

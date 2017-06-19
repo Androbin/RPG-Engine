@@ -43,7 +43,7 @@ public class EntityRenderer extends Renderer {
   @ Override
   public void render( final Graphics2D g ) {
     final int i = entity.viewDir.ordinal();
-    final int j = (int) ( entity.getMoveProgress() * animation[ i ].length );
+    final int j = (int) ( entity.move.getProgress() * animation[ i ].length );
     drawImage( g, animation[ i ][ j ], 0f, 0f, scale, scale );
   }
 }

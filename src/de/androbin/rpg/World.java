@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.List;
-import java.util.logging.*;
 import java.util.stream.*;
 
 public class World {
@@ -17,7 +16,8 @@ public class World {
   private final List<Entity> entities;
   private final List<GameObject> objects;
   
-  public final SpaceTime<Sprite> spaceTime;
+  public final SpaceTime<Sprite> strong;
+  public final SpaceTime<Sprite> weak;
   
   public World( final Dimension size, final String name ) {
     this.name = name;
@@ -27,21 +27,18 @@ public class World {
     this.objects = new ArrayList<>();
     this.entities = new ArrayList<>();
     
-    this.spaceTime = new SpaceTime<>();
+    this.strong = new SpaceTime<>();
+    this.weak = new SpaceTime<>();
   }
   
   public final boolean addEntity( final Entity entity ) {
     if ( entities.contains( entity ) ) {
-      Logger.getGlobal().log( Level.WARNING,
-          "World " + name + " tried to add Entity twice: " + entity );
       return true;
     }
     
-    final boolean success = spaceTime.tryAdd( entity, entity.getBounds() );
+    final boolean success = strong.tryAdd( entity, entity.getBounds() );
     
     if ( !success ) {
-      Logger.getGlobal().log( Level.WARNING,
-          "World " + name + " failed to attach Entity: " + entity );
       return false;
     }
     
@@ -51,19 +48,17 @@ public class World {
   
   public final boolean addGameObject( final GameObject object ) {
     if ( objects.contains( object ) ) {
-      Logger.getGlobal().log( Level.WARNING,
-          "World " + name + " tried to add GameObject twice: " + object );
       return true;
     }
     
     if ( object.data.passEvent == null ) {
-      final boolean success = spaceTime.tryAdd( object, object.getBounds() );
+      final boolean success = strong.tryAdd( object, object.getBounds() );
       
       if ( !success ) {
-        Logger.getGlobal().log( Level.WARNING,
-            "World " + name + " failed to attach GameObject: " + object );
         return false;
       }
+    } else {
+      weak.add( object, object.getBounds() );
     }
     
     objects.add( object );
@@ -76,17 +71,23 @@ public class World {
   }
   
   public Entity getEntity( final Point pos ) {
-    final Object o = spaceTime.tryGet( pos );
+    final Object o = strong.tryGet( pos );
     return o instanceof Entity ? (Entity) o : null;
   }
   
   public GameObject getGameObject( final Point pos ) {
-    final Object o = spaceTime.tryGet( pos );
-    return o instanceof GameObject ? (GameObject) o : null;
+    final Object o = strong.tryGet( pos );
+    final Object p = weak.tryGet( pos );
+    return o instanceof GameObject ? (GameObject) o
+        : p instanceof GameObject ? (GameObject) p : null;
   }
   
   public Tile getTile( final Point pos ) {
-    return checkBounds( pos ) ? tiles[ pos.y * size.width + pos.x ] : null;
+    if ( !checkBounds( pos ) ) {
+      return null;
+    }
+    
+    return tiles[ pos.y * size.width + pos.x ];
   }
   
   public final List<Entity> listEntities() {
@@ -95,12 +96,17 @@ public class World {
   
   public final void removeEntity( final Entity entity ) {
     entities.remove( entity );
-    spaceTime.remove( entity );
+    strong.remove( entity );
   }
   
   public final void removeGameObject( final GameObject object ) {
     objects.remove( object );
-    spaceTime.remove( object );
+    
+    if ( object.data.passEvent == null ) {
+      strong.remove( object );
+    } else {
+      weak.remove( object );
+    }
   }
   
   public final void render( final Graphics2D g, final Rectangle2D.Float view, final float scale ) {

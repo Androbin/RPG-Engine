@@ -1,13 +1,14 @@
 package de.androbin.rpg.event;
 
+import de.androbin.rpg.*;
 import java.util.*;
 import java.util.function.*;
 
 public interface Event {
-  Event NULL = func( "null", args -> {
+  Event NULL = func( "null", ( master, args ) -> {
   } );
   
-  static Event func( final String name, final Consumer<Map<String, Object>> action ) {
+  static Event func( final String name, final BiConsumer<RPGScreen, Map<String, Object>> action ) {
     return new Event() {
       @ Override
       public String getLogMessage() {
@@ -15,15 +16,15 @@ public interface Event {
       }
       
       @ Override
-      public void run( final Map<String, Object> args ) {
-        action.accept( args );
+      public void run( final RPGScreen master, final Map<String, Object> args ) {
+        action.accept( master, args );
       }
     };
   };
   
   String getLogMessage();
   
-  void run( Map<String, Object> args );
+  void run( RPGScreen master, Map<String, Object> args );
   
   interface Builder {
     Event build( String[] args );
