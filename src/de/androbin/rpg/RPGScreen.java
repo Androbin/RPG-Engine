@@ -72,6 +72,18 @@ public abstract class RPGScreen extends Screen {
     return worlds.computeIfAbsent( name, this::createWorld );
   }
   
+  private boolean isAcceptingMoveRequest( final Direction dir ) {
+    if ( !player.move.hasCurrent() ) {
+      return true;
+    }
+    
+    if ( player.move.getCurrent() != dir ) {
+      return true;
+    }
+    
+    return player.move.getProgress() >= 0.4f;
+  }
+  
   @ Override
   public void render( final Graphics2D g ) {
     g.setColor( Color.BLACK );
@@ -106,8 +118,12 @@ public abstract class RPGScreen extends Screen {
   
   @ Override
   protected void update( final float delta ) {
-    if ( player != null && requestDir != null ) {
-      player.move.request( requestDir );
+    if ( player != null ) {
+      final Direction dir = requestDir;
+      
+      if ( isAcceptingMoveRequest( dir ) ) {
+        player.move.request( dir );
+      }
     }
     
     final List<Entity> entities = world.listEntities();

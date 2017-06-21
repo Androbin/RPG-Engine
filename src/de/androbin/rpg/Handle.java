@@ -41,6 +41,10 @@ public abstract class Handle<I, O> {
   }
   
   public void request( final I arg ) {
+    if ( arg == null ) {
+      return;
+    }
+    
     requested = arg;
   }
   
