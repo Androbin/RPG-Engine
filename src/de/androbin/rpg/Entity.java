@@ -110,6 +110,8 @@ public abstract class Entity implements Sprite {
   }
   
   private final class MoveHandle extends Handle<Direction, Void> {
+    private final Entity entity = Entity.this;
+    
     @ Override
     public boolean canHandle( final Direction dir ) {
       final Tile tile = nextTile( dir );
@@ -121,10 +123,10 @@ public abstract class Entity implements Sprite {
       pos = dir.from( pos );
       
       final Rectangle target = new Rectangle( pos, size );
-      world.strong.set( Entity.this, target );
+      world.strong.set( entity, target );
       
       final Map<String, Object> args = new HashMap<>();
-      args.put( "entity", this );
+      args.put( "entity", entity );
       
       getTile().trigger( master.events, args );
       return null;
@@ -139,7 +141,7 @@ public abstract class Entity implements Sprite {
       }
       
       final Rectangle target = dir.expand( pos );
-      return world.strong.trySet( Entity.this, target );
+      return world.strong.trySet( entity, target );
     }
   }
 }
