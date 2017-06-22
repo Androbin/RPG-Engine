@@ -10,7 +10,7 @@ public abstract class Handle<I, O> {
   public BiConsumer<I, O> callback;
   public BiConsumer<I, Boolean> requestCallback;
   
-  protected boolean canHandle( final I arg ) {
+  public boolean canHandle( final I arg ) {
     return true;
   }
   

@@ -23,40 +23,7 @@ public abstract class Entity implements Sprite {
     this.size = new Dimension( 1, 1 );
     this.viewDir = Direction.DOWN;
     
-    move = new Handle<Direction, Void>() {
-      @ Override
-      protected boolean canHandle( final Direction dir ) {
-        return canMove( dir );
-      }
-      
-      @ Override
-      protected Void doHandle( final RPGScreen master, final Direction dir ) {
-        doMove( master, dir );
-        return null;
-      }
-      
-      @ Override
-      protected boolean handle( final Direction dir ) {
-        return move( dir );
-      }
-    };
-  }
-  
-  public boolean canMove( final Direction dir ) {
-    final Tile tile = nextTile( dir );
-    return tile != null && tile.isPassable();
-  }
-  
-  private void doMove( final RPGScreen master, final Direction dir ) {
-    pos = dir.from( pos );
-    
-    final Rectangle target = new Rectangle( pos, size );
-    world.strong.set( this, target );
-    
-    final Map<String, Object> args = new HashMap<>();
-    args.put( "entity", this );
-    
-    getTile().trigger( master.events, args );
+    move = new MoveHandle();
   }
   
   @ Override
@@ -86,17 +53,6 @@ public abstract class Entity implements Sprite {
   public final Rectangle2D.Float getViewBounds() {
     final float h = 1f; // TODO infer from renderer
     return new Rectangle2D.Float( pos.x, pos.y + size.height - h, size.width, h );
-  }
-  
-  private boolean move( final Direction dir ) {
-    viewDir = dir;
-    
-    if ( !canMove( dir ) ) {
-      return false;
-    }
-    
-    final Rectangle target = dir.expand( pos );
-    return world.strong.trySet( this, target );
   }
   
   public abstract float moveSpeed();
@@ -151,5 +107,39 @@ public abstract class Entity implements Sprite {
   
   public void updateWeak( final float delta ) {
     move.updateWeak( delta * moveSpeed() );
+  }
+  
+  private final class MoveHandle extends Handle<Direction, Void> {
+    @ Override
+    public boolean canHandle( final Direction dir ) {
+      final Tile tile = nextTile( dir );
+      return tile != null && tile.isPassable();
+    }
+    
+    @ Override
+    protected Void doHandle( final RPGScreen master, final Direction dir ) {
+      pos = dir.from( pos );
+      
+      final Rectangle target = new Rectangle( pos, size );
+      world.strong.set( Entity.this, target );
+      
+      final Map<String, Object> args = new HashMap<>();
+      args.put( "entity", this );
+      
+      getTile().trigger( master.events, args );
+      return null;
+    }
+    
+    @ Override
+    protected boolean handle( final Direction dir ) {
+      viewDir = dir;
+      
+      if ( !canHandle( dir ) ) {
+        return false;
+      }
+      
+      final Rectangle target = dir.expand( pos );
+      return world.strong.trySet( Entity.this, target );
+    }
   }
 }
