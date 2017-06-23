@@ -26,6 +26,8 @@ public abstract class RPGScreen extends Screen {
   public RPGScreen( final Game game, final float scale ) {
     super( game );
     
+    inputs.keyboard = new KeyInput();
+    
     this.camera = new Camera();
     this.events = new EventQueue();
     this.trans = new Point2D.Float();
@@ -42,31 +44,6 @@ public abstract class RPGScreen extends Screen {
   }
   
   protected abstract World createWorld( String name );
-  
-  @ Override
-  public KeyListener getKeyListener() {
-    return new KeyAdapter() {
-      @ Override
-      public void keyPressed( final KeyEvent event ) {
-        final int keycode = event.getKeyCode();
-        final Direction dir = Directions.byKeyCode( keycode );
-        
-        if ( dir != null ) {
-          requestDir = dir;
-        }
-      }
-      
-      @ Override
-      public void keyReleased( final KeyEvent event ) {
-        final int keycode = event.getKeyCode();
-        final Direction dir = Directions.byKeyCode( keycode );
-        
-        if ( dir == requestDir ) {
-          requestDir = null;
-        }
-      }
-    };
-  }
   
   protected final World getWorld( final String name ) {
     return worlds.computeIfAbsent( name, this::createWorld );
@@ -141,4 +118,26 @@ public abstract class RPGScreen extends Screen {
     camera.update( delta );
     calcTranslation();
   }
+  
+  private final class KeyInput extends KeyAdapter {
+    @ Override
+    public void keyPressed( final KeyEvent event ) {
+      final int keycode = event.getKeyCode();
+      final Direction dir = Directions.byKeyCode( keycode );
+      
+      if ( dir != null ) {
+        requestDir = dir;
+      }
+    }
+    
+    @ Override
+    public void keyReleased( final KeyEvent event ) {
+      final int keycode = event.getKeyCode();
+      final Direction dir = Directions.byKeyCode( keycode );
+      
+      if ( dir == requestDir ) {
+        requestDir = null;
+      }
+    }
+  };
 }
