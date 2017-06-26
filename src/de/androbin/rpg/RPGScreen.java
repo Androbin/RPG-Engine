@@ -89,8 +89,7 @@ public abstract class RPGScreen extends Screen {
     }
     
     world = getWorld( name );
-    player.reattach( world, pos );
-    world.addEntity( player );
+    world.addEntity( player, pos );
   }
   
   @ Override

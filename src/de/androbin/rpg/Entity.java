@@ -17,13 +17,21 @@ public abstract class Entity implements Sprite {
   
   public final Handle<Direction, Void> move;
   
-  public Entity( final World world, final Point pos ) {
-    this.world = world;
-    this.pos = pos;
-    this.size = new Dimension( 1, 1 );
+  public Entity() {
+    this( new Dimension( 1, 1 ) );
+  }
+  
+  public Entity( final Dimension size ) {
+    this.pos = new Point();
+    this.size = size;
     this.viewDir = Direction.DOWN;
     
     move = new MoveHandle();
+  }
+  
+  protected final void attach( final World world, final Point pos ) {
+    this.world = world;
+    this.pos = pos;
   }
   
   @ Override
@@ -35,7 +43,7 @@ public abstract class Entity implements Sprite {
     if ( move.hasCurrent() ) {
       final Direction dir = move.getCurrent();
       final float progress = move.getProgress();
-      return new Point2D.Float( pos.x + dir.dx * progress, pos.y + dir.dy * progress );
+      return dir.from( pos, progress );
     } else {
       return new Point2D.Float( pos.x, pos.y );
     }
@@ -78,11 +86,6 @@ public abstract class Entity implements Sprite {
   
   private Tile nextTile( final Direction dir ) {
     return world.getTile( dir.from( pos ) );
-  }
-  
-  protected final void reattach( final World world, final Point pos ) {
-    this.pos = pos;
-    this.world = world;
   }
   
   @ Override

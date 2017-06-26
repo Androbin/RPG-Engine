@@ -31,7 +31,9 @@ public class World {
     this.weak = new SpaceTime<>();
   }
   
-  public final boolean addEntity( final Entity entity ) {
+  public final boolean addEntity( final Entity entity, final Point pos ) {
+    entity.attach( this, pos );
+    
     if ( entities.contains( entity ) ) {
       return true;
     }
@@ -110,16 +112,13 @@ public class World {
   }
   
   public final void render( final Graphics2D g, final Rectangle2D.Float view, final float scale ) {
-    for ( int y = (int) view.y; y <= view.y + view.height; y++ ) {
-      for ( int x = (int) view.x; x <= view.x + view.width; x++ ) {
-        final Point pos = new Point( x, y );
-        final Tile tile = getTile( pos );
-        
-        if ( tile != null ) {
-          tile.render( g, pos, scale );
-        }
+    LoopUtil.forEach( view, pos -> {
+      final Tile tile = getTile( pos );
+      
+      if ( tile != null ) {
+        tile.render( g, pos, scale );
       }
-    }
+    } );
     
     final Comparator<Sprite> comp = ( a, b ) -> Float.compare( a.getBounds().y, b.getBounds().y );
     Stream.concat( objects.stream(), entities.stream() )
