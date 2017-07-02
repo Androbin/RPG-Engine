@@ -17,8 +17,8 @@ public final class Tiles {
     return create( getData( name ) );
   }
   
-  private static Tile create( final TileData data ) {
-    return builder.build( data );
+  public static Tile create( final TileData data ) {
+    return data == null ? null : builder.build( data );
   }
   
   private static TileData createData( final String type ) {
