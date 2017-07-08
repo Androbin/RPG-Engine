@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.*;
 
 public class World {
-  public final String name;
+  public Identifier id;
   public final Dimension size;
   
   private final Tile[] tiles;
@@ -19,8 +19,8 @@ public class World {
   public final SpaceTime<Sprite> strong;
   public final SpaceTime<Sprite> weak;
   
-  public World( final Dimension size, final String name ) {
-    this.name = name;
+  public World( final Identifier id, final Dimension size ) {
+    this.id = id;
     this.size = size;
     
     this.tiles = new Tile[ size.width * size.height ];

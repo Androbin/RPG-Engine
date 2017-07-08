@@ -59,8 +59,7 @@ public abstract class Entity implements Sprite {
   
   @ Override
   public final Rectangle2D.Float getViewBounds() {
-    final float h = 1f; // TODO infer from renderer
-    return new Rectangle2D.Float( pos.x, pos.y + size.height - h, size.width, h );
+    return renderer == null ? null : renderer.getBounds();
   }
   
   public abstract float moveSpeed();
@@ -94,14 +93,8 @@ public abstract class Entity implements Sprite {
       return;
     }
     
-    final Point2D.Float pos = getFloatPos();
-    final float px = pos.x * scale;
-    final float py = pos.y * scale;
-    
-    g.translate( px, py );
     renderer.setScale( scale );
     renderer.render( g );
-    g.translate( -px, -py );
   }
   
   public void updateStrong( final RPGScreen master ) {

@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.List;
 
 public abstract class RPGScreen extends Screen {
-  private final Map<String, World> worlds = new HashMap<>();
+  private final Map<Identifier, World> worlds = new HashMap<>();
   
   protected World world;
   
@@ -43,10 +43,10 @@ public abstract class RPGScreen extends Screen {
     trans.y = camera.calcTranslationY( getHeight(), ph, scale );
   }
   
-  protected abstract World createWorld( String name );
+  protected abstract World createWorld( Identifier id );
   
-  protected final World getWorld( final String name ) {
-    return worlds.computeIfAbsent( name, this::createWorld );
+  protected final World getWorld( final Identifier id ) {
+    return worlds.computeIfAbsent( id, this::createWorld );
   }
   
   private boolean isAcceptingMoveRequest( final Direction dir ) {
@@ -83,12 +83,12 @@ public abstract class RPGScreen extends Screen {
     g.translate( -trans.x, -trans.y );
   }
   
-  public void switchWorld( final String name, final Point pos ) {
+  public void switchWorld( final Identifier id, final Point pos ) {
     if ( world != null ) {
       world.removeEntity( player );
     }
     
-    world = getWorld( name );
+    world = getWorld( id );
     world.addEntity( player, pos );
   }
   

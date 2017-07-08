@@ -1,11 +1,11 @@
 package de.androbin.rpg.obj;
 
-import java.awt.*;
-import java.awt.image.*;
-import org.json.simple.*;
 import de.androbin.gfx.util.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.event.Event;
+import java.awt.*;
+import java.awt.image.*;
+import org.json.simple.*;
 
 public class GameObjectData {
   public final String name;

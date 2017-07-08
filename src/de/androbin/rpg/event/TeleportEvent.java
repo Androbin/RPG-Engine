@@ -19,21 +19,21 @@ public final class TeleportEvent implements Event {
     return null;
   };
   
-  private String world;
-  private Point pos;
+  private final Identifier world;
+  private final Point pos;
   
   public TeleportEvent( final Point pos ) {
     this( null, pos );
   }
   
-  public TeleportEvent( final String world, final Point pos ) {
-    this.world = world;
+  public TeleportEvent( final String serial, final Point pos ) {
+    this.world = Identifier.fromSerial( serial );
     this.pos = pos;
   }
   
   @ Override
   public String getLogMessage() {
-    return "teleport { world: " + world + ", x: " + pos.x + ", y: " + pos.y + " }";
+    return "teleport { world: '" + world + "', pos: (" + pos.x + ", " + pos.y + ") }";
   }
   
   @ Override

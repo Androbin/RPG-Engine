@@ -42,15 +42,16 @@ public final class Camera {
       return 0.5f * ( width - worldWidth );
     }
     
-    if ( currentFocus == null ) {
+    final Point2D.Float current = getCurrentFocus();
+    
+    if ( current == null ) {
       return 0f;
     }
     
-    final Point2D.Float focus = this.currentFocus.get();
-    final float ix = nextFocus == null ? focus.x
-        : moveProgress < breakpoint()
-            ? inter( focus.x, moveProgress * 1 / breakpoint(), getNextFocus().x )
-            : getNextFocus().x;
+    final Point2D.Float next = getNextFocus();
+    final float ix = next == null ? current.x
+        : moveProgress >= breakpoint() ? next.x
+            : inter( current.x, moveProgress / breakpoint(), next.x );
     return bound( width - worldWidth, 0.5f * width - scale * ix, 0f );
   }
   
@@ -59,20 +60,21 @@ public final class Camera {
       return 0.5f * ( height - worldHeight );
     }
     
-    if ( currentFocus == null ) {
+    final Point2D.Float current = getCurrentFocus();
+    
+    if ( current == null ) {
       return 0f;
     }
     
-    final Point2D.Float currentFocus = getCurrentFocus();
-    final float iy = nextFocus == null ? currentFocus.y
-        : moveProgress >= breakpoint() ? inter( currentFocus.y,
-            ( moveProgress - breakpoint() ) * 1 / ( 1 - breakpoint() ), getNextFocus().y )
-            : currentFocus.y;
+    final Point2D.Float next = getNextFocus();
+    final float iy = next == null ? current.y
+        : moveProgress <= breakpoint() ? next.y
+            : inter( current.y, ( moveProgress - breakpoint() ) / ( 1f - breakpoint() ), next.y );
     return bound( height - worldHeight, 0.5f * height - scale * iy, 0f );
   }
   
   public static Supplier<Point2D.Float> focus( final Entity entity ) {
-    return () -> new Point2D.Float( entity.getFloatPos().x, entity.getFloatPos().y );
+    return entity::getFloatPos;
   }
   
   public static Supplier<Point2D.Float> focus( final Point2D.Float point ) {
@@ -80,11 +82,11 @@ public final class Camera {
   }
   
   public Point2D.Float getCurrentFocus() {
-    return currentFocus.get();
+    return currentFocus == null ? null : currentFocus.get();
   }
   
   public Point2D.Float getNextFocus() {
-    return nextFocus.get();
+    return nextFocus == null ? null : nextFocus.get();
   }
   
   public void moveFocus( final Supplier<Point2D.Float> nextFocus, final float moveSpeed ) {
@@ -103,15 +105,17 @@ public final class Camera {
   }
   
   public void update( final float delta ) {
-    if ( nextFocus != null ) {
-      moveProgress += delta * moveSpeed;
+    if ( nextFocus == null ) {
+      return;
+    }
+    
+    moveProgress += delta * moveSpeed;
+    
+    if ( moveProgress >= 1f ) {
+      moveProgress = 0f;
       
-      if ( moveProgress >= 1f ) {
-        moveProgress = 0f;
-        
-        currentFocus = nextFocus;
-        nextFocus = null;
-      }
+      currentFocus = nextFocus;
+      nextFocus = null;
     }
   }
 }

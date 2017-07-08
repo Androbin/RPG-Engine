@@ -17,7 +17,7 @@ public class EntityRenderer extends Renderer {
     this.animation = animation;
   }
   
-  public static BufferedImage[][] createSheet( final String path, final int res ) {
+  public static BufferedImage[][] createSheet( final String path ) {
     final Direction[] directions = Direction.values();
     final BufferedImage[][] animation = new BufferedImage[ directions.length ][];
     
@@ -25,10 +25,15 @@ public class EntityRenderer extends Renderer {
       final String dir = CaseUtil.toProperCase( directions[ i ].name() );
       final BufferedImage image = ImageUtil.loadImage( path + "/" + dir + ".png" );
       
-      animation[ i ] = new BufferedImage[ image.getWidth() / res ];
+      final int ratio = Math.round( (float) image.getWidth() / image.getHeight() );
+      
+      final int width = image.getWidth() / ratio;
+      final int height = image.getHeight();
+      
+      animation[ i ] = new BufferedImage[ ratio ];
       
       for ( int j = 0; j < animation[ i ].length; j++ ) {
-        animation[ i ][ j ] = image.getSubimage( j * res, 0, res, res );
+        animation[ i ][ j ] = image.getSubimage( j * width, 0, width, height );
       }
     }
     
@@ -37,13 +42,32 @@ public class EntityRenderer extends Renderer {
   
   @ Override
   public Rectangle2D.Float getBounds() {
-    return new Rectangle2D.Float( 0f, 0f, scale, scale );
+    final Point2D.Float pos = entity.getFloatPos();
+    final Dimension size = entity.size;
+    
+    final int i = entity.viewDir.ordinal();
+    final int j = (int) ( entity.move.getProgress() * animation[ i ].length );
+    
+    final BufferedImage image = animation[ i ][ j ];
+    
+    final float res = image.getWidth() / size.width;
+    final float y = pos.y + size.height - image.getHeight() / res;
+    final float height = image.getHeight() / res;
+    
+    return new Rectangle2D.Float( pos.x, y, size.width, height );
   }
   
   @ Override
   public void render( final Graphics2D g ) {
+    final Rectangle2D.Float bounds = getBounds();
+    
+    bounds.x *= scale;
+    bounds.y *= scale;
+    bounds.width *= scale;
+    bounds.height *= scale;
+    
     final int i = entity.viewDir.ordinal();
     final int j = (int) ( entity.move.getProgress() * animation[ i ].length );
-    drawImage( g, animation[ i ][ j ], 0f, 0f, scale, scale );
+    drawImage( g, animation[ i ][ j ], bounds );
   }
 }
