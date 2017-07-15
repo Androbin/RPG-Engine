@@ -9,13 +9,13 @@ public class TileData {
   public final String name;
   public final BufferedImage image;
   
-  public final Event passEvent;
+  public final Event event;
   
   public TileData( final String name, final JSONObject data ) {
     this.name = name;
     this.image = ImageUtil.loadImage( "tile/" + name + ".png" );
     
-    this.passEvent = Events.parse( (String) data.get( "pass_event" ) );
+    this.event = Events.parse( (String) data.get( "event" ) );
   }
   
   public interface Builder {

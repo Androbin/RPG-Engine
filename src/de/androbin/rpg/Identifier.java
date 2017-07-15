@@ -15,8 +15,9 @@ public final class Identifier implements Iterable<String> {
   
   @ Override
   public boolean equals( final Object obj ) {
-    if ( obj instanceof String[] ) {
-      return Arrays.equals( path, (String[]) obj );
+    if ( obj instanceof Identifier ) {
+      final Identifier id = (Identifier) obj;
+      return Arrays.equals( path, id.path );
     } else {
       return false;
     }

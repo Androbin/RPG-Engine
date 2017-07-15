@@ -7,7 +7,9 @@ public final class EventQueue {
   private final Queue<Item> queue = new ArrayDeque<>();
   
   public void enqueue( final Event event, final Map<String, Object> args ) {
-    queue.add( new Item( event, args ) );
+    if ( event != Event.NULL ) {
+      queue.add( new Item( event, args ) );
+    }
   }
   
   public void run( final RPGScreen master ) {

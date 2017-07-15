@@ -1,6 +1,8 @@
 package de.androbin.rpg;
 
-import de.androbin.rpg.obj.*;
+import de.androbin.rpg.event.EventQueue;
+import de.androbin.rpg.phantom.*;
+import de.androbin.rpg.thing.*;
 import de.androbin.rpg.tile.*;
 import java.awt.*;
 import java.awt.geom.*;
@@ -13,8 +15,9 @@ public class World {
   public final Dimension size;
   
   private final Tile[] tiles;
+  private final List<Thing> things;
+  private final List<Phantom> phantoms;
   private final List<Entity> entities;
-  private final List<GameObject> objects;
   
   public final SpaceTime<Sprite> strong;
   public final SpaceTime<Sprite> weak;
@@ -24,7 +27,8 @@ public class World {
     this.size = size;
     
     this.tiles = new Tile[ size.width * size.height ];
-    this.objects = new ArrayList<>();
+    this.things = new ArrayList<>();
+    this.phantoms = new ArrayList<>();
     this.entities = new ArrayList<>();
     
     this.strong = new SpaceTime<>();
@@ -48,22 +52,29 @@ public class World {
     return true;
   }
   
-  public final boolean addGameObject( final GameObject object ) {
-    if ( objects.contains( object ) ) {
+  public final boolean addPhantom( final Phantom phantom ) {
+    if ( phantoms.contains( phantom ) ) {
       return true;
     }
     
-    if ( object.data.passEvent == null ) {
-      final boolean success = strong.tryAdd( object, object.getBounds() );
-      
-      if ( !success ) {
-        return false;
-      }
-    } else {
-      weak.add( object, object.getBounds() );
+    weak.add( phantom, phantom.getBounds() );
+    
+    phantoms.add( phantom );
+    return true;
+  }
+  
+  public final boolean addThing( final Thing thing ) {
+    if ( things.contains( thing ) ) {
+      return true;
     }
     
-    objects.add( object );
+    final boolean success = strong.tryAdd( thing, thing.getBounds() );
+    
+    if ( !success ) {
+      return false;
+    }
+    
+    things.add( thing );
     return true;
   }
   
@@ -77,11 +88,14 @@ public class World {
     return o instanceof Entity ? (Entity) o : null;
   }
   
-  public GameObject getGameObject( final Point pos ) {
-    final Object o = strong.tryGet( pos );
-    final Object p = weak.tryGet( pos );
-    return o instanceof GameObject ? (GameObject) o
-        : p instanceof GameObject ? (GameObject) p : null;
+  public Phantom getPhantom( final Point pos ) {
+    final Sprite o = weak.tryGet( pos );
+    return o instanceof Phantom ? (Phantom) o : null;
+  }
+  
+  public Thing getThing( final Point pos ) {
+    final Sprite o = strong.tryGet( pos );
+    return o instanceof Thing ? (Thing) o : null;
   }
   
   public Tile getTile( final Point pos ) {
@@ -101,14 +115,14 @@ public class World {
     strong.remove( entity );
   }
   
-  public final void removeGameObject( final GameObject object ) {
-    objects.remove( object );
-    
-    if ( object.data.passEvent == null ) {
-      strong.remove( object );
-    } else {
-      weak.remove( object );
-    }
+  public final void removePhantom( final Phantom phantom ) {
+    phantoms.remove( phantom );
+    weak.remove( phantom );
+  }
+  
+  public final void removeThing( final Thing thing ) {
+    things.remove( thing );
+    strong.remove( thing );
   }
   
   public final void render( final Graphics2D g, final Rectangle2D.Float view, final float scale ) {
@@ -121,7 +135,7 @@ public class World {
     } );
     
     final Comparator<Sprite> comp = ( a, b ) -> Float.compare( a.getBounds().y, b.getBounds().y );
-    Stream.concat( objects.stream(), entities.stream() )
+    Stream.concat( Stream.concat( things.stream(), phantoms.stream() ), entities.stream() )
         .filter( o -> o.getViewBounds().intersects( view ) )
         .sorted( comp )
         .forEachOrdered( o -> o.render( g, scale ) );
@@ -134,5 +148,26 @@ public class World {
     
     tiles[ pos.y * size.width + pos.x ] = tile;
     return true;
+  }
+  
+  public void triggerStrong( final Point pos, final EventQueue events,
+      final Map<String, Object> args ) {
+    final Thing thing = getThing( pos );
+    
+    if ( thing != null ) {
+      thing.trigger( events, args );
+    }
+  }
+  
+  public void triggerWeak( final Point pos, final EventQueue events,
+      final Map<String, Object> args ) {
+    final Tile tile = getTile( pos );
+    tile.trigger( events, args );
+    
+    final Phantom phantom = getPhantom( pos );
+    
+    if ( phantom != null ) {
+      phantom.trigger( events, args );
+    }
   }
 }

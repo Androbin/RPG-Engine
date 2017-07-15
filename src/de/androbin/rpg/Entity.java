@@ -53,10 +53,6 @@ public abstract class Entity implements Sprite {
     return pos;
   }
   
-  private Tile getTile() {
-    return world.getTile( pos );
-  }
-  
   @ Override
   public final Rectangle2D.Float getViewBounds() {
     return renderer == null ? null : renderer.getBounds();
@@ -124,7 +120,7 @@ public abstract class Entity implements Sprite {
       final Map<String, Object> args = new HashMap<>();
       args.put( "entity", entity );
       
-      getTile().trigger( master.events, args );
+      world.triggerWeak( pos, master.events, args );
       return null;
     }
     

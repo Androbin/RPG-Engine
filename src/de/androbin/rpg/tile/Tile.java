@@ -16,7 +16,7 @@ public class Tile {
   }
   
   public boolean isPassable() {
-    return data.passEvent != null;
+    return data.event != null;
   }
   
   public void render( final Graphics2D g, final Point pos, final float scale ) {
@@ -31,8 +31,8 @@ public class Tile {
   }
   
   public void trigger( final EventQueue events, final Map<String, Object> args ) {
-    if ( data.passEvent != null && data.passEvent != Event.NULL ) {
-      events.enqueue( data.passEvent, args );
+    if ( data.event != null ) {
+      events.enqueue( data.event, args );
     }
     
     if ( event != null ) {
