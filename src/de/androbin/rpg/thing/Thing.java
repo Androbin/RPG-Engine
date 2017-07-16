@@ -12,12 +12,18 @@ public class Thing implements Sprite {
   protected transient Renderer renderer;
   
   public final ThingData data;
+  public final int id;
   public final Point pos;
   
   private Event event;
   
   public Thing( final ThingData data, final Point pos ) {
+    this( data, 0, pos );
+  }
+  
+  public Thing( final ThingData data, final int id, final Point pos ) {
     this.data = data;
+    this.id = id;
     this.pos = pos;
     
     renderer = new ThingRenderer( this );
@@ -58,6 +64,6 @@ public class Thing implements Sprite {
   }
   
   public interface Builder {
-    Thing build( ThingData data, final Point pos );
+    Thing build( ThingData data, int id, Point pos );
   }
 }

@@ -10,6 +10,7 @@ public abstract class Entity implements Sprite {
   protected transient World world;
   protected transient Renderer renderer;
   
+  public final int id;
   private Point pos;
   public final Dimension size;
   
@@ -18,10 +19,11 @@ public abstract class Entity implements Sprite {
   public final Handle<Direction, Void> move;
   
   public Entity() {
-    this( new Dimension( 1, 1 ) );
+    this( 0, new Dimension( 1, 1 ) );
   }
   
-  public Entity( final Dimension size ) {
+  public Entity( final int id, final Dimension size ) {
+    this.id = id;
     this.pos = new Point();
     this.size = size;
     this.viewDir = Direction.DOWN;

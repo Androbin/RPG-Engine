@@ -58,6 +58,6 @@ public class Phantom implements Sprite {
   }
   
   public interface Builder {
-    Phantom build( PhantomData data, final Point pos );
+    Phantom build( PhantomData data, Point pos );
   }
 }

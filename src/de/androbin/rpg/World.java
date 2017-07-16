@@ -57,7 +57,11 @@ public class World {
       return true;
     }
     
-    weak.add( phantom, phantom.getBounds() );
+    final boolean success = weak.tryAdd( phantom, phantom.getBounds() );
+    
+    if ( !success ) {
+      return false;
+    }
     
     phantoms.add( phantom );
     return true;
@@ -108,6 +112,14 @@ public class World {
   
   public final List<Entity> listEntities() {
     return Collections.unmodifiableList( entities );
+  }
+  
+  public final List<Phantom> listPhantoms() {
+    return Collections.unmodifiableList( phantoms );
+  }
+  
+  public final List<Thing> listThings() {
+    return Collections.unmodifiableList( things );
   }
   
   public final void removeEntity( final Entity entity ) {
