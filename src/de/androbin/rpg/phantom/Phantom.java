@@ -12,15 +12,18 @@ public class Phantom implements Sprite {
   protected transient Renderer renderer;
   
   public final PhantomData data;
-  public final Point pos;
+  private Point pos;
   
   private Event event;
   
-  public Phantom( final PhantomData data, final Point pos ) {
+  public Phantom( final PhantomData data ) {
     this.data = data;
-    this.pos = pos;
     
     renderer = new PhantomRenderer( this );
+  }
+  
+  public final void attach( final Point pos ) {
+    this.pos = pos;
   }
   
   @ Override
@@ -28,26 +31,31 @@ public class Phantom implements Sprite {
     return new Rectangle( pos, data.size );
   }
   
+  public final Point getPos() {
+    return pos;
+  }
+  
+  public final Renderer getRenderer() {
+    return renderer;
+  }
+  
   @ Override
-  public Rectangle2D.Float getViewBounds() {
+  public final Rectangle2D.Float getViewBounds() {
     return renderer == null ? null : renderer.getBounds();
   }
   
   @ Override
   public void render( final Graphics2D g, final float scale ) {
-    if ( renderer == null ) {
-      return;
+    if ( renderer != null ) {
+      renderer.render( g, scale );
     }
-    
-    renderer.setScale( scale );
-    renderer.render( g );
   }
   
-  public void setEvent( final Event event ) {
+  public final void setEvent( final Event event ) {
     this.event = event;
   }
   
-  public void trigger( final EventQueue events, final Map<String, Object> args ) {
+  public final void trigger( final EventQueue events, final Map<String, Object> args ) {
     if ( data.event != null ) {
       events.enqueue( data.event, args );
     }
@@ -58,6 +66,6 @@ public class Phantom implements Sprite {
   }
   
   public interface Builder {
-    Phantom build( PhantomData data, Point pos );
+    Phantom build( PhantomData data );
   }
 }

@@ -13,47 +13,55 @@ public class Thing implements Sprite {
   
   public final ThingData data;
   public final int id;
-  public final Point pos;
+  private Point pos;
   
   private Event event;
   
-  public Thing( final ThingData data, final Point pos ) {
-    this( data, 0, pos );
+  public Thing( final ThingData data ) {
+    this( data, 0 );
   }
   
-  public Thing( final ThingData data, final int id, final Point pos ) {
+  public Thing( final ThingData data, final int id ) {
     this.data = data;
     this.id = id;
-    this.pos = pos;
     
     renderer = new ThingRenderer( this );
   }
   
-  @ Override
-  public Rectangle getBounds() {
-    return new Rectangle( pos, data.size );
+  public final void attach( final Point pos ) {
+    this.pos = pos;
   }
   
   @ Override
-  public Rectangle2D.Float getViewBounds() {
+  public final Rectangle getBounds() {
+    return new Rectangle( pos, data.size );
+  }
+  
+  public final Point getPos() {
+    return pos;
+  }
+  
+  public final Renderer getRenderer() {
+    return renderer;
+  }
+  
+  @ Override
+  public final Rectangle2D.Float getViewBounds() {
     return renderer == null ? null : renderer.getBounds();
   }
   
   @ Override
   public void render( final Graphics2D g, final float scale ) {
-    if ( renderer == null ) {
-      return;
+    if ( renderer != null ) {
+      renderer.render( g, scale );
     }
-    
-    renderer.setScale( scale );
-    renderer.render( g );
   }
   
-  public void setEvent( final Event event ) {
+  public final void setEvent( final Event event ) {
     this.event = event;
   }
   
-  public void trigger( final EventQueue events, final Map<String, Object> args ) {
+  public final void trigger( final EventQueue events, final Map<String, Object> args ) {
     if ( data.event != null ) {
       events.enqueue( data.event, args );
     }
@@ -64,6 +72,6 @@ public class Thing implements Sprite {
   }
   
   public interface Builder {
-    Thing build( ThingData data, int id, Point pos );
+    Thing build( ThingData data, int id );
   }
 }

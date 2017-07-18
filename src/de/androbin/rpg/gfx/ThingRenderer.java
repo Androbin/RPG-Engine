@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 
-public class ThingRenderer extends Renderer {
+public class ThingRenderer implements Renderer {
   protected final Thing thing;
   
   public ThingRenderer( final Thing thing ) {
@@ -14,9 +14,7 @@ public class ThingRenderer extends Renderer {
   }
   
   @ Override
-  public Rectangle2D.Float getBounds() {
-    final Point pos = thing.pos;
-    
+  public Rectangle2D.Float getBounds( final Point2D.Float pos ) {
     final ThingData data = thing.data;
     final BufferedImage image = data.image;
     final Dimension size = data.size;
@@ -29,8 +27,14 @@ public class ThingRenderer extends Renderer {
   }
   
   @ Override
-  public void render( final Graphics2D g ) {
-    final Rectangle2D.Float bounds = getBounds();
+  public Point2D.Float getPos() {
+    final Point pos = thing.getPos();
+    return new Point2D.Float( pos.x, pos.y );
+  }
+  
+  @ Override
+  public void render( final Graphics2D g, final Point2D.Float pos, final float scale ) {
+    final Rectangle2D.Float bounds = getBounds( pos );
     
     bounds.x *= scale;
     bounds.y *= scale;

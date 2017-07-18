@@ -52,7 +52,9 @@ public class World {
     return true;
   }
   
-  public final boolean addPhantom( final Phantom phantom ) {
+  public final boolean addPhantom( final Phantom phantom, final Point pos ) {
+    phantom.attach( pos );
+    
     if ( phantoms.contains( phantom ) ) {
       return true;
     }
@@ -67,7 +69,9 @@ public class World {
     return true;
   }
   
-  public final boolean addThing( final Thing thing ) {
+  public final boolean addThing( final Thing thing, final Point pos ) {
+    thing.attach( pos );
+    
     if ( things.contains( thing ) ) {
       return true;
     }

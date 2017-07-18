@@ -2,57 +2,23 @@ package de.androbin.rpg.gfx;
 
 import java.awt.*;
 import java.awt.geom.*;
-import de.androbin.gfx.*;
 
-public abstract class Renderer implements Renderable {
-  protected float scale = 1f;
-  
-  public abstract Rectangle2D.Float getBounds();
-  
-  public void setScale( final float scale ) {
-    this.scale = scale;
+public interface Renderer {
+  default Rectangle2D.Float getBounds() {
+    return getBounds( getPos() );
   }
   
-  public static abstract class Decorator extends Renderer {
-    private Renderer renderer;
-    
-    public Decorator() {
-    }
-    
-    public Decorator( final Renderer renderer ) {
-      setRenderer( renderer );
-    }
-    
-    public abstract Rectangle2D.Float getDecoratorBounds();
-    
-    @ Override
-    public final Rectangle2D.Float getBounds() {
-      final Rectangle2D.Float bounds0 = renderer.getBounds();
-      final Rectangle2D.Float bounds1 = getDecoratorBounds();
-      return bounds1 == null ? bounds0 : (Rectangle2D.Float) bounds0.createUnion( bounds1 );
-    }
-    
-    public Graphics2D preDecorate( final Graphics2D g ) {
-      return g;
-    }
-    
-    @ Override
-    public final void render( final Graphics2D g ) {
-      final Graphics2D h = preDecorate( g );
-      renderer.render( h );
-      postDecorate( g );
-    }
-    
-    public final void setRenderer( final Renderer renderer ) {
-      this.renderer = renderer;
-    }
-    
-    @ Override
-    public void setScale( final float scale ) {
-      super.setScale( scale );
-      renderer.setScale( scale );
-    }
-    
-    public abstract void postDecorate( Graphics2D g );
+  Rectangle2D.Float getBounds( Point2D.Float pos );
+  
+  Point2D.Float getPos();
+  
+  default void render( final Graphics2D g, final float scale ) {
+    render( g, getPos(), scale );
   }
+  
+  default void render( final Graphics2D g, final Point pos, final float scale ) {
+    render( g, new Point2D.Float( pos.x, pos.y ), scale );
+  }
+  
+  void render( Graphics2D g, Point2D.Float pos, float scale );
 }

@@ -21,7 +21,7 @@ public abstract class Handle<I, O> {
   }
   
   public float getProgress() {
-    return progress;
+    return Math.min( progress, requested == null ? 1f : 2f );
   }
   
   public I getRequested() {

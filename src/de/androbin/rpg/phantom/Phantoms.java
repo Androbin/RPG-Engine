@@ -1,7 +1,6 @@
 package de.androbin.rpg.phantom;
 
 import static de.androbin.util.JSONUtil.*;
-import java.awt.*;
 import java.util.*;
 import org.json.simple.*;
 
@@ -14,12 +13,12 @@ public final class Phantoms {
   private Phantoms() {
   }
   
-  public static Phantom create( final String name, final Point pos ) {
-    return create( getData( name ), pos );
+  public static Phantom create( final String name ) {
+    return create( getData( name ) );
   }
   
-  public static Phantom create( final PhantomData data, final Point pos ) {
-    return builder.build( data, pos );
+  public static Phantom create( final PhantomData data ) {
+    return builder.build( data );
   }
   
   private static PhantomData createData( final String type ) {

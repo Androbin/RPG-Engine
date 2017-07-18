@@ -1,14 +1,14 @@
 package de.androbin.rpg.gfx;
 
 import static de.androbin.gfx.util.GraphicsUtil.*;
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
 import de.androbin.gfx.util.*;
 import de.androbin.rpg.*;
 import de.androbin.util.txt.*;
+import java.awt.*;
+import java.awt.geom.*;
+import java.awt.image.*;
 
-public class EntityRenderer extends Renderer {
+public class EntityRenderer implements Renderer {
   protected final Entity entity;
   protected final BufferedImage[][] animation;
   
@@ -41,12 +41,11 @@ public class EntityRenderer extends Renderer {
   }
   
   @ Override
-  public Rectangle2D.Float getBounds() {
-    final Point2D.Float pos = entity.getFloatPos();
+  public Rectangle2D.Float getBounds( final Point2D.Float pos ) {
     final Dimension size = entity.size;
     
     final int i = entity.viewDir.ordinal();
-    final int j = (int) ( entity.move.getProgress() * animation[ i ].length );
+    final int j = (int) ( entity.move.getProgress() % 1f * animation[ i ].length );
     
     final BufferedImage image = animation[ i ][ j ];
     
@@ -58,8 +57,13 @@ public class EntityRenderer extends Renderer {
   }
   
   @ Override
-  public void render( final Graphics2D g ) {
-    final Rectangle2D.Float bounds = getBounds();
+  public Point2D.Float getPos() {
+    return entity.getFloatPos();
+  }
+  
+  @ Override
+  public void render( final Graphics2D g, final Point2D.Float pos, final float scale ) {
+    final Rectangle2D.Float bounds = getBounds( pos );
     
     bounds.x *= scale;
     bounds.y *= scale;
@@ -67,7 +71,8 @@ public class EntityRenderer extends Renderer {
     bounds.height *= scale;
     
     final int i = entity.viewDir.ordinal();
-    final int j = (int) ( entity.move.getProgress() * animation[ i ].length );
+    final int j = (int) ( entity.move.getProgress() % 1f * animation[ i ].length );
+    
     drawImage( g, animation[ i ][ j ], bounds );
   }
 }

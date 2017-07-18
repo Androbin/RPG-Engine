@@ -24,14 +24,13 @@ public abstract class Entity implements Sprite {
   
   public Entity( final int id, final Dimension size ) {
     this.id = id;
-    this.pos = new Point();
     this.size = size;
     this.viewDir = Direction.DOWN;
     
     move = new MoveHandle();
   }
   
-  protected final void attach( final World world, final Point pos ) {
+  public final void attach( final World world, final Point pos ) {
     this.world = world;
     this.pos = pos;
   }
@@ -53,6 +52,10 @@ public abstract class Entity implements Sprite {
   
   public final Point getPos() {
     return pos;
+  }
+  
+  public final Renderer getRenderer() {
+    return renderer;
   }
   
   @ Override
@@ -81,18 +84,15 @@ public abstract class Entity implements Sprite {
     return true;
   }
   
-  private Tile nextTile( final Direction dir ) {
+  private final Tile nextTile( final Direction dir ) {
     return world.getTile( dir.from( pos ) );
   }
   
   @ Override
   public void render( final Graphics2D g, final float scale ) {
-    if ( renderer == null ) {
-      return;
+    if ( renderer != null ) {
+      renderer.render( g, scale );
     }
-    
-    renderer.setScale( scale );
-    renderer.render( g );
   }
   
   public void updateStrong( final RPGScreen master ) {

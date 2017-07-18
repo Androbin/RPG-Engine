@@ -1,7 +1,6 @@
 package de.androbin.rpg.thing;
 
 import static de.androbin.util.JSONUtil.*;
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.function.*;
@@ -20,20 +19,20 @@ public final class Things {
   private Things() {
   }
   
-  public static Thing create( final String name, final Point pos ) {
-    return create( name, 0, pos );
+  public static Thing create( final String name ) {
+    return create( name, 0 );
   }
   
-  public static Thing create( final String name, final int id, final Point pos ) {
-    return create( getData( name ), id, pos );
+  public static Thing create( final String name, final int id ) {
+    return create( getData( name ), id );
   }
   
-  public static Thing create( final ThingData data, final Point pos ) {
-    return create( data, 0, pos );
+  public static Thing create( final ThingData data ) {
+    return create( data, 0 );
   }
   
-  public static Thing create( final ThingData data, final int id, final Point pos ) {
-    return builder.build( data, id, pos );
+  public static Thing create( final ThingData data, final int id ) {
+    return builder.build( data, id );
   }
   
   private static ThingData createData( final String type ) {
