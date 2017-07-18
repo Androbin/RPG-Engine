@@ -60,7 +60,7 @@ public abstract class Entity implements Sprite {
   
   @ Override
   public final Rectangle2D.Float getViewBounds() {
-    return renderer == null ? null : renderer.getBounds();
+    return renderer == null ? null : renderer.getBounds( getFloatPos() );
   }
   
   public abstract float moveSpeed();
@@ -91,7 +91,7 @@ public abstract class Entity implements Sprite {
   @ Override
   public void render( final Graphics2D g, final float scale ) {
     if ( renderer != null ) {
-      renderer.render( g, scale );
+      renderer.render( g, getFloatPos(), scale );
     }
   }
   

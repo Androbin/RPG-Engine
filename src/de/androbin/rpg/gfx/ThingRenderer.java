@@ -27,12 +27,6 @@ public class ThingRenderer implements Renderer {
   }
   
   @ Override
-  public Point2D.Float getPos() {
-    final Point pos = thing.getPos();
-    return new Point2D.Float( pos.x, pos.y );
-  }
-  
-  @ Override
   public void render( final Graphics2D g, final Point2D.Float pos, final float scale ) {
     final Rectangle2D.Float bounds = getBounds( pos );
     

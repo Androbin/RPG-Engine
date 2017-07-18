@@ -57,11 +57,6 @@ public class EntityRenderer implements Renderer {
   }
   
   @ Override
-  public Point2D.Float getPos() {
-    return entity.getFloatPos();
-  }
-  
-  @ Override
   public void render( final Graphics2D g, final Point2D.Float pos, final float scale ) {
     final Rectangle2D.Float bounds = getBounds( pos );
     
