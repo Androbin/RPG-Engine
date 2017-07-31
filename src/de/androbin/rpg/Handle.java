@@ -16,15 +16,19 @@ public abstract class Handle<I, O> {
   
   protected abstract O doHandle( final RPGScreen master, final I arg );
   
-  public I getCurrent() {
+  public final I getCurrent() {
     return current;
   }
   
-  public float getProgress() {
-    return Math.min( progress, requested == null ? 1f : 2f );
+  public final float getModProgress() {
+    return progress % 1f;
   }
   
-  public I getRequested() {
+  public final float getProgress() {
+    return progress;
+  }
+  
+  public final I getRequested() {
     return requested;
   }
   
@@ -32,11 +36,11 @@ public abstract class Handle<I, O> {
     return canHandle( arg );
   }
   
-  public boolean hasCurrent() {
+  public final boolean hasCurrent() {
     return current != null;
   }
   
-  public boolean hasRequested() {
+  public final boolean hasRequested() {
     return requested != null;
   }
   

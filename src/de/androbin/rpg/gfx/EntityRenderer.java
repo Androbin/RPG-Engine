@@ -45,7 +45,7 @@ public class EntityRenderer implements Renderer {
     final Dimension size = entity.size;
     
     final int i = entity.viewDir.ordinal();
-    final int j = (int) ( entity.move.getProgress() % 1f * animation[ i ].length );
+    final int j = (int) ( entity.move.getModProgress() * animation[ i ].length );
     
     final BufferedImage image = animation[ i ][ j ];
     
@@ -66,7 +66,7 @@ public class EntityRenderer implements Renderer {
     bounds.height *= scale;
     
     final int i = entity.viewDir.ordinal();
-    final int j = (int) ( entity.move.getProgress() % 1f * animation[ i ].length );
+    final int j = (int) ( entity.move.getModProgress() * animation[ i ].length );
     
     drawImage( g, animation[ i ][ j ], bounds );
   }
