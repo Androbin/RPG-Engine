@@ -1,15 +1,16 @@
 package de.androbin.rpg;
 
-import de.androbin.game.*;
 import de.androbin.rpg.event.EventQueue;
 import de.androbin.rpg.gfx.*;
+import de.androbin.shell.*;
+import de.androbin.shell.gfx.*;
+import de.androbin.shell.input.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.List;
 
-public abstract class RPGScreen extends Screen {
+public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   private final Map<Identifier, World> worlds = new HashMap<>();
   
   protected World world;
@@ -23,10 +24,8 @@ public abstract class RPGScreen extends Screen {
   
   protected float scale;
   
-  public RPGScreen( final Game game, final float scale ) {
-    super( game );
-    
-    inputs.keyboard = new KeyInput();
+  public RPGScreen( final float scale ) {
+    addKeyInput( new RPGKeyInput() );
     
     this.camera = new Camera();
     this.events = new EventQueue();
@@ -93,7 +92,7 @@ public abstract class RPGScreen extends Screen {
   }
   
   @ Override
-  protected void update( final float delta ) {
+  public void update( final float delta ) {
     if ( player != null ) {
       final Direction dir = requestDir;
       
@@ -118,10 +117,9 @@ public abstract class RPGScreen extends Screen {
     calcTranslation();
   }
   
-  private final class KeyInput extends KeyAdapter {
+  private final class RPGKeyInput implements KeyInput {
     @ Override
-    public void keyPressed( final KeyEvent event ) {
-      final int keycode = event.getKeyCode();
+    public void keyPressed( final int keycode ) {
       final Direction dir = Directions.byKeyCode( keycode );
       
       if ( dir != null ) {
@@ -130,8 +128,7 @@ public abstract class RPGScreen extends Screen {
     }
     
     @ Override
-    public void keyReleased( final KeyEvent event ) {
-      final int keycode = event.getKeyCode();
+    public void keyReleased( final int keycode ) {
       final Direction dir = Directions.byKeyCode( keycode );
       
       if ( dir == requestDir ) {
