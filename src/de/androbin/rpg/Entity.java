@@ -84,7 +84,7 @@ public abstract class Entity implements Sprite {
     return true;
   }
   
-  private final Tile nextTile( final Direction dir ) {
+  private Tile nextTile( final Direction dir ) {
     return world.getTile( dir.from( pos ) );
   }
   
