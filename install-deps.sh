@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 open=()
 closed=()
 
@@ -19,7 +21,7 @@ while [ -n "${open[*]}" ]; do
     while read -r dep2; do
       contains=false
       
-      for dep3 in "${closed[@]}"; do
+      for dep3 in "${closed[@]}" "${new[@]}"; do
         if [[ "$dep3" == "$dep2" ]]; then
           contains=true
         fi
