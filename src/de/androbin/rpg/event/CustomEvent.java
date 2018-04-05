@@ -1,26 +1,24 @@
 package de.androbin.rpg.event;
 
 import de.androbin.rpg.*;
-import java.util.*;
 
-public final class CustomEvent implements Event {
+public final class CustomEvent extends Event {
   public final String name;
-  private final Event[] events;
+  public final Event[] parts;
   
-  public CustomEvent( final String name, final Event[] events ) {
+  public CustomEvent( final String name, final Event[] parts ) {
     this.name = name;
-    this.events = events;
+    this.parts = parts;
   }
   
   @ Override
-  public String getLogMessage() {
+  public String getMessage() {
     return name;
   }
   
-  @ Override
-  public void run( final RPGScreen master, final Map<String, Object> args ) {
-    for ( final Event event : events ) {
-      event.run( master, args );
+  public static void handle( final RPGScreen master, final CustomEvent event ) {
+    for ( final Event part : event.parts ) {
+      Events.handle( master, part );
     }
   }
 }

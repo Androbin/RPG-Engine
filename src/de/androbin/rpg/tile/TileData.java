@@ -1,24 +1,36 @@
 package de.androbin.rpg.tile;
 
-import java.awt.image.*;
+import java.util.*;
+import java.util.function.*;
 import org.json.simple.*;
-import de.androbin.gfx.util.*;
+import de.androbin.rpg.*;
 import de.androbin.rpg.event.*;
+import de.androbin.rpg.gfx.sheet.*;
 
 public class TileData {
+  public final Ident type;
   public final String name;
-  public final BufferedImage image;
   
-  public final Event event;
+  public final boolean passable;
   
-  public TileData( final String name, final JSONObject data ) {
-    this.name = name;
-    this.image = ImageUtil.loadImage( "tile/" + name + ".png" );
+  public final Function<Map<String, Object>, Event> enterEvent;
+  
+  public final Sheet sheet;
+  
+  @ SuppressWarnings( "unchecked" )
+  public TileData( final Ident type, final JSONObject props ) {
+    this.type = type;
+    this.name = (String) props.get( "name" );
     
-    this.event = Events.parse( (String) data.get( "event" ) );
+    this.passable = (boolean) props.getOrDefault( "passable", true );
+    
+    this.enterEvent = Events.parse( (String) props.get( "enter_event" ) );
+    
+    this.sheet = Sheets.create( this );
   }
   
+  @ FunctionalInterface
   public interface Builder {
-    TileData build( String name, JSONObject data );
+    TileData build( Ident type, JSONObject props );
   }
 }

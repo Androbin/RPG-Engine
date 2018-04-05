@@ -44,4 +44,8 @@ public final class Directions {
       final Predicate<Direction> pred ) {
     return pred.test( d0 ) ? d0 : d1;
   }
+  
+  public static Direction valueOf( final String name ) {
+    return name == null ? null : Direction.valueOf( name.toUpperCase() );
+  }
 }

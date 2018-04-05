@@ -37,11 +37,13 @@ public final class SpaceTime<T> {
   }
   
   public Rectangle get( final T o ) {
-    return find( o ).getValue();
+    final Pair<T, Rectangle> pair = find( o );
+    return pair == null ? null : pair.getValue();
   }
   
   public T get( final Point pos ) {
-    return find( pos ).getKey();
+    final Pair<T, Rectangle> pair = find( pos );
+    return pair == null ? null : pair.getKey();
   }
   
   private void remove( final Pair<T, Rectangle> pair ) {
@@ -70,16 +72,6 @@ public final class SpaceTime<T> {
     
     add( o, bounds );
     return true;
-  }
-  
-  public Rectangle tryGet( final T o ) {
-    final Pair<T, Rectangle> pair = find( o );
-    return pair == null ? null : pair.getValue();
-  }
-  
-  public T tryGet( final Point pos ) {
-    final Pair<T, Rectangle> pair = find( pos );
-    return pair == null ? null : pair.getKey();
   }
   
   private boolean tryRemove( final Pair<T, Rectangle> pair ) {

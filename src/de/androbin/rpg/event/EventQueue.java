@@ -1,33 +1,18 @@
 package de.androbin.rpg.event;
 
-import de.androbin.rpg.*;
 import java.util.*;
+import de.androbin.rpg.*;
 
 public final class EventQueue {
-  private final Queue<Item> queue = new ArrayDeque<>();
+  private final Queue<Event> queue = new ArrayDeque<>();
   
-  public void enqueue( final Event event, final Map<String, Object> args ) {
-    if ( event != Event.NULL ) {
-      queue.add( new Item( event, args ) );
-    }
+  public void enqueue( final Event event ) {
+    queue.add( event );
   }
   
-  public void run( final RPGScreen master ) {
-    queue.forEach( item -> item.run( master ) );
-    queue.clear();
-  }
-  
-  private static class Item {
-    private final Event event;
-    private final Map<String, Object> args;
-    
-    public Item( final Event event, final Map<String, Object> args ) {
-      this.event = event;
-      this.args = args;
-    }
-    
-    public void run( final RPGScreen master ) {
-      event.run( master, args );
+  public void process( final RPGScreen master ) {
+    while ( !queue.isEmpty() ) {
+      Events.handle( master, queue.remove() );
     }
   }
 }

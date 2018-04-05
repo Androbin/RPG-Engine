@@ -2,25 +2,68 @@ package de.androbin.rpg.event;
 
 import static de.androbin.collection.util.ObjectCollectionUtil.*;
 import java.util.*;
+import java.util.function.*;
+import de.androbin.rpg.*;
+import de.androbin.rpg.event.handler.*;
 import de.androbin.util.*;
 
 public final class Events {
-  public static final Map<String, Event.Builder> BUILDERS = new HashMap<>();
+  private static final Map<String, Event.Builder> BUILDERS = new HashMap<>();
+  private static final Map<Class< ? extends Event>, Event.Handler< ? extends Event>> HANDLERS = new HashMap<>();
+  
+  public static final EventQueue QUEUE = new EventQueue();
   
   static {
-    BUILDERS.put( "teleport", TeleportEvent.BUILDER );
+    Events.BUILDERS.put( "teleport", TeleportEvent.BUILDER );
+    putHandler( TeleportEvent.class, new TeleportEventHandler() );
+    putHandler( TileEnterEvent.class, new TileEnterEventHandler() );
   }
   
   private Events() {
   }
   
-  public static Event parse( final String text ) {
-    if ( text == null ) {
-      return null;
+  private static Object[] compile( final String[] args, final Map<String, Object> values ) {
+    if ( values == null ) {
+      return compile( args, Collections.emptyMap() );
     }
     
-    if ( text.equals( "none" ) ) {
-      return Event.NULL;
+    return fill( new Object[ args.length ], i -> {
+      final String arg = args[ i ];
+      
+      if ( arg.startsWith( "$" ) ) {
+        return values.getOrDefault( arg.substring( 1 ), null );
+      } else {
+        return arg;
+      }
+    } );
+  }
+  
+  public static void putBuilder( final String func, final Event.Builder builder ) {
+    BUILDERS.put( func, builder );
+  }
+  
+  public static <E extends Event> void putHandler(
+      final Class<E> clazz, final Event.Handler<E> handler ) {
+    HANDLERS.put( clazz, handler );
+  }
+  
+  @ SuppressWarnings( "unchecked" )
+  public static <E extends Event> void handle( final RPGScreen master, final E event ) {
+    final String message = event.getMessage();
+    
+    if ( message != null ) {
+      System.out.println( message );
+    }
+    
+    if ( HANDLERS.containsKey( event.getClass() ) ) {
+      final Event.Handler<E> handler = (Event.Handler<E>) HANDLERS.get( event.getClass() );
+      handler.handle( master, event );
+    }
+  }
+  
+  public static Function<Map<String, Object>, Event> parse( final String text ) {
+    if ( text == null ) {
+      return null;
     }
     
     final String func;
@@ -40,11 +83,13 @@ public final class Events {
     final String[] args = argString.split( ",\\s?" );
     
     if ( BUILDERS.containsKey( func ) ) {
-      return BUILDERS.get( func ).build( args );
+      final Event.Builder builder = BUILDERS.get( func );
+      return values -> builder.build( compile( args, values ) );
     } else {
       final String[] events = JSONUtil.toStringArray( JSONUtil.parseJSON( "event/" + func ).get() );
-      return new CustomEvent( func,
-          fillParallel( new Event[ events.length ], i -> parse( events[ i ] ) ) );
+      return values -> new CustomEvent( func, fill( new Event[ events.length ], i -> {
+        return parse( events[ i ] ).apply( values );
+      } ) );
     }
   }
 }

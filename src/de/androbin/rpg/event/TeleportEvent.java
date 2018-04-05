@@ -1,51 +1,44 @@
 package de.androbin.rpg.event;
 
 import java.awt.*;
-import java.util.*;
 import de.androbin.rpg.*;
+import de.androbin.rpg.entity.*;
 
-public final class TeleportEvent implements Event {
+public final class TeleportEvent extends Event {
   public static final Event.Builder BUILDER = args -> {
+    final Entity entity = (Entity) args[ 0 ];
+    
     switch ( args.length ) {
-      case 3:
-        return new TeleportEvent( args[ 0 ],
-            new Point( Integer.parseInt( args[ 1 ] ), Integer.parseInt( args[ 2 ] ) ) );
+      case 4:
+        return new TeleportEvent( entity, (String) args[ 1 ], new Point(
+            Integer.parseInt( (String) args[ 2 ] ),
+            Integer.parseInt( (String) args[ 3 ] ) ) );
       
-      case 2:
-        return new TeleportEvent(
-            new Point( Integer.parseInt( args[ 0 ] ), Integer.parseInt( args[ 1 ] ) ) );
+      case 3:
+        return new TeleportEvent( entity, new Point(
+            Integer.parseInt( (String) args[ 1 ] ),
+            Integer.parseInt( (String) args[ 2 ] ) ) );
     }
     
     return null;
   };
   
-  private final Identifier world;
-  private final Point pos;
+  public final Entity entity;
+  public final Ident world;
+  public final Point pos;
   
-  public TeleportEvent( final Point pos ) {
-    this( null, pos );
+  public TeleportEvent( final Entity entity, final Point pos ) {
+    this( entity, null, pos );
   }
   
-  public TeleportEvent( final String serial, final Point pos ) {
-    this.world = Identifier.fromSerial( serial );
+  public TeleportEvent( final Entity entity, final String world, final Point pos ) {
+    this.entity = entity;
+    this.world = Ident.fromSerial( world );
     this.pos = pos;
   }
   
   @ Override
-  public String getLogMessage() {
+  public String getMessage() {
     return "teleport { world: '" + world + "', pos: (" + pos.x + ", " + pos.y + ") }";
-  }
-  
-  @ Override
-  public void run( final RPGScreen master, final Map<String, Object> args ) {
-    final Entity entity = (Entity) args.get( "entity" );
-    
-    if ( world == null ) {
-      entity.moveTo( pos );
-    } else {
-      if ( entity.equals( master.player ) ) {
-        master.switchWorld( world, pos );
-      }
-    }
   }
 }

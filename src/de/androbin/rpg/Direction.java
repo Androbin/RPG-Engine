@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.geom.*;
 
 public enum Direction {
-  UP( 0, -1 ), LEFT( -1, 0 ), DOWN( 0, 1 ), RIGHT( 1, 0 );
+  DOWN( 0, 1 ), LEFT( -1, 0 ), UP( 0, -1 ), RIGHT( 1, 0 );
   
   public final int dx;
   public final int dy;
@@ -45,7 +45,11 @@ public enum Direction {
   }
   
   public Point from( final Point p ) {
-    return new Point( p.x + dx, p.y + dy );
+    return from( p, 1 );
+  }
+  
+  public Point from( final Point p, final int x ) {
+    return new Point( p.x + dx * x, p.y + dy * x );
   }
   
   public Point2D.Float from( final Point p, final float progress ) {

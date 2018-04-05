@@ -1,32 +1,17 @@
 package de.androbin.rpg.event;
 
 import de.androbin.rpg.*;
-import java.util.*;
-import java.util.function.*;
 
-public interface Event {
-  Event NULL = func( "null", ( master, args ) -> {
-  } );
+public abstract class Event {
+  public abstract String getMessage();
   
-  static Event func( final String name, final BiConsumer<RPGScreen, Map<String, Object>> action ) {
-    return new Event() {
-      @ Override
-      public String getLogMessage() {
-        return name;
-      }
-      
-      @ Override
-      public void run( final RPGScreen master, final Map<String, Object> args ) {
-        action.accept( master, args );
-      }
-    };
-  };
+  @ FunctionalInterface
+  public interface Builder {
+    Event build( Object[] args );
+  }
   
-  String getLogMessage();
-  
-  void run( RPGScreen master, Map<String, Object> args );
-  
-  interface Builder {
-    Event build( String[] args );
+  @ FunctionalInterface
+  public interface Handler<E extends Event> {
+    void handle( RPGScreen master, E event );
   }
 }

@@ -3,7 +3,7 @@ package de.androbin.rpg.gfx;
 import static de.androbin.math.util.floats.FloatMathUtil.*;
 import java.awt.geom.*;
 import java.util.function.*;
-import de.androbin.rpg.*;
+import de.androbin.rpg.entity.*;
 
 public final class Camera {
   private Supplier<Point2D.Float> currentFocus;

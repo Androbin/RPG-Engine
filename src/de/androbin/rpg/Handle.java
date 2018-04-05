@@ -4,8 +4,10 @@ import java.util.function.*;
 
 public abstract class Handle<I, O> {
   private I current;
-  private I requested;
+  private I next;
+  
   private float progress;
+  public float speed = 1f;
   
   public BiConsumer<I, O> callback;
   public BiConsumer<I, Boolean> requestCallback;
@@ -14,7 +16,7 @@ public abstract class Handle<I, O> {
     return true;
   }
   
-  protected abstract O doHandle( final RPGScreen master, final I arg );
+  protected abstract O doHandle( final I arg );
   
   public final I getCurrent() {
     return current;
@@ -28,8 +30,8 @@ public abstract class Handle<I, O> {
     return progress;
   }
   
-  public final I getRequested() {
-    return requested;
+  public final I getNext() {
+    return next;
   }
   
   protected boolean handle( final I arg ) {
@@ -40,51 +42,49 @@ public abstract class Handle<I, O> {
     return current != null;
   }
   
-  public final boolean hasRequested() {
-    return requested != null;
+  public final boolean hasNext() {
+    return next != null;
   }
   
-  public void request( final I arg ) {
+  public void makeNext( final I arg ) {
     if ( arg == null ) {
       return;
     }
     
-    requested = arg;
+    next = arg;
   }
   
-  public void updateStrong( final RPGScreen master ) {
+  public void update( final float delta ) {
     if ( current == null ) {
-      if ( requested == null ) {
+      if ( next == null ) {
         progress = 0f;
       } else {
-        final I val = requested;
-        final boolean success = handle( requested );
+        final I val = next;
+        final boolean success = handle( next );
         
         if ( success ) {
-          current = requested;
+          current = next;
         }
         
-        requested = null;
+        next = null;
         
         if ( requestCallback != null ) {
           requestCallback.accept( val, success );
         }
       }
-    } else if ( progress >= 1f ) {
-      final I val1 = current;
-      final O val2 = doHandle( master, current );
-      current = null;
-      progress--;
+    } else {
+      progress += delta * speed;
       
-      if ( callback != null ) {
-        callback.accept( val1, val2 );
+      if ( progress >= 1f ) {
+        final I val1 = current;
+        final O val2 = doHandle( current );
+        current = null;
+        progress--;
+        
+        if ( callback != null ) {
+          callback.accept( val1, val2 );
+        }
       }
-    }
-  }
-  
-  public void updateWeak( final float delta ) {
-    if ( current != null ) {
-      progress += delta;
     }
   }
 }

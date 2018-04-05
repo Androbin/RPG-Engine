@@ -1,25 +1,27 @@
 package de.androbin.rpg;
 
-import de.androbin.rpg.event.EventQueue;
-import de.androbin.rpg.gfx.*;
-import de.androbin.shell.*;
-import de.androbin.shell.gfx.*;
-import de.androbin.shell.input.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.List;
+import de.androbin.rpg.entity.*;
+import de.androbin.rpg.event.*;
+import de.androbin.rpg.gfx.*;
+import de.androbin.shell.*;
+import de.androbin.shell.gfx.*;
+import de.androbin.shell.input.*;
 
 public abstract class RPGScreen extends BasicShell implements AWTGraphics {
-  private final Map<Identifier, World> worlds = new HashMap<>();
+  private final Map<Ident, World> worlds = new HashMap<>();
   
   protected World world;
   
   public Entity player;
   private Direction requestDir;
   
+  protected WorldRenderer worldRenderer;
+  
   protected final Camera camera;
-  protected final EventQueue events;
   protected final Point2D.Float trans;
   
   protected float scale;
@@ -27,8 +29,9 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   public RPGScreen( final float scale ) {
     addKeyInput( new RPGKeyInput() );
     
+    this.worldRenderer = new WorldRenderer();
+    
     this.camera = new Camera();
-    this.events = new EventQueue();
     this.trans = new Point2D.Float();
     
     this.scale = scale;
@@ -42,9 +45,19 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
     trans.y = camera.calcTranslationY( getHeight(), ph, scale );
   }
   
-  protected abstract World createWorld( Identifier id );
+  protected abstract World createWorld( Ident id );
   
-  protected final World getWorld( final Identifier id ) {
+  private Rectangle2D.Float getView() {
+    final float startY = Math.max( 0f, -trans.y / scale );
+    final float endY = Math.min( ( getHeight() - trans.y ) / scale, world.size.height );
+    
+    final float startX = Math.max( 0f, -trans.x / scale );
+    final float endX = Math.min( ( getWidth() - trans.x ) / scale, world.size.width );
+    
+    return new Rectangle2D.Float( startX, startY, endX - startX, endY - startY );
+  }
+  
+  protected final World getWorld( final Ident id ) {
     return worlds.computeIfAbsent( id, this::createWorld );
   }
   
@@ -70,19 +83,11 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
     }
     
     g.translate( trans.x, trans.y );
-    
-    final float startY = Math.max( 0f, -trans.y / scale );
-    final float endY = Math.min( ( getHeight() - trans.y ) / scale, world.size.height );
-    
-    final float startX = Math.max( 0f, -trans.x / scale );
-    final float endX = Math.min( ( getWidth() - trans.x ) / scale, world.size.width );
-    
-    world.render( g, new Rectangle2D.Float( startX, startY, endX - startX, endY - startY ), scale );
-    
+    worldRenderer.render( g, world, getView(), scale );
     g.translate( -trans.x, -trans.y );
   }
   
-  public void switchWorld( final Identifier id, final Point pos ) {
+  public void switchWorld( final Ident id, final Point pos ) {
     if ( world != null ) {
       world.removeEntity( player );
     }
@@ -97,21 +102,17 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
       final Direction dir = requestDir;
       
       if ( isAcceptingMoveRequest( dir ) ) {
-        player.move.request( dir );
+        player.move.makeNext( dir );
       }
     }
     
     final List<Entity> entities = world.listEntities();
     
     for ( final Entity entity : entities ) {
-      entity.updateWeak( delta );
+      entity.update( delta );
     }
     
-    for ( final Entity entity : entities ) {
-      entity.updateStrong( this );
-    }
-    
-    events.run( this );
+    Events.QUEUE.process( this );
     
     camera.update( delta );
     calcTranslation();

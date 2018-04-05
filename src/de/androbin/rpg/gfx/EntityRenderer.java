@@ -1,73 +1,51 @@
 package de.androbin.rpg.gfx;
 
 import static de.androbin.gfx.util.GraphicsUtil.*;
-import de.androbin.gfx.util.*;
-import de.androbin.rpg.*;
-import de.androbin.util.txt.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.*;
+import de.androbin.rpg.*;
+import de.androbin.rpg.entity.*;
+import de.androbin.rpg.gfx.sheet.*;
 
-public class EntityRenderer implements Renderer {
-  protected final Entity entity;
-  protected final BufferedImage[][] animation;
-  
-  public EntityRenderer( final Entity entity, final BufferedImage[][] animation ) {
-    this.entity = entity;
-    this.animation = animation;
+public class EntityRenderer<E extends Entity> {
+  public final Rectangle2D.Float getBounds( final E entity ) {
+    return getBounds( entity, entity.getFloatPos() );
   }
   
-  public static BufferedImage[][] createSheet( final String path ) {
-    final Direction[] directions = Direction.values();
-    final BufferedImage[][] animation = new BufferedImage[ directions.length ][];
-    
-    for ( int i = 0; i < animation.length; i++ ) {
-      final String dir = CaseUtil.toProperCase( directions[ i ].name() );
-      final BufferedImage image = ImageUtil.loadImage( path + "/" + dir + ".png" );
-      
-      final int ratio = Math.round( (float) image.getWidth() / image.getHeight() );
-      
-      final int width = image.getWidth() / ratio;
-      final int height = image.getHeight();
-      
-      animation[ i ] = new BufferedImage[ ratio ];
-      
-      for ( int j = 0; j < animation[ i ].length; j++ ) {
-        animation[ i ][ j ] = image.getSubimage( j * width, 0, width, height );
-      }
-    }
-    
-    return animation;
+  public final Rectangle2D.Float getBounds( final E entity, final Point2D.Float pos ) {
+    return getBounds( entity.data, Sheets.getImage( entity ), pos );
   }
   
-  @ Override
-  public Rectangle2D.Float getBounds( final Point2D.Float pos ) {
-    final Dimension size = entity.size;
+  public Rectangle2D.Float getBounds( final EntityData data, final BufferedImage image,
+      final Point2D.Float pos ) {
+    final Dimension size = data.size;
     
-    final int i = entity.viewDir.ordinal();
-    final int j = (int) ( entity.move.getModProgress() * animation[ i ].length );
+    final float res = Globals.get().res;
     
-    final BufferedImage image = animation[ i ][ j ];
-    
-    final float res = image.getWidth() / size.width;
-    final float y = pos.y + size.height - image.getHeight() / res;
+    final float width = image.getWidth() / res;
     final float height = image.getHeight() / res;
     
-    return new Rectangle2D.Float( pos.x, y, size.width, height );
+    final float x = pos.x - data.sheetDX / res;
+    final float y = pos.y + size.height - height - data.sheetDY / res;
+    
+    return new Rectangle2D.Float( x, y, width, height );
   }
   
-  @ Override
-  public void render( final Graphics2D g, final Point2D.Float pos, final float scale ) {
-    final Rectangle2D.Float bounds = getBounds( pos );
+  public final void render( final Graphics2D g, final E entity, final float scale ) {
+    render( g, entity, entity.getFloatPos(), scale );
+  }
+  
+  public void render( final Graphics2D g, final E entity,
+      final Point2D.Float pos, final float scale ) {
+    final BufferedImage image = Sheets.getImage( entity );
+    final Rectangle2D.Float bounds = getBounds( entity.data, image, pos );
     
     bounds.x *= scale;
     bounds.y *= scale;
     bounds.width *= scale;
     bounds.height *= scale;
     
-    final int i = entity.viewDir.ordinal();
-    final int j = (int) ( entity.move.getModProgress() * animation[ i ].length );
-    
-    drawImage( g, animation[ i ][ j ], bounds );
+    drawImage( g, image, bounds );
   }
 }
