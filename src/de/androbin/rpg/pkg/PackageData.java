@@ -1,23 +1,22 @@
 package de.androbin.rpg.pkg;
 
-import java.awt.*;
-import org.json.simple.*;
+import de.androbin.json.*;
 import de.androbin.rpg.*;
-import de.androbin.util.*;
+import java.awt.*;
 
 public class PackageData {
   public final Ident type;
   
   public final Dimension sheetSize;
   
-  public PackageData( final Ident type, final JSONObject props ) {
+  public PackageData( final Ident type, final XObject props ) {
     this.type = type;
     
-    this.sheetSize = JSONUtil.toDimension( props.get( "sheet.size" ) );
+    this.sheetSize = props.get( "sheet.size" ).asDimension();
   }
   
   @ FunctionalInterface
   public interface Builder {
-    PackageData build( Ident type, JSONObject props );
+    PackageData build( Ident type, XObject props );
   }
 }

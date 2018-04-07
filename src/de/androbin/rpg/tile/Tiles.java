@@ -1,10 +1,9 @@
 package de.androbin.rpg.tile;
 
-import static de.androbin.util.JSONUtil.*;
-import java.util.*;
-import org.json.simple.*;
+import de.androbin.json.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.pkg.*;
+import java.util.*;
 
 public final class Tiles {
   public static final Packages PACKAGES = new Packages( "tile" );
@@ -30,7 +29,7 @@ public final class Tiles {
   }
   
   private static TileData createData( final Ident type ) {
-    final JSONObject props = (JSONObject) parseJSON( "tile/" + type + ".json" ).get();
+    final XObject props = JSONUtil.readJSON( "tile/" + type + ".json" ).get().asObject();
     return DATA_BUILDERS.select( type ).build( type, props );
   }
   

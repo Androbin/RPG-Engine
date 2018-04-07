@@ -1,9 +1,8 @@
 package de.androbin.rpg.pkg;
 
-import static de.androbin.util.JSONUtil.*;
-import java.util.*;
-import org.json.simple.*;
+import de.androbin.json.*;
 import de.androbin.rpg.*;
+import java.util.*;
 
 public final class Packages {
   private final Map<Ident, PackageData> data = new HashMap<>();
@@ -17,8 +16,7 @@ public final class Packages {
   }
   
   private PackageData createData( final Ident type ) {
-    final JSONObject props = (JSONObject) parseJSON( prefix + "/" + type + "/package.json" )
-        .orElseGet( JSONObject::new );
+    final XObject props = JSONUtil.readJSONObject( prefix + "/" + type + "/package.json" );
     return dataBuilder.build( type, props );
   }
   

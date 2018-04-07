@@ -1,12 +1,11 @@
 package de.androbin.rpg.entity;
 
-import static de.androbin.util.JSONUtil.*;
+import de.androbin.json.*;
+import de.androbin.rpg.*;
+import de.androbin.rpg.pkg.*;
 import java.io.*;
 import java.util.*;
 import java.util.function.*;
-import org.json.simple.*;
-import de.androbin.rpg.*;
-import de.androbin.rpg.pkg.*;
 
 public final class Entities {
   public static final Packages PACKAGES = new Packages( "entity" );
@@ -36,7 +35,7 @@ public final class Entities {
   }
   
   private static EntityData createData( final Ident type ) {
-    final JSONObject props = (JSONObject) parseJSON( "entity/" + type + ".json" ).get();
+    final XObject props = JSONUtil.readJSON( "entity/" + type + ".json" ).get().asObject();
     return DATA_BUILDERS.select( type ).build( type, props );
   }
   

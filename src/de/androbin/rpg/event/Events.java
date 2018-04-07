@@ -1,11 +1,11 @@
 package de.androbin.rpg.event;
 
 import static de.androbin.collection.util.ObjectCollectionUtil.*;
+import de.androbin.json.*;
 import java.util.*;
 import java.util.function.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.event.handler.*;
-import de.androbin.util.*;
 
 public final class Events {
   private static final Map<String, Event.Builder> BUILDERS = new HashMap<>();
@@ -86,7 +86,7 @@ public final class Events {
       final Event.Builder builder = BUILDERS.get( func );
       return values -> builder.build( compile( args, values ) );
     } else {
-      final String[] events = JSONUtil.toStringArray( JSONUtil.parseJSON( "event/" + func ).get() );
+      final String[] events = JSONUtil.readJSON( "event/" + func ).get().asStringArray();
       return values -> new CustomEvent( func, fill( new Event[ events.length ], i -> {
         return parse( events[ i ] ).apply( values );
       } ) );

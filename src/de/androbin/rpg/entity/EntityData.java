@@ -1,14 +1,13 @@
 package de.androbin.rpg.entity;
 
-import java.awt.*;
-import java.util.*;
-import java.util.function.*;
-import org.json.simple.*;
+import de.androbin.json.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.event.Event;
 import de.androbin.rpg.gfx.sheet.*;
-import de.androbin.util.*;
+import java.awt.*;
+import java.util.*;
+import java.util.function.*;
 
 public class EntityData {
   public final Ident type;
@@ -24,26 +23,25 @@ public class EntityData {
   public final int sheetDX;
   public final int sheetDY;
   
-  @ SuppressWarnings( "unchecked" )
-  public EntityData( final Ident type, final JSONObject props ) {
+  public EntityData( final Ident type, final XObject props ) {
     this.type = type;
-    this.name = (String) props.get( "name" );
+    this.name = props.get( "name" ).asString();
     
-    this.solid = (boolean) props.getOrDefault( "solid", true );
+    this.solid = props.get( "solid" ).asBoolean( true );
     this.size = new Dimension(
-        JSONUtil.toInt( props.getOrDefault( "width", 1 ) ),
-        JSONUtil.toInt( props.getOrDefault( "height", 1 ) ) );
-    this.orientation = Directions.valueOf( (String) props.get( "orientation" ) );
+        props.get( "width" ).asInt( 1 ),
+        props.get( "height" ).asInt( 1 ) );
+    this.orientation = Directions.valueOf( props.get( "orientation" ).asString() );
     
-    this.enterEvent = Events.parse( (String) props.get( "enter_event" ) );
+    this.enterEvent = Events.parse( props.get( "enter_event" ).asString() );
     
     this.sheet = Sheets.create( this );
-    this.sheetDX = ( (Number) props.getOrDefault( "dx", 0 ) ).intValue();
-    this.sheetDY = ( (Number) props.getOrDefault( "dy", 0 ) ).intValue();
+    this.sheetDX = props.get( "dx" ).asInt( 0 );
+    this.sheetDY = props.get( "dy" ).asInt( 0 );
   }
   
   @ FunctionalInterface
   public interface Builder {
-    EntityData build( Ident type, JSONObject props );
+    EntityData build( Ident type, XObject props );
   }
 }

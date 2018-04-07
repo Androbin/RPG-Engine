@@ -1,15 +1,14 @@
 package de.androbin.rpg;
 
-import org.json.simple.*;
-import de.androbin.util.*;
+import de.androbin.json.*;
 
 public final class Globals {
   private static Globals INSTANCE;
   
   public final int res;
   
-  private Globals( final JSONObject config ) {
-    res = ( (Number) config.get( "res" ) ).intValue();
+  private Globals( final XObject config ) {
+    res = config.get( "res" ).asInt();
   }
   
   public static Globals get() {
@@ -17,10 +16,10 @@ public final class Globals {
   }
   
   public static void init( final String path ) {
-    init( (JSONObject) JSONUtil.parseJSON( path ).get() );
+    init( JSONUtil.readJSON( path ).get().asObject() );
   }
   
-  public static void init( final JSONObject config ) {
+  public static void init( final XObject config ) {
     INSTANCE = new Globals( config );
   }
 }

@@ -1,11 +1,11 @@
 package de.androbin.rpg.tile;
 
-import java.util.*;
-import java.util.function.*;
-import org.json.simple.*;
+import de.androbin.json.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.gfx.sheet.*;
+import java.util.*;
+import java.util.function.*;
 
 public class TileData {
   public final Ident type;
@@ -17,20 +17,19 @@ public class TileData {
   
   public final Sheet sheet;
   
-  @ SuppressWarnings( "unchecked" )
-  public TileData( final Ident type, final JSONObject props ) {
+  public TileData( final Ident type, final XObject props ) {
     this.type = type;
-    this.name = (String) props.get( "name" );
+    this.name = props.get( "name" ).asString();
     
-    this.passable = (boolean) props.getOrDefault( "passable", true );
+    this.passable = props.get( "passable" ).asBoolean( true );
     
-    this.enterEvent = Events.parse( (String) props.get( "enter_event" ) );
+    this.enterEvent = Events.parse( props.get( "enter_event" ).asString() );
     
     this.sheet = Sheets.create( this );
   }
   
   @ FunctionalInterface
   public interface Builder {
-    TileData build( Ident type, JSONObject props );
+    TileData build( Ident type, XObject props );
   }
 }
