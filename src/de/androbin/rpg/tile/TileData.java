@@ -4,8 +4,6 @@ import de.androbin.json.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.gfx.sheet.*;
-import java.util.*;
-import java.util.function.*;
 
 public class TileData {
   public final Ident type;
@@ -13,7 +11,7 @@ public class TileData {
   
   public final boolean passable;
   
-  public final Function<Map<String, Object>, Event> enterEvent;
+  public final Event.Raw enterEvent;
   
   public final Sheet sheet;
   

@@ -16,11 +16,11 @@ public final class TileEnterEventHandler implements Event.Handler<TileEnterEvent
     values.put( "entity", entity );
     
     if ( tile.data.enterEvent != null ) {
-      Events.QUEUE.enqueue( tile.data.enterEvent.apply( values ) );
+      Events.QUEUE.enqueue( tile.data.enterEvent.compile( values ) );
     }
     
     if ( tile.enterEvent != null ) {
-      Events.QUEUE.enqueue( tile.enterEvent.apply( values ) );
+      Events.QUEUE.enqueue( tile.enterEvent.compile( values ) );
     }
   }
 }

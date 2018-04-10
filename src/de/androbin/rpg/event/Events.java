@@ -2,14 +2,13 @@ package de.androbin.rpg.event;
 
 import static de.androbin.collection.util.ObjectCollectionUtil.*;
 import de.androbin.json.*;
-import java.util.*;
-import java.util.function.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.event.handler.*;
+import java.util.*;
 
 public final class Events {
   private static final Map<String, Event.Builder> BUILDERS = new HashMap<>();
-  private static final Map<Class< ? extends Event>, Event.Handler< ? extends Event>> HANDLERS = new HashMap<>();
+  private static final Map<Class<? extends Event>, Event.Handler<? extends Event>> HANDLERS = new HashMap<>();
   
   public static final EventQueue QUEUE = new EventQueue();
   
@@ -61,7 +60,7 @@ public final class Events {
     }
   }
   
-  public static Function<Map<String, Object>, Event> parse( final String text ) {
+  public static Event.Raw parse( final String text ) {
     if ( text == null ) {
       return null;
     }
@@ -88,7 +87,7 @@ public final class Events {
     } else {
       final String[] events = JSONUtil.readJSON( "event/" + func ).get().asStringArray();
       return values -> new CustomEvent( func, fill( new Event[ events.length ], i -> {
-        return parse( events[ i ] ).apply( values );
+        return parse( events[ i ] ).compile( values );
       } ) );
     }
   }

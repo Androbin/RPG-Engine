@@ -6,8 +6,6 @@ import de.androbin.rpg.event.*;
 import de.androbin.rpg.event.Event;
 import de.androbin.rpg.gfx.sheet.*;
 import java.awt.*;
-import java.util.*;
-import java.util.function.*;
 
 public class EntityData {
   public final Ident type;
@@ -17,7 +15,7 @@ public class EntityData {
   public final Dimension size;
   public final Direction orientation;
   
-  public final Function<Map<String, Object>, Event> enterEvent;
+  public final Event.Raw enterEvent;
   
   public final Sheet sheet;
   public final int sheetDX;
