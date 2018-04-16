@@ -81,9 +81,6 @@ public final class Ident implements Iterable<String> {
   private final class PartialIterator implements Iterator<Ident> {
     private int end = 1;
     
-    public PartialIterator() {
-    }
-    
     @ Override
     public boolean hasNext() {
       return end <= path.length;

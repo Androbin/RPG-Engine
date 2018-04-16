@@ -3,7 +3,7 @@ package de.androbin.rpg;
 import de.androbin.json.*;
 
 public final class Globals {
-  private static Globals INSTANCE;
+  private static Globals instance;
   
   public final int res;
   
@@ -12,7 +12,7 @@ public final class Globals {
   }
   
   public static Globals get() {
-    return INSTANCE;
+    return instance;
   }
   
   public static void init( final String path ) {
@@ -20,6 +20,6 @@ public final class Globals {
   }
   
   public static void init( final XObject config ) {
-    INSTANCE = new Globals( config );
+    instance = new Globals( config );
   }
 }

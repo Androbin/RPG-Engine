@@ -10,7 +10,7 @@ public abstract class AbstractPackager<T> implements Packager<T> {
     T best = getDefault();
     
     for ( final Ident partialId : id.partial() ) {
-      T value = get( partialId );
+      final T value = get( partialId );
       
       if ( value != null ) {
         best = value;
