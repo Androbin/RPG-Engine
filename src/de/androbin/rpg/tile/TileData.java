@@ -5,10 +5,7 @@ import de.androbin.rpg.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.gfx.sheet.*;
 
-public class TileData {
-  public final Ident type;
-  public final String name;
-  
+public class TileData extends Data {
   public final boolean passable;
   
   public final Event.Raw enterEvent;
@@ -16,8 +13,7 @@ public class TileData {
   public final Sheet sheet;
   
   public TileData( final Ident type, final XObject props ) {
-    this.type = type;
-    this.name = props.get( "name" ).asString();
+    super( type, props );
     
     this.passable = props.get( "passable" ).asBoolean( true );
     

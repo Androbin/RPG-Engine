@@ -7,10 +7,7 @@ import de.androbin.rpg.event.Event;
 import de.androbin.rpg.gfx.sheet.*;
 import java.awt.*;
 
-public class EntityData {
-  public final Ident type;
-  public final String name;
-  
+public class EntityData extends Data {
   public final boolean solid;
   public final Dimension size;
   public final Direction orientation;
@@ -22,8 +19,7 @@ public class EntityData {
   public final int sheetDY;
   
   public EntityData( final Ident type, final XObject props ) {
-    this.type = type;
-    this.name = props.get( "name" ).asString();
+    super( type, props );
     
     this.solid = props.get( "solid" ).asBoolean( true );
     this.size = new Dimension(
