@@ -7,6 +7,7 @@ Dependencies:
  - 2D Game Engine
  - Collection Utils
  - GFX
+ - IO
  - JSON
  - Math Utils
  - Screen System
