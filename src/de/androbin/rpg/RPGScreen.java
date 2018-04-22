@@ -4,6 +4,7 @@ import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.gfx.*;
 import de.androbin.rpg.overlay.*;
+import de.androbin.rpg.story.*;
 import de.androbin.shell.*;
 import de.androbin.shell.gfx.*;
 import de.androbin.shell.input.*;
@@ -17,6 +18,8 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   
   protected World world;
   
+  protected StoryState story;
+  
   public Entity player;
   private Direction requestDir;
   
@@ -29,22 +32,26 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   
   protected float scale;
   
-  public RPGScreen( final float scale ) {
+  public RPGScreen( final StoryState story, final float scale ) {
     keyboardTee.mask = true;
     addKeyInput( new OverlayKeyInput( () -> overlay ) );
     addKeyInput( new RPGKeyInput() );
     
-    this.worldRenderer = new WorldRenderer();
+    this.story = story;
     
-    this.camera = new Camera();
-    this.trans = new Point2D.Float();
+    worldRenderer = new WorldRenderer();
+    
+    camera = new Camera();
+    trans = new Point2D.Float();
     
     this.scale = scale;
   }
   
   private void calcTranslation() {
-    final float pw = scale * world.size.width;
-    final float ph = scale * world.size.height;
+    final Dimension size = world.size;
+    
+    final float pw = scale * size.width;
+    final float ph = scale * size.height;
     
     trans.x = camera.calcTranslationX( getWidth(), pw, scale );
     trans.y = camera.calcTranslationY( getHeight(), ph, scale );
@@ -53,11 +60,13 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   protected abstract World createWorld( Ident id );
   
   private Rectangle2D.Float getView() {
+    final Dimension size = world.size;
+    
     final float startY = Math.max( 0f, -trans.y / scale );
-    final float endY = Math.min( ( getHeight() - trans.y ) / scale, world.size.height );
+    final float endY = Math.min( ( getHeight() - trans.y ) / scale, size.height );
     
     final float startX = Math.max( 0f, -trans.x / scale );
-    final float endX = Math.min( ( getWidth() - trans.x ) / scale, world.size.width );
+    final float endX = Math.min( ( getWidth() - trans.x ) / scale, size.width );
     
     return new Rectangle2D.Float( startX, startY, endX - startX, endY - startY );
   }
@@ -67,15 +76,17 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   }
   
   private boolean isAcceptingMoveRequest( final Direction dir ) {
-    if ( !player.move.hasCurrent() ) {
+    final MoveHandle move = player.move;
+    
+    if ( !move.hasCurrent() ) {
       return true;
     }
     
-    if ( player.move.getCurrent() != dir ) {
+    if ( move.getCurrent() != dir ) {
       return true;
     }
     
-    return player.move.getProgress() >= 0.4f;
+    return move.getProgress() >= 0.4f;
   }
   
   @ Override
@@ -134,6 +145,7 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
     }
     
     Events.QUEUE.process( this );
+    story.update();
     
     camera.update( delta );
     calcTranslation();
