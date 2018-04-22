@@ -2,6 +2,7 @@ package de.androbin.rpg.entity;
 
 import de.androbin.json.*;
 import de.androbin.rpg.*;
+import de.androbin.rpg.dir.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.event.Event;
 import de.androbin.rpg.gfx.sheet.*;

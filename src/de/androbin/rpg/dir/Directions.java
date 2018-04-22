@@ -1,4 +1,4 @@
-package de.androbin.rpg;
+package de.androbin.rpg.dir;
 
 import java.awt.event.*;
 import java.util.*;

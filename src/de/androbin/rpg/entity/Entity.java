@@ -3,6 +3,7 @@ package de.androbin.rpg.entity;
 import java.awt.*;
 import java.awt.geom.*;
 import de.androbin.rpg.*;
+import de.androbin.rpg.dir.*;
 import de.androbin.rpg.event.Event;
 
 public class Entity {
@@ -35,9 +36,17 @@ public class Entity {
   
   public final Point2D.Float getFloatPos() {
     if ( move.hasCurrent() ) {
-      final Direction dir = move.getCurrent();
+      final DirectionPair dir = move.getCurrent();
       final float progress = move.getProgress();
-      return dir.from( pos, progress );
+      final float scalar;
+      
+      if ( dir.second == null ) {
+        scalar = ( progress + 0.5f ) % 1f - 0.5f;
+      } else {
+        scalar = progress;
+      }
+      
+      return dir.from( pos, scalar );
     } else {
       return new Point2D.Float( pos.x, pos.y );
     }

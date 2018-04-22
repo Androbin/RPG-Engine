@@ -1,5 +1,6 @@
 package de.androbin.rpg;
 
+import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.gfx.*;
@@ -7,7 +8,6 @@ import de.androbin.rpg.overlay.*;
 import de.androbin.rpg.story.*;
 import de.androbin.shell.*;
 import de.androbin.shell.gfx.*;
-import de.androbin.shell.input.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
@@ -21,7 +21,7 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   protected StoryState story;
   
   public Entity player;
-  private Direction requestDir;
+  private DirectionPair requestDir;
   
   protected WorldRenderer worldRenderer;
   
@@ -35,7 +35,7 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   public RPGScreen( final StoryState story, final float scale ) {
     keyboardTee.mask = true;
     addKeyInput( new OverlayKeyInput( () -> overlay ) );
-    addKeyInput( new RPGKeyInput() );
+    addKeyInput( new MoveKeyInput( () -> requestDir, dir -> requestDir = dir ) );
     
     this.story = story;
     
@@ -75,14 +75,19 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
     return worlds.computeIfAbsent( id, this::createWorld );
   }
   
-  private boolean isAcceptingMoveRequest( final Direction dir ) {
+  private boolean isAcceptingMoveRequest( final DirectionPair dir ) {
     final MoveHandle move = player.move;
+    final DirectionPair current = move.getCurrent();
     
-    if ( !move.hasCurrent() ) {
+    if ( current == null || dir == null ) {
       return true;
     }
     
-    if ( move.getCurrent() != dir ) {
+    if ( current.second != null || dir.second != null ) {
+      return true;
+    }
+    
+    if ( current.first != dir.first ) {
       return true;
     }
     
@@ -131,7 +136,7 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   @ Override
   public void update( final float delta ) {
     if ( player != null ) {
-      final Direction dir = requestDir;
+      final DirectionPair dir = requestDir;
       
       if ( isAcceptingMoveRequest( dir ) ) {
         player.move.makeNext( dir );
@@ -158,24 +163,4 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
       }
     }
   }
-  
-  private final class RPGKeyInput implements KeyInput {
-    @ Override
-    public void keyPressed( final int keycode ) {
-      final Direction dir = Directions.byKeyCode( keycode );
-      
-      if ( dir != null ) {
-        requestDir = dir;
-      }
-    }
-    
-    @ Override
-    public void keyReleased( final int keycode ) {
-      final Direction dir = Directions.byKeyCode( keycode );
-      
-      if ( dir == requestDir ) {
-        requestDir = null;
-      }
-    }
-  };
 }

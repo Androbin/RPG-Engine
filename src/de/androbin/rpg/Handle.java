@@ -3,10 +3,10 @@ package de.androbin.rpg;
 import java.util.function.*;
 
 public abstract class Handle<I, O> {
-  private I current;
-  private I next;
+  protected I current;
+  protected I next;
   
-  private float progress;
+  protected float progress;
   public float speed = 1f;
   
   public BiConsumer<I, O> callback;
