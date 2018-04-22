@@ -1,15 +1,16 @@
 package de.androbin.rpg;
 
+import de.androbin.rpg.entity.*;
+import de.androbin.rpg.event.*;
+import de.androbin.rpg.gfx.*;
+import de.androbin.rpg.overlay.*;
+import de.androbin.shell.*;
+import de.androbin.shell.gfx.*;
+import de.androbin.shell.input.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.List;
-import de.androbin.rpg.entity.*;
-import de.androbin.rpg.event.*;
-import de.androbin.rpg.gfx.*;
-import de.androbin.shell.*;
-import de.androbin.shell.gfx.*;
-import de.androbin.shell.input.*;
 
 public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   private final Map<Ident, World> worlds = new HashMap<>();
@@ -21,12 +22,16 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   
   protected WorldRenderer worldRenderer;
   
+  private Overlay overlay;
+  
   protected final Camera camera;
   protected final Point2D.Float trans;
   
   protected float scale;
   
   public RPGScreen( final float scale ) {
+    keyboardTee.mask = true;
+    addKeyInput( new OverlayKeyInput( () -> overlay ) );
     addKeyInput( new RPGKeyInput() );
     
     this.worldRenderer = new WorldRenderer();
@@ -74,6 +79,13 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   }
   
   @ Override
+  protected void onResized( final int width, final int height ) {
+    if ( overlay != null ) {
+      overlay.onResized( width, height );
+    }
+  }
+  
+  @ Override
   public void render( final Graphics2D g ) {
     g.setColor( Color.BLACK );
     g.fillRect( 0, 0, getWidth(), getHeight() );
@@ -85,6 +97,15 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
     g.translate( trans.x, trans.y );
     worldRenderer.render( g, world, getView(), scale );
     g.translate( -trans.x, -trans.y );
+    
+    if ( overlay != null ) {
+      overlay.render( g );
+    }
+  }
+  
+  public void setOverlay( final Overlay overlay ) {
+    overlay.onResized( getWidth(), getHeight() );
+    this.overlay = overlay;
   }
   
   public void switchWorld( final Ident id, final Point pos ) {
@@ -116,6 +137,14 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
     
     camera.update( delta );
     calcTranslation();
+    
+    if ( overlay != null ) {
+      if ( overlay.isDone() ) {
+        overlay = null;
+      } else {
+        overlay.update( delta );
+      }
+    }
   }
   
   private final class RPGKeyInput implements KeyInput {
