@@ -39,7 +39,7 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
     
     this.story = story;
     
-    worldRenderer = new WorldRenderer();
+    worldRenderer = new SimpleWorldRenderer();
     
     camera = new Camera();
     trans = new Point2D.Float();
