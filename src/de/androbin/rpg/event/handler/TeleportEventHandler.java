@@ -1,11 +1,12 @@
 package de.androbin.rpg.event.handler;
 
-import java.awt.*;
 import de.androbin.rpg.*;
+import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.event.Event;
 import de.androbin.rpg.tile.*;
+import java.awt.*;
 
 public final class TeleportEventHandler implements Event.Handler<TeleportEvent> {
   @ Override
@@ -28,7 +29,11 @@ public final class TeleportEventHandler implements Event.Handler<TeleportEvent> 
         return;
       }
       
-      entity.orientation = entity.data.orientation;
+      if ( entity instanceof Agent ) {
+        final Agent agent = (Agent) entity;
+        agent.orientation = Direction.DOWN;
+      }
+      
       entity.pos = pos;
     } else {
       if ( entity == master.player ) {

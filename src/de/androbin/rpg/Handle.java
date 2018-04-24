@@ -2,21 +2,19 @@ package de.androbin.rpg;
 
 import java.util.function.*;
 
-public abstract class Handle<I, O> {
+public class Handle<I, O> {
   protected I current;
   protected I next;
   
-  protected float progress;
+  private float progress;
   public float speed = 1f;
   
   public BiConsumer<I, O> callback;
   public BiConsumer<I, Boolean> requestCallback;
   
-  public boolean canHandle( final I arg ) {
-    return true;
+  protected O finish( final I arg ) {
+    return null;
   }
-  
-  protected abstract O doHandle( final I arg );
   
   public final I getCurrent() {
     return current;
@@ -30,28 +28,16 @@ public abstract class Handle<I, O> {
     return progress;
   }
   
-  public final I getNext() {
-    return next;
-  }
-  
-  protected boolean handle( final I arg ) {
-    return canHandle( arg );
-  }
-  
   public final boolean hasCurrent() {
     return current != null;
   }
   
-  public final boolean hasNext() {
-    return next != null;
+  protected boolean prepare( final I arg ) {
+    return true;
   }
   
-  public void makeNext( final I arg ) {
-    if ( arg == null ) {
-      return;
-    }
-    
-    next = arg;
+  protected void rewind( final float delta ) {
+    progress -= delta;
   }
   
   public void update( final float delta ) {
@@ -60,7 +46,7 @@ public abstract class Handle<I, O> {
         progress = 0f;
       } else {
         final I val = next;
-        final boolean success = handle( next );
+        final boolean success = prepare( next );
         
         if ( success ) {
           current = next;
@@ -77,9 +63,9 @@ public abstract class Handle<I, O> {
       
       if ( progress >= 1f ) {
         final I val1 = current;
-        final O val2 = doHandle( current );
+        final O val2 = finish( current );
         current = null;
-        progress--;
+        rewind( 1f );
         
         if ( callback != null ) {
           callback.accept( val1, val2 );

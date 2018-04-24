@@ -9,7 +9,7 @@ public final class DummyStoryNode extends StoryNode {
   }
   
   public DummyStoryNode( final Ident id, final List<Ident> deps ) {
-    super( id, null );
+    super( id, deps );
   }
   
   @ Override

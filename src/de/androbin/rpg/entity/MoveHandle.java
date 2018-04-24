@@ -7,39 +7,29 @@ import de.androbin.rpg.tile.*;
 import java.awt.*;
 
 public final class MoveHandle extends Handle<DirectionPair, Void> {
-  private final Entity entity;
+  private final Agent agent;
   
-  public MoveHandle( final Entity entity ) {
-    this.entity = entity;
-  }
-  
-  @ Override
-  public boolean canHandle( final DirectionPair dir ) {
-    return canHandle( dir.first );
+  public MoveHandle( final Agent agent ) {
+    this.agent = agent;
   }
   
   public boolean canHandle( final Direction dir ) {
-    return LoopUtil.and( dir.outer( entity.getBounds() ), pos -> {
-      final Tile tile = entity.world.getTile( pos );
+    return LoopUtil.and( dir.outer( agent.getBounds() ), pos -> {
+      final Tile tile = agent.world.getTile( pos );
       return tile != null && tile.data.passable;
     } );
   }
   
   private void contract( final Direction dir ) {
-    entity.pos = current.first.from( entity.pos );
+    agent.pos = current.first.from( agent.pos );
     
-    final Rectangle target = new Rectangle( entity.pos, entity.data.size );
-    entity.world.getSpaceTime( entity ).set( entity, target );
+    final Rectangle target = new Rectangle( agent.pos, agent.data.size );
+    agent.world.getSpaceTime( agent ).set( agent, target );
     
-    LoopUtil.forEach( dir.inner( entity.getBounds() ), pos -> {
-      final Tile tile = entity.world.getTile( pos );
-      Events.QUEUE.enqueue( new TileEnterEvent( tile, entity ) );
+    LoopUtil.forEach( dir.inner( agent.getBounds() ), pos -> {
+      final Tile tile = agent.world.getTile( pos );
+      Events.QUEUE.enqueue( new TileEnterEvent( tile, agent ) );
     } );
-  }
-  
-  @ Override
-  protected Void doHandle( final DirectionPair dir ) {
-    return null;
   }
   
   private boolean expand( final Direction dir ) {
@@ -47,41 +37,26 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
       return false;
     }
     
-    final Rectangle target = dir.expand( entity.getBounds() );
-    return entity.world.getSpaceTime( entity ).trySet( entity, target );
+    final Rectangle target = dir.expand( agent.getBounds() );
+    return agent.world.getSpaceTime( agent ).trySet( agent, target );
   }
   
   private boolean expand( final Direction dir, final boolean naive ) {
     final boolean success = expand( dir );
     
-    if ( entity.orientation != null && ( success || naive ) ) {
-      entity.orientation = dir;
+    if ( agent.orientation != null && ( success || naive ) ) {
+      agent.orientation = dir;
     }
     
     return success;
   }
   
   @ Override
-  protected boolean handle( final DirectionPair dir ) {
+  protected boolean prepare( final DirectionPair dir ) {
     return expand( dir.first, true );
   }
   
-  @ Override
-  public void update( final float delta ) {
-    if ( current == null && next != null && next.second != null ) {
-      if ( expand( next.first, true ) ) {
-        current = new DirectionPair( next.first );
-      }
-    }
-    
-    final float before = getProgress();
-    super.update( delta );
-    final float after = getProgress();
-    
-    if ( current == null || before >= 0.5f || after < 0.5f ) {
-      return;
-    }
-    
+  private void merge() {
     if ( next == null ) {
       current = new DirectionPair( current.first );
     } else if ( next.second == null ) {
@@ -96,7 +71,43 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
       current = next.reverse();
       next = null;
     }
+  }
+  
+  public void request( final Direction dir ) {
+    request( new DirectionPair( dir ) );
+  }
+  
+  public void request( final DirectionPair dir ) {
+    next = dir;
+  }
+  
+  private void sanitize() {
+    if ( next.second == null ) {
+      return;
+    }
     
+    if ( expand( next.first, true ) ) {
+      current = new DirectionPair( next.first );
+    } else if ( expand( next.second, false ) ) {
+      current = new DirectionPair( next.second );
+    }
+  }
+  
+  @ Override
+  public void update( final float delta ) {
+    if ( current == null && next != null ) {
+      sanitize();
+    }
+    
+    final float before = getProgress();
+    super.update( delta );
+    final float after = getProgress();
+    
+    if ( current == null || before >= 0.5f || after < 0.5f ) {
+      return;
+    }
+    
+    merge();
     contract( current.first );
     
     if ( current.second == null ) {
@@ -104,7 +115,7 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
     }
     
     if ( expand( current.second, false ) ) {
-      progress -= 0.5f;
+      rewind( 0.5f );
       current = current.reverse();
     } else {
       current = new DirectionPair( current.first );

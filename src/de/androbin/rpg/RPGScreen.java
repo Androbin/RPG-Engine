@@ -20,7 +20,7 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   
   protected StoryState story;
   
-  public Entity player;
+  public Agent player;
   private DirectionPair requestDir;
   
   protected WorldRenderer worldRenderer;
@@ -139,7 +139,7 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
       final DirectionPair dir = requestDir;
       
       if ( isAcceptingMoveRequest( dir ) ) {
-        player.move.makeNext( dir );
+        player.move.request( dir );
       }
     }
     

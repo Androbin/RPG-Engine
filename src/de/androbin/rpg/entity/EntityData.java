@@ -2,7 +2,6 @@ package de.androbin.rpg.entity;
 
 import de.androbin.json.*;
 import de.androbin.rpg.*;
-import de.androbin.rpg.dir.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.event.Event;
 import de.androbin.rpg.gfx.sheet.*;
@@ -11,7 +10,6 @@ import java.awt.*;
 public class EntityData extends Data {
   public final boolean solid;
   public final Dimension size;
-  public final Direction orientation;
   
   public final Event.Raw enterEvent;
   
@@ -26,7 +24,6 @@ public class EntityData extends Data {
     this.size = new Dimension(
         props.get( "width" ).asInt( 1 ),
         props.get( "height" ).asInt( 1 ) );
-    this.orientation = Directions.valueOf( props.get( "orientation" ).asString() );
     
     this.enterEvent = Events.parse( props.get( "enter_event" ).asString() );
     

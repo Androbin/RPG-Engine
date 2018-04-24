@@ -1,11 +1,12 @@
 package de.androbin.rpg;
 
+import de.androbin.rpg.entity.*;
+import de.androbin.rpg.tile.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.*;
 import java.util.stream.*;
-import de.androbin.rpg.entity.*;
-import de.androbin.rpg.tile.*;
 
 public class World {
   public final Ident id;
@@ -39,7 +40,7 @@ public class World {
     final boolean success = spaceTime.tryAdd( entity, entity.getBounds() );
     
     if ( !success ) {
-      // entity.pos = null;
+      entity.pos = null;
       return false;
     }
     
@@ -73,14 +74,30 @@ public class World {
     return tiles[ pos.y * size.width + pos.x ];
   }
   
+  public final List<Agent> listAgents() {
+    return listEntities( Agent.class );
+  }
+  
   public final List<Entity> listEntities() {
     return Collections.unmodifiableList( entities );
   }
   
-  public final List<Entity> listEntities( final boolean solid ) {
+  @ SuppressWarnings( "unchecked" )
+  public <T> List<T> listEntities( final Class<T> type ) {
     return entities.stream()
-        .filter( entity -> entity.data.solid == solid )
+        .filter( entity -> type.isAssignableFrom( entity.getClass() ) )
+        .map( entity -> (T) entity )
         .collect( Collectors.toList() );
+  }
+  
+  private List<Entity> listEntities( final Predicate<Entity> filter ) {
+    return entities.stream()
+        .filter( filter )
+        .collect( Collectors.toList() );
+  }
+  
+  public final List<Entity> listEntities( final boolean solid ) {
+    return listEntities( entity -> entity.data.solid == solid );
   }
   
   public final boolean removeEntity( final Entity entity ) {
