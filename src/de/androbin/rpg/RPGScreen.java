@@ -4,10 +4,10 @@ import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.gfx.*;
-import de.androbin.rpg.overlay.*;
 import de.androbin.rpg.story.*;
 import de.androbin.shell.*;
 import de.androbin.shell.gfx.*;
+import de.androbin.shell.input.supply.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
@@ -34,7 +34,7 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   
   public RPGScreen( final StoryState story, final float scale ) {
     keyboardTee.mask = true;
-    addKeyInput( new OverlayKeyInput( () -> overlay ) );
+    addKeyInput( KeyInputSupply.fromShell( () -> overlay ) );
     addKeyInput( new MoveKeyInput( () -> requestDir, dir -> requestDir = dir ) );
     
     this.story = story;
@@ -97,7 +97,7 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   @ Override
   protected void onResized( final int width, final int height ) {
     if ( overlay != null ) {
-      overlay.onResized( width, height );
+      overlay.setSize( width, height );
     }
   }
   
@@ -120,7 +120,8 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   }
   
   public void setOverlay( final Overlay overlay ) {
-    overlay.onResized( getWidth(), getHeight() );
+    overlay.setRunning( true );
+    overlay.setSize( getWidth(), getHeight() );
     this.overlay = overlay;
   }
   
@@ -156,10 +157,10 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
     calcTranslation();
     
     if ( overlay != null ) {
-      if ( overlay.isDone() ) {
-        overlay = null;
-      } else {
+      if ( overlay.isRunning() ) {
         overlay.update( delta );
+      } else {
+        overlay = null;
       }
     }
   }
