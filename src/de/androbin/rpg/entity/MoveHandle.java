@@ -99,8 +99,14 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
       sanitize();
     }
     
+    float speed = 1f;
+    
+    if ( current != null && current.second != null ) {
+      speed *= Math.sqrt( 0.5f );
+    }
+    
     final float before = getProgress();
-    super.update( delta );
+    super.update( delta * speed );
     final float after = getProgress();
     
     if ( current == null || before >= 0.5f || after < 0.5f ) {
