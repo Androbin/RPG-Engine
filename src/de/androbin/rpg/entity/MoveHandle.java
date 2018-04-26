@@ -13,7 +13,7 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
     this.agent = agent;
   }
   
-  public boolean canHandle( final Direction dir ) {
+  private boolean canMove( final Direction dir ) {
     return LoopUtil.and( dir.outer( agent.getBounds() ), pos -> {
       final Tile tile = agent.world.getTile( pos );
       return tile != null && tile.data.passable;
@@ -33,7 +33,7 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
   }
   
   private boolean expand( final Direction dir ) {
-    if ( !canHandle( dir ) ) {
+    if ( !canMove( dir ) ) {
       return false;
     }
     
@@ -41,90 +41,98 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
     return agent.world.getSpaceTime( agent ).trySet( agent, target );
   }
   
-  private boolean expand( final Direction dir, final boolean naive ) {
-    final boolean success = expand( dir );
+  private boolean expand( final DirectionPair dir, final boolean dim, final boolean naive ) {
+    final boolean success = expand( dir.first );
     
-    if ( agent.orientation != null && ( success || naive ) ) {
-      agent.orientation = dir;
+    if ( success || naive ) {
+      agent.orientation = dim ? dir : new DirectionPair( dir.first );
     }
     
     return success;
   }
   
   @ Override
-  protected boolean prepare( final DirectionPair dir ) {
-    return expand( dir.first, true );
-  }
-  
-  private void merge() {
-    if ( next == null ) {
-      current = new DirectionPair( current.first );
-    } else if ( next.second == null ) {
-      if ( next.first != current.first.opposite() ) {
-        current = new DirectionPair( current.first, next.first );
-        next = null;
-      }
-    } else if ( next.first == current.first ) {
-      current = next;
-      next = null;
-    } else if ( next.second == current.first ) {
-      current = next.reverse();
-      next = null;
-    }
-  }
-  
-  public void request( final Direction dir ) {
-    request( new DirectionPair( dir ) );
-  }
-  
-  public void request( final DirectionPair dir ) {
-    next = dir;
-  }
-  
-  private void sanitize() {
-    if ( next.second == null ) {
-      return;
-    }
-    
-    if ( expand( next.first, true ) ) {
-      current = new DirectionPair( next.first );
-    } else if ( expand( next.second, false ) ) {
-      current = new DirectionPair( next.second );
-    }
-  }
-  
-  @ Override
-  public void update( final float delta ) {
-    if ( current == null && next != null ) {
-      sanitize();
-    }
-    
-    float speed = 1f;
-    
-    if ( current != null && current.second != null ) {
-      speed *= Math.sqrt( 0.5f );
-    }
-    
-    final float before = getProgress();
-    super.update( delta * speed );
-    final float after = getProgress();
-    
-    if ( current == null || before >= 0.5f || after < 0.5f ) {
-      return;
-    }
-    
-    merge();
+  protected void handle( final DirectionPair dir ) {
+    super.handle( dir );
     contract( current.first );
     
     if ( current.second == null ) {
       return;
     }
     
-    if ( expand( current.second, false ) ) {
+    if ( expand( current.reverse(), true, false ) ) {
       rewind( 0.5f );
-      current = current.reverse();
+      setCurrent( current.reverse() );
     } else {
-      current = new DirectionPair( current.first );
+      setCurrent( new DirectionPair( current.first ) );
     }
+  }
+  
+  @ Override
+  protected boolean prepare( final DirectionPair dir ) {
+    return expand( dir, false, true );
+  }
+  
+  @ Override
+  protected DirectionPair merge( final DirectionPair next ) {
+    if ( next == null ) {
+      return new DirectionPair( current.first );
+    } else if ( next.second == null ) {
+      if ( next.first != current.first.opposite() ) {
+        return new DirectionPair( current.first, next.first );
+      }
+    } else if ( next.first == current.first ) {
+      return next;
+    } else if ( next.second == current.first ) {
+      return next.reverse();
+    }
+    
+    return null;
+  }
+  
+  public void request( final Direction dir ) {
+    if ( dir == null ) {
+      request( (DirectionPair) null );
+      return;
+    }
+    
+    request( new DirectionPair( dir ) );
+  }
+  
+  @ Override
+  protected DirectionPair sanitize( final DirectionPair dir ) {
+    if ( dir.second == null ) {
+      return dir;
+    }
+    
+    if ( expand( dir, false, true ) ) {
+      return new DirectionPair( dir.first );
+    } else if ( expand( dir.reverse(), false, false ) ) {
+      return new DirectionPair( dir.second );
+    }
+    
+    return null;
+  }
+  
+  @ Override
+  protected void setCurrent( final DirectionPair dir ) {
+    super.setCurrent( dir );
+    
+    if ( dir == null ) {
+      return;
+    }
+    
+    agent.orientation = dir;
+  }
+  
+  @ Override
+  public void update( final float delta ) {
+    float speed = 1f;
+    
+    if ( current != null && current.second != null ) {
+      speed *= Math.sqrt( 0.5f );
+    }
+    
+    super.update( delta * speed );
   }
 }

@@ -32,16 +32,45 @@ public class Handle<I, O> {
     return current != null;
   }
   
+  protected void handle( final I arg ) {
+    final I merged = merge( next );
+    
+    if ( merged != null ) {
+      setCurrent( merged );
+      next = null;
+    }
+  }
+  
+  protected I merge( final I arg ) {
+    return null;
+  }
+  
   protected boolean prepare( final I arg ) {
     return true;
+  }
+  
+  public void request( final I arg ) {
+    next = arg;
   }
   
   protected void rewind( final float delta ) {
     progress -= delta;
   }
   
+  protected I sanitize( final I arg ) {
+    return arg;
+  }
+  
+  protected void setCurrent( final I arg ) {
+    current = arg;
+  }
+  
   public void update( final float delta ) {
     if ( current == null ) {
+      if ( next != null ) {
+        next = sanitize( next );
+      }
+      
       if ( next == null ) {
         progress = 0f;
       } else {
@@ -49,7 +78,7 @@ public class Handle<I, O> {
         final boolean success = prepare( next );
         
         if ( success ) {
-          current = next;
+          setCurrent( next );
         }
         
         next = null;
@@ -59,12 +88,18 @@ public class Handle<I, O> {
         }
       }
     } else {
+      final float before = progress;
       progress += delta * speed;
+      final float after = progress;
+      
+      if ( before < 0.5f && after >= 0.5f ) {
+        handle( current );
+      }
       
       if ( progress >= 1f ) {
         final I val1 = current;
         final O val2 = finish( current );
-        current = null;
+        setCurrent( null );
         rewind( 1f );
         
         if ( callback != null ) {

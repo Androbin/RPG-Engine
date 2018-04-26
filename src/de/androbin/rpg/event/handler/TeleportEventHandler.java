@@ -31,7 +31,7 @@ public final class TeleportEventHandler implements Event.Handler<TeleportEvent> 
       
       if ( entity instanceof Agent ) {
         final Agent agent = (Agent) entity;
-        agent.orientation = Direction.DOWN;
+        agent.orientation = new DirectionPair( Direction.DOWN );
       }
       
       entity.pos = pos;

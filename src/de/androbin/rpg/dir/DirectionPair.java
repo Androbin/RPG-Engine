@@ -17,6 +17,22 @@ public final class DirectionPair {
     this.second = second == first ? null : second;
   }
   
+  public int dx() {
+    if ( second == null ) {
+      return first.dx;
+    }
+    
+    return first.dx + second.dx;
+  }
+  
+  public int dy() {
+    if ( second == null ) {
+      return first.dy;
+    }
+    
+    return first.dy + second.dy;
+  }
+  
   @ Override
   public boolean equals( final Object obj ) {
     if ( obj instanceof DirectionPair ) {
@@ -27,6 +43,18 @@ public final class DirectionPair {
     return false;
   }
   
+  public Point from( final Point p ) {
+    return from( p, 1 );
+  }
+  
+  public Point from( final Point p, final int x ) {
+    if ( second == null ) {
+      return first.from( p, x );
+    }
+    
+    return new Point( p.x + dx() * x, p.y + dy() * x );
+  }
+  
   public Point2D.Float from( final Point p, final float scalar ) {
     if ( second == null ) {
       return first.from( p, scalar );
@@ -35,6 +63,14 @@ public final class DirectionPair {
     return new Point2D.Float(
         p.x + first.dx * scalar + second.dx * ( scalar - 0.5f ),
         p.y + first.dy * scalar + second.dy * ( scalar - 0.5f ) );
+  }
+  
+  public DirectionPair opposite() {
+    if ( second == null ) {
+      return new DirectionPair( first.opposite() );
+    }
+    
+    return new DirectionPair( first.opposite(), second.opposite() );
   }
   
   public DirectionPair reverse() {

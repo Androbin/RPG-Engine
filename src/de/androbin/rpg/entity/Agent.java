@@ -4,14 +4,14 @@ import de.androbin.rpg.dir.*;
 import java.awt.geom.*;
 
 public class Agent extends Entity {
-  public Direction orientation;
+  public DirectionPair orientation;
   
   public final MoveHandle move;
   
   public Agent( final EntityData data, final int id ) {
     super( data, id );
     
-    this.orientation = Direction.DOWN;
+    this.orientation = new DirectionPair( Direction.DOWN );
     
     this.move = new MoveHandle( this );
   }
