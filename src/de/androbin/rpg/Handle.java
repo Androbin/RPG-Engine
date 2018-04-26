@@ -66,6 +66,16 @@ public class Handle<I, O> {
   }
   
   public void update( final float delta ) {
+    final float total = delta * speed;
+    final int steps = (int) ( total / 0.5f ) + 1;
+    final float step = total / steps;
+    
+    for ( int i = 0; i < steps; i++ ) {
+      updateAtomic( step );
+    }
+  }
+  
+  public void updateAtomic( final float delta ) {
     if ( current == null ) {
       if ( next != null ) {
         next = sanitize( next );
@@ -89,7 +99,7 @@ public class Handle<I, O> {
       }
     } else {
       final float before = progress;
-      progress += delta * speed;
+      progress += delta;
       final float after = progress;
       
       if ( before < 0.5f && after >= 0.5f ) {
