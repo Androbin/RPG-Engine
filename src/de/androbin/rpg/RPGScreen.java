@@ -76,14 +76,10 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   }
   
   private boolean isAcceptingMoveRequest( final DirectionPair dir ) {
-    if ( dir == null ) {
-      return false;
-    }
-    
     final MoveHandle move = player.move;
     final DirectionPair current = move.getCurrent();
     
-    if ( current == null ) {
+    if ( current == null || dir == null ) {
       return true;
     }
     

@@ -18,21 +18,13 @@ public class Agent extends Entity {
   
   @ Override
   public Point2D.Float getFloatPos() {
-    if ( move.hasCurrent() ) {
-      final DirectionPair dir = move.getCurrent();
-      final float progress = move.getProgress();
-      final float scalar;
-      
-      if ( dir.second == null ) {
-        scalar = ( progress + 0.5f ) % 1f - 0.5f;
-      } else {
-        scalar = progress;
-      }
-      
-      return dir.from( pos, scalar );
+    if ( move.getCurrent() == null ) {
+      return super.getFloatPos();
     }
     
-    return super.getFloatPos();
+    final DirectionPair dir = move.getCurrent();
+    final float scalar = move.interpolate();
+    return dir.from( pos, scalar );
   }
   
   @ Override
