@@ -41,6 +41,7 @@ public final class StoryState {
     node.finish();
     
     active.remove( id );
+    done.add( id );
     
     for ( final Ident dep : graph.getDeps( id ) ) {
       final StoryNode depNode = graph.getNode( dep );
@@ -61,8 +62,6 @@ public final class StoryState {
         done.add( id );
       }
     }
-    
-    this.done.addAll( done );
     
     for ( final Ident node : done ) {
       setDone( node );
