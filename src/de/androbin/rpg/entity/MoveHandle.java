@@ -150,11 +150,20 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
   
   public void request( final Direction dir ) {
     if ( dir == null ) {
-      request( (DirectionPair) null );
+      // request( (DirectionPair) null );
       return;
     }
     
     request( new DirectionPair( dir ) );
+  }
+  
+  @ Override
+  public void request( final DirectionPair next ) {
+    if ( next == null ) {
+      return;
+    }
+    
+    super.request( next );
   }
   
   @ Override
