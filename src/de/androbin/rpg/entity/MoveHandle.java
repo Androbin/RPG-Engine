@@ -33,20 +33,24 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
   }
   
   private boolean canMove( final Direction dir ) {
+    final World world = agent.getSpot().world;
     return LoopUtil.and( dir.outer( agent.getBounds() ), pos -> {
-      final Tile tile = agent.world.getTile( pos );
+      final Tile tile = world.getTile( pos );
       return tile != null && tile.data.passable;
     } );
   }
   
   private void contract( final Direction dir ) {
-    agent.pos = dir.from( agent.pos );
+    final Spot spot = agent.getSpot();
+    spot.move( dir );
     
-    final Rectangle target = new Rectangle( agent.pos, agent.data.size );
-    agent.world.getSpaceTime( agent ).set( agent, target );
+    final World world = spot.world;
+    
+    final Rectangle target = new Rectangle( spot.getPos(), agent.data.size );
+    world.getSpaceTime( agent ).set( agent, target );
     
     LoopUtil.forEach( dir.inner( agent.getBounds() ), pos -> {
-      final Tile tile = agent.world.getTile( pos );
+      final Tile tile = world.getTile( pos );
       Events.QUEUE.enqueue( new TileEnterEvent( tile, agent ) );
     } );
   }
@@ -56,8 +60,9 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
       return false;
     }
     
+    final World world = agent.getSpot().world;
     final Rectangle target = dir.expand( agent.getBounds() );
-    return agent.world.getSpaceTime( agent ).trySet( agent, target );
+    return world.getSpaceTime( agent ).trySet( agent, target );
   }
   
   private boolean expand( final DirectionPair dir, final boolean naive ) {
@@ -68,10 +73,6 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
     }
     
     return success;
-  }
-  
-  public State getState() {
-    return state;
   }
   
   @ Override
@@ -167,7 +168,8 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
   }
   
   @ Override
-  protected void reset() {
+  public void reset() {
+    super.reset();
     state = State.ZERO;
   }
   

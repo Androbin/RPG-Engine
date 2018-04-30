@@ -8,22 +8,28 @@ public class Entity {
   public final EntityData data;
   public final int id;
   
-  public transient World world;
-  public Point pos;
+  private Spot spot;
   
   public Entity( final EntityData data, final int id ) {
     this.data = data;
     this.id = id;
-    
-    this.pos = new Point();
   }
   
   public Rectangle getBounds() {
-    return new Rectangle( pos, data.size );
+    return new Rectangle( spot.getPos(), data.size );
   }
   
   public Point2D.Float getFloatPos() {
+    final Point pos = spot.getPos();
     return new Point2D.Float( pos.x, pos.y );
+  }
+  
+  public Spot getSpot() {
+    return spot;
+  }
+  
+  public void setSpot( final Spot spot ) {
+    this.spot = spot;
   }
   
   public void update( final float delta ) {

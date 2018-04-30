@@ -47,7 +47,10 @@ public class Handle<I, O> {
     this.next = next;
   }
   
-  protected void reset() {
+  public void reset() {
+    current = null;
+    next = null;
+    progress = 0f;
   }
   
   protected void rewind( final float delta ) {
@@ -86,7 +89,6 @@ public class Handle<I, O> {
       }
       
       if ( next == null ) {
-        progress = 0f;
         reset();
       } else {
         final I val = next;

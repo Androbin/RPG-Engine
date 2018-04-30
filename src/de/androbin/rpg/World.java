@@ -34,17 +34,17 @@ public class World {
       return false;
     }
     
-    entity.pos = pos;
+    final Spot spot = new Spot( this, pos );
+    entity.setSpot( spot );
     
     final SpaceTime<Entity> spaceTime = getSpaceTime( entity );
     final boolean success = spaceTime.tryAdd( entity, entity.getBounds() );
     
     if ( !success ) {
-      entity.pos = null;
+      entity.setSpot( null );
       return false;
     }
     
-    entity.world = this;
     entities.add( entity );
     return true;
   }
@@ -106,8 +106,7 @@ public class World {
     }
     
     entities.remove( entity );
-    entity.world = null;
-    entity.pos = null;
+    entity.setSpot( null );
     
     getSpaceTime( entity ).remove( entity );
     return true;
