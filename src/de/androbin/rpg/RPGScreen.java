@@ -5,6 +5,7 @@ import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.gfx.*;
 import de.androbin.rpg.story.*;
+import de.androbin.rpg.world.*;
 import de.androbin.shell.*;
 import de.androbin.shell.gfx.*;
 import de.androbin.shell.input.supply.*;
@@ -127,11 +128,11 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   
   public void switchWorld( final Ident id, final Point pos ) {
     if ( world != null ) {
-      world.removeEntity( player );
+      world.entities.remove( player );
     }
     
     world = getWorld( id );
-    world.addEntity( player, pos );
+    world.entities.add( player, pos );
   }
   
   @ Override
@@ -144,7 +145,7 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
       }
     }
     
-    final List<Entity> entities = world.listEntities();
+    final List<Entity> entities = world.entities.list();
     
     for ( final Entity entity : entities ) {
       entity.update( delta );

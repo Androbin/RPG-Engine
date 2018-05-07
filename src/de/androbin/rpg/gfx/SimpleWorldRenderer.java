@@ -6,6 +6,7 @@ import java.util.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.tile.*;
+import de.androbin.rpg.world.*;
 
 public class SimpleWorldRenderer implements WorldRenderer {
   private TileRenderer<Tile> tileRenderer;
@@ -30,7 +31,7 @@ public class SimpleWorldRenderer implements WorldRenderer {
   public void render( final Graphics2D g, final World world,
       final Rectangle2D.Float view, final float scale ) {
     LoopUtil.forEach( view, pos -> {
-      final Tile tile = world.getTile( pos );
+      final Tile tile = world.tiles.get( pos );
       
       if ( tile != null ) {
         tileRenderer.render( g, tile, pos, scale );
@@ -45,7 +46,7 @@ public class SimpleWorldRenderer implements WorldRenderer {
           boundsA.y + boundsA.height + ( a.data.solid ? 0.5f : 0f ),
           boundsB.y + boundsB.height + ( b.data.solid ? 0.5f : 0f ) );
     };
-    world.listEntities().stream()
+    world.entities.list().stream()
         .filter( entity -> entityRenderer.getBounds( entity ).intersects( view ) )
         .sorted( comp )
         .forEachOrdered( entity -> entityRenderer.render( g, entity, scale ) );

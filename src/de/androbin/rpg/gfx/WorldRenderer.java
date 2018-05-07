@@ -1,8 +1,8 @@
 package de.androbin.rpg.gfx;
 
-import de.androbin.rpg.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.tile.*;
+import de.androbin.rpg.world.*;
 import java.awt.*;
 import java.awt.geom.*;
 

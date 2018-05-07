@@ -4,6 +4,7 @@ import de.androbin.rpg.*;
 import de.androbin.rpg.dir.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.tile.*;
+import de.androbin.rpg.world.*;
 import java.awt.*;
 
 public final class MoveHandle extends Handle<DirectionPair, Void> {
@@ -35,7 +36,7 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
   private boolean canMove( final Direction dir ) {
     final World world = agent.getSpot().world;
     return LoopUtil.and( dir.outer( agent.getBounds() ), pos -> {
-      final Tile tile = world.getTile( pos );
+      final Tile tile = world.tiles.get( pos );
       return tile != null && tile.data.passable;
     } );
   }
@@ -47,10 +48,10 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
     final World world = spot.world;
     
     final Rectangle target = new Rectangle( spot.getPos(), agent.data.size );
-    world.getSpaceTime( agent ).set( agent, target );
+    world.entities.move( agent, target );
     
     LoopUtil.forEach( dir.inner( agent.getBounds() ), pos -> {
-      final Tile tile = world.getTile( pos );
+      final Tile tile = world.tiles.get( pos );
       Events.QUEUE.enqueue( new TileEnterEvent( tile, agent ) );
     } );
   }
@@ -62,7 +63,7 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
     
     final World world = agent.getSpot().world;
     final Rectangle target = dir.expand( agent.getBounds() );
-    return world.getSpaceTime( agent ).trySet( agent, target );
+    return world.entities.tryMove( agent, target );
   }
   
   private boolean expand( final DirectionPair dir, final boolean naive ) {

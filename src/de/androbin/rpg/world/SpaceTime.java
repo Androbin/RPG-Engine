@@ -1,4 +1,4 @@
-package de.androbin.rpg;
+package de.androbin.rpg.world;
 
 import java.awt.*;
 import java.util.*;
@@ -47,6 +47,10 @@ public final class SpaceTime<T> {
   }
   
   private void remove( final Pair<T, Rectangle> pair ) {
+    if ( pair == null ) {
+      return;
+    }
+    
     map.remove( pair );
   }
   
@@ -72,23 +76,6 @@ public final class SpaceTime<T> {
     
     add( o, bounds );
     return true;
-  }
-  
-  private boolean tryRemove( final Pair<T, Rectangle> pair ) {
-    if ( pair == null ) {
-      return false;
-    }
-    
-    remove( pair );
-    return true;
-  }
-  
-  public boolean tryRemove( final T o ) {
-    return tryRemove( find( o ) );
-  }
-  
-  public boolean tryRemove( final Point pos ) {
-    return tryRemove( find( pos ) );
   }
   
   public boolean trySet( final T o, final Rectangle target ) {
