@@ -10,14 +10,14 @@ import de.androbin.rpg.gfx.sheet.*;
 
 public class SimpleEntityRenderer<E extends Entity> implements EntityRenderer<E> {
   @ Override
-  public Rectangle2D.Float getBounds( final EntityData data, final BufferedImage image,
-      final Point2D.Float pos ) {
+  public Rectangle2D.Float getBounds( final EntityData data, final Point2D.Float pos,
+      final Dimension rawSize ) {
     final Dimension size = data.size;
     
     final float res = Globals.get().res;
     
-    final float width = image.getWidth() / res;
-    final float height = image.getHeight() / res;
+    final float width = rawSize.width / res;
+    final float height = rawSize.height / res;
     
     final float x = pos.x - data.sheetDX / res;
     final float y = pos.y + size.height - height - data.sheetDY / res;
@@ -28,8 +28,11 @@ public class SimpleEntityRenderer<E extends Entity> implements EntityRenderer<E>
   @ Override
   public void render( final Graphics2D g, final E entity,
       final Point2D.Float pos, final float scale ) {
-    final BufferedImage image = Sheets.getImage( entity );
-    final Rectangle2D.Float bounds = getBounds( entity.data, image, pos );
+    final EntityData data = entity.data;
+    final Dimension rawSize = data.sheet.rawSize;
+    
+    final BufferedImage image = Sheets.getImage( entity, scale );
+    final Rectangle2D.Float bounds = getBounds( data, pos, rawSize );
     
     bounds.x *= scale;
     bounds.y *= scale;

@@ -19,7 +19,7 @@ public class TileData extends Data {
     
     this.enterEvent = Events.parse( props.get( "enter_event" ).asString() );
     
-    this.sheet = Sheets.create( this );
+    this.sheet = Sheets.createTile( type );
   }
   
   @ FunctionalInterface

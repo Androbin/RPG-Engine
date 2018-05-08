@@ -3,12 +3,21 @@ package de.androbin.rpg.gfx.sheet;
 import java.awt.*;
 import java.awt.image.*;
 import de.androbin.gfx.util.*;
+import de.androbin.rpg.*;
 
 public final class Sheet {
-  private final BufferedImage[][] images;
+  private final BufferedImage[][] raw;
+  private final BufferedImage[][] scaled;
   
-  private Sheet( final BufferedImage[][] images ) {
-    this.images = images;
+  public final Dimension rawSize;
+  private float scale;
+  
+  private Sheet( final BufferedImage[][] images, final Dimension rawSize ) {
+    raw = images;
+    scaled = new BufferedImage[ images.length ][ images[ 0 ].length ];
+    
+    this.rawSize = rawSize;
+    setScale( Globals.get().res );
   }
   
   public static Sheet create( final String path, final Dimension size ) {
@@ -25,11 +34,30 @@ public final class Sheet {
       }
     }
     
-    return new Sheet( images );
+    return new Sheet( images, new Dimension( width, height ) );
   }
   
   public BufferedImage getImage( final Point pos ) {
-    return images[ pos.y ][ pos.x ];
+    return scaled[ pos.y ][ pos.x ];
+  }
+  
+  public void setScale( final float scale ) {
+    if ( this.scale == scale ) {
+      return;
+    }
+    
+    final float scalar = scale / Globals.get().res;
+    final Dimension size = new Dimension(
+        Math.round( rawSize.width * scalar ),
+        Math.round( rawSize.height * scalar ) );
+    
+    this.scale = scale;
+    
+    for ( int y = 0; y < raw.length; y++ ) {
+      for ( int x = 0; x < raw[ y ].length; x++ ) {
+        scaled[ y ][ x ] = ImageUtil.scaleImage( raw[ y ][ x ], size );
+      }
+    }
   }
   
   @ FunctionalInterface

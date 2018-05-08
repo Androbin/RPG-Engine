@@ -27,7 +27,7 @@ public class EntityData extends Data {
     
     this.enterEvent = Events.parse( props.get( "enter_event" ).asString() );
     
-    this.sheet = Sheets.create( this );
+    this.sheet = Sheets.createEntity( type );
     this.sheetDX = props.get( "dx" ).asInt( 0 );
     this.sheetDY = props.get( "dy" ).asInt( 0 );
   }

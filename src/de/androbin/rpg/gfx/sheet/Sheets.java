@@ -28,26 +28,34 @@ public final class Sheets {
   private Sheets() {
   }
   
-  public static Sheet create( final EntityData data ) {
-    return Sheet.create( "entity/" + data.type, ENTITY_SIZES.select( data.type.parent() ) );
+  public static Sheet createEntity( final Ident type ) {
+    return Sheet.create( "entity/" + type, ENTITY_SIZES.select( type.parent() ) );
   }
   
-  public static Sheet create( final TileData data ) {
-    return Sheet.create( "tile/" + data.type, TILE_SIZES.select( data.type.parent() ) );
+  public static Sheet createTile( final Ident type ) {
+    return Sheet.create( "tile/" + type, TILE_SIZES.select( type.parent() ) );
   }
   
-  public static <E extends Entity> BufferedImage getImage( final E entity ) {
+  public static <E extends Entity> BufferedImage getImage( final E entity, final float scale ) {
+    final EntityData data = entity.data;
+    final Sheet sheet = data.sheet;
+    sheet.setScale( scale );
+    
     @ SuppressWarnings( "unchecked" )
     final Sheet.Layout<? super E> layout = (Layout<? super E>) ENTITY_LAYOUTS
-        .select( entity.data.type.parent() );
-    return entity.data.sheet.getImage( layout.locate( entity ) );
+        .select( data.type.parent() );
+    return sheet.getImage( layout.locate( entity ) );
   }
   
-  public static <T extends Tile> BufferedImage getImage( final T tile ) {
+  public static <T extends Tile> BufferedImage getImage( final T tile, final float scale ) {
+    final TileData data = tile.data;
+    final Sheet sheet = data.sheet;
+    sheet.setScale( scale );
+    
     @ SuppressWarnings( "unchecked" )
     final Sheet.Layout<? super T> layout = (Layout<? super T>) TILE_LAYOUTS
-        .select( tile.data.type.parent() );
-    return tile.data.sheet.getImage( layout.locate( tile ) );
+        .select( data.type.parent() );
+    return sheet.getImage( layout.locate( tile ) );
   }
   
   public static void registerEntity( final String serial,
