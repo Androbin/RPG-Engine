@@ -16,7 +16,7 @@ public final class CustomEvent extends Event {
     return name;
   }
   
-  public static void handle( final RPGScreen master, final CustomEvent event ) {
+  public static void handle( final Master master, final CustomEvent event ) {
     for ( final Event part : event.parts ) {
       Events.handle( master, part );
     }

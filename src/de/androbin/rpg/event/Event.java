@@ -17,7 +17,7 @@ public abstract class Event {
   }
   
   @ FunctionalInterface
-  public interface Handler<E extends Event> {
-    void handle( RPGScreen master, E event );
+  public interface Handler<M extends Master, E extends Event> {
+    void handle( M master, E event );
   }
 }

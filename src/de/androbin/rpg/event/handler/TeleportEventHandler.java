@@ -8,9 +8,9 @@ import de.androbin.rpg.tile.*;
 import de.androbin.rpg.world.*;
 import java.awt.*;
 
-public final class TeleportEventHandler implements Event.Handler<TeleportEvent> {
+public final class TeleportEventHandler implements Event.Handler<Master, TeleportEvent> {
   @ Override
-  public void handle( final RPGScreen master, final TeleportEvent event ) {
+  public void handle( final Master master, final TeleportEvent event ) {
     final Entity entity = event.entity;
     final Ident worldId = event.world;
     final Point pos = event.pos;

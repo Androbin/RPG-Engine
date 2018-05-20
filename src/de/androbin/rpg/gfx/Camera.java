@@ -3,29 +3,13 @@ package de.androbin.rpg.gfx;
 import static de.androbin.math.util.floats.FloatMathUtil.*;
 import java.awt.geom.*;
 import java.util.function.*;
-import de.androbin.rpg.entity.*;
 
 public final class Camera {
   private Supplier<Point2D.Float> currentFocus;
   private Supplier<Point2D.Float> nextFocus;
   
-  private float moveProgress;
-  private float moveSpeed;
-  
-  public Camera() {
-  }
-  
-  public Camera( final Point2D.Float point ) {
-    this( focus( point ) );
-  }
-  
-  public Camera( final Entity entity ) {
-    this( focus( entity ) );
-  }
-  
-  public Camera( final Supplier<Point2D.Float> supplier ) {
-    this.currentFocus = supplier;
-  }
+  private float progress;
+  private float speed;
   
   private float breakpoint() {
     final Point2D.Float current = getCurrentFocus();
@@ -50,8 +34,8 @@ public final class Camera {
     
     final Point2D.Float next = getNextFocus();
     final float ix = next == null ? current.x
-        : moveProgress >= breakpoint() ? next.x
-            : inter( current.x, moveProgress / breakpoint(), next.x );
+        : progress >= breakpoint() ? next.x
+            : inter( current.x, progress / breakpoint(), next.x );
     return bound( width - worldWidth, 0.5f * width - scale * ix, 0f );
   }
   
@@ -68,30 +52,22 @@ public final class Camera {
     
     final Point2D.Float next = getNextFocus();
     final float iy = next == null ? current.y
-        : moveProgress <= breakpoint() ? next.y
-            : inter( current.y, ( moveProgress - breakpoint() ) / ( 1f - breakpoint() ), next.y );
+        : progress <= breakpoint() ? next.y
+            : inter( current.y, ( progress - breakpoint() ) / ( 1f - breakpoint() ), next.y );
     return bound( height - worldHeight, 0.5f * height - scale * iy, 0f );
   }
   
-  public static Supplier<Point2D.Float> focus( final Entity entity ) {
-    return entity::getFloatPos;
-  }
-  
-  public static Supplier<Point2D.Float> focus( final Point2D.Float point ) {
-    return () -> point;
-  }
-  
-  public Point2D.Float getCurrentFocus() {
+  private Point2D.Float getCurrentFocus() {
     return currentFocus == null ? null : currentFocus.get();
   }
   
-  public Point2D.Float getNextFocus() {
+  private Point2D.Float getNextFocus() {
     return nextFocus == null ? null : nextFocus.get();
   }
   
-  public void moveFocus( final Supplier<Point2D.Float> nextFocus, final float moveSpeed ) {
-    this.moveSpeed = moveSpeed;
-    this.moveProgress = 0f;
+  public void moveFocus( final Supplier<Point2D.Float> nextFocus, final float speed ) {
+    this.speed = speed;
+    this.progress = 0f;
     
     final Point2D.Float current = currentFocus.get();
     this.currentFocus = () -> current;
@@ -100,7 +76,7 @@ public final class Camera {
   }
   
   public void setFocus( final Supplier<Point2D.Float> focus ) {
-    this.moveProgress = 0f;
+    this.progress = 0f;
     this.currentFocus = focus;
   }
   
@@ -109,10 +85,10 @@ public final class Camera {
       return;
     }
     
-    moveProgress += delta * moveSpeed;
+    progress += delta * speed;
     
-    if ( moveProgress >= 1f ) {
-      moveProgress = 0f;
+    if ( progress >= 1f ) {
+      progress = 0f;
       
       currentFocus = nextFocus;
       nextFocus = null;

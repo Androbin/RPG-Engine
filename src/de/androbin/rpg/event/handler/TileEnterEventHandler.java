@@ -6,9 +6,9 @@ import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.tile.*;
 
-public final class TileEnterEventHandler implements Event.Handler<TileEnterEvent> {
+public final class TileEnterEventHandler implements Event.Handler<Master, TileEnterEvent> {
   @ Override
-  public void handle( final RPGScreen master, final TileEnterEvent event ) {
+  public void handle( final Master master, final TileEnterEvent event ) {
     final Tile tile = event.tile;
     final Entity entity = event.entity;
     

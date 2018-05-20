@@ -1,67 +1,50 @@
 package de.androbin.rpg;
 
+import de.androbin.mixin.*;
 import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.gfx.*;
-import de.androbin.rpg.story.*;
-import de.androbin.rpg.world.*;
 import de.androbin.shell.*;
 import de.androbin.shell.gfx.*;
-import de.androbin.shell.input.supply.*;
+import de.androbin.shell.input.tee.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.List;
 
-public abstract class RPGScreen extends BasicShell implements AWTGraphics {
-  private final Map<Ident, World> worlds = new HashMap<>();
-  
-  protected World world;
-  
-  protected StoryState story;
-  
-  public Agent player;
+public abstract class RPGScreen<M extends Master> extends BasicShell implements AWTGraphics {
+  public M master;
   private DirectionPair requestDir;
   
   protected WorldRenderer worldRenderer;
-  
-  private Overlay overlay;
-  
-  protected final Camera camera;
   protected final Point2D.Float trans;
-  
   protected float scale;
   
-  public RPGScreen( final StoryState story, final float scale ) {
+  public RPGScreen() {
     keyboardTee.mask = true;
-    addKeyInput( KeyInputSupply.fromShell( () -> overlay ) );
-    addKeyInput( new MoveKeyInput( () -> requestDir, dir -> requestDir = dir ) );
-    
-    this.story = story;
+    keyInputs.add( new KeyInputTee( new MixIterable<>( () -> new PipeIterator<>(
+        master.overlays.iterator(),
+        overlay -> overlay.getInputs().keyboard ) ) ) );
+    keyInputs.add( new MoveKeyInput( () -> requestDir, dir -> requestDir = dir ) );
     
     worldRenderer = new SimpleWorldRenderer();
     
-    camera = new Camera();
     trans = new Point2D.Float();
-    
-    this.scale = scale;
   }
   
   private void calcTranslation() {
-    final Dimension size = world.size;
+    final Dimension size = master.world.size;
     
     final float pw = scale * size.width;
     final float ph = scale * size.height;
     
-    trans.x = camera.calcTranslationX( getWidth(), pw, scale );
-    trans.y = camera.calcTranslationY( getHeight(), ph, scale );
+    trans.x = master.camera.calcTranslationX( getWidth(), pw, scale );
+    trans.y = master.camera.calcTranslationY( getHeight(), ph, scale );
   }
   
-  protected abstract World createWorld( Ident id );
-  
   private Rectangle2D.Float getView() {
-    final Dimension size = world.size;
+    final Dimension size = master.world.size;
     
     final float startY = Math.max( 0f, -trans.y / scale );
     final float endY = Math.min( ( getHeight() - trans.y ) / scale, size.height );
@@ -72,12 +55,8 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
     return new Rectangle2D.Float( startX, startY, endX - startX, endY - startY );
   }
   
-  protected final World getWorld( final Ident id ) {
-    return worlds.computeIfAbsent( id, this::createWorld );
-  }
-  
   private boolean isAcceptingMoveRequest( final DirectionPair dir ) {
-    final MoveHandle move = player.move;
+    final MoveHandle move = master.player.move;
     final DirectionPair current = move.getCurrent();
     
     if ( current == null || dir == null ) {
@@ -96,72 +75,53 @@ public abstract class RPGScreen extends BasicShell implements AWTGraphics {
   }
   
   @ Override
-  protected void onResized( final int width, final int height ) {
-    if ( overlay != null ) {
-      overlay.setSize( width, height );
-    }
-  }
-  
-  @ Override
   public void render( final Graphics2D g ) {
     g.setColor( Color.BLACK );
     g.fillRect( 0, 0, getWidth(), getHeight() );
     
-    if ( world == null ) {
+    if ( master.world == null ) {
       return;
     }
     
     g.translate( trans.x, trans.y );
-    worldRenderer.render( g, world, getView(), scale );
+    worldRenderer.render( g, master.world, getView(), scale );
     g.translate( -trans.x, -trans.y );
     
-    if ( overlay != null ) {
+    for ( final Overlay overlay : master.overlays ) {
+      overlay.setSize( getWidth(), getHeight() );
       overlay.render( g );
     }
   }
   
-  public void setOverlay( final Overlay overlay ) {
-    overlay.setRunning( true );
-    overlay.setSize( getWidth(), getHeight() );
-    this.overlay = overlay;
-  }
-  
-  public void switchWorld( final Ident id, final Point pos ) {
-    if ( world != null ) {
-      world.entities.remove( player );
-    }
-    
-    world = getWorld( id );
-    world.entities.add( player, pos );
-  }
-  
   @ Override
   public void update( final float delta ) {
-    if ( player != null ) {
+    if ( master.player != null ) {
       final DirectionPair dir = requestDir;
       
       if ( isAcceptingMoveRequest( dir ) ) {
-        player.move.request( dir );
+        master.player.move.request( dir );
       }
     }
     
-    final List<Entity> entities = world.entities.list();
+    final List<Entity> entities = master.world.entities.list();
     
     for ( final Entity entity : entities ) {
       entity.update( delta );
     }
     
-    Events.QUEUE.process( this );
-    story.update();
+    Events.QUEUE.process( master );
+    master.story.update();
     
-    camera.update( delta );
+    master.camera.update( delta );
     calcTranslation();
     
-    if ( overlay != null ) {
+    for ( final Iterator<Overlay> iter = master.overlays.iterator(); iter.hasNext(); ) {
+      final Overlay overlay = iter.next();
+      
       if ( overlay.isRunning() ) {
         overlay.update( delta );
       } else {
-        overlay = null;
+        iter.remove();
       }
     }
   }

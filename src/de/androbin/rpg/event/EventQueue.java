@@ -10,7 +10,7 @@ public final class EventQueue {
     queue.add( event );
   }
   
-  public void process( final RPGScreen master ) {
+  public void process( final Master master ) {
     while ( !queue.isEmpty() ) {
       Events.handle( master, queue.remove() );
     }

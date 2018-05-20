@@ -8,7 +8,7 @@ import java.util.*;
 
 public final class Events {
   private static final Map<String, Event.Builder> BUILDERS = new HashMap<>();
-  private static final Map<Class<? extends Event>, Event.Handler<? extends Event>> HANDLERS = new HashMap<>();
+  private static final Map<Class<? extends Event>, Event.Handler<? extends Master, ? extends Event>> HANDLERS = new HashMap<>();
   
   public static final EventQueue QUEUE = new EventQueue();
   
@@ -41,13 +41,13 @@ public final class Events {
     BUILDERS.put( func, builder );
   }
   
-  public static <E extends Event> void putHandler(
-      final Class<E> clazz, final Event.Handler<E> handler ) {
+  public static <M extends Master, E extends Event> void putHandler(
+      final Class<E> clazz, final Event.Handler<M, E> handler ) {
     HANDLERS.put( clazz, handler );
   }
   
   @ SuppressWarnings( "unchecked" )
-  public static <E extends Event> void handle( final RPGScreen master, final E event ) {
+  public static <M extends Master, E extends Event> void handle( final M master, final E event ) {
     final String message = event.getMessage();
     
     if ( message != null ) {
@@ -55,7 +55,7 @@ public final class Events {
     }
     
     if ( HANDLERS.containsKey( event.getClass() ) ) {
-      final Event.Handler<E> handler = (Event.Handler<E>) HANDLERS.get( event.getClass() );
+      final Event.Handler<M, E> handler = (Event.Handler<M, E>) HANDLERS.get( event.getClass() );
       handler.handle( master, event );
     }
   }
