@@ -4,13 +4,13 @@ import de.androbin.rpg.*;
 import de.androbin.rpg.dir.*;
 import java.awt.geom.*;
 
-public class Agent extends Entity {
+public abstract class Agent extends Entity {
   public DirectionPair orientation;
   
   public final MoveHandle move;
   
-  public Agent( final EntityData data, final int id ) {
-    super( data, id );
+  public Agent( final int id ) {
+    super( id );
     
     this.move = new MoveHandle( this );
   }
@@ -33,7 +33,6 @@ public class Agent extends Entity {
     move.reset();
   }
   
-  @ Override
   public void update( final float delta ) {
     move.update( delta );
   }

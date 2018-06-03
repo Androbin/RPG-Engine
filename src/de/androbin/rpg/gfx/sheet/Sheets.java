@@ -29,32 +29,30 @@ public final class Sheets {
   }
   
   public static Sheet createEntity( final Ident type ) {
-    return Sheet.create( "entity/" + type, ENTITY_SIZES.select( type.parent() ) );
+    return Sheet.create( "entity/" + type, ENTITY_SIZES.select( type ) );
   }
   
   public static Sheet createTile( final Ident type ) {
-    return Sheet.create( "tile/" + type, TILE_SIZES.select( type.parent() ) );
+    return Sheet.create( "tile/" + type, TILE_SIZES.select( type ) );
   }
   
   public static <E extends Entity> BufferedImage getImage( final E entity, final float scale ) {
-    final EntityData data = entity.data;
+    final EntityData data = entity.getData();
     final Sheet sheet = data.sheet;
     sheet.setScale( scale );
     
     @ SuppressWarnings( "unchecked" )
-    final Sheet.Layout<? super E> layout = (Layout<? super E>) ENTITY_LAYOUTS
-        .select( data.type.parent() );
+    final Sheet.Layout<E> layout = (Layout<E>) ENTITY_LAYOUTS.select( data.type );
     return sheet.getImage( layout.locate( entity ) );
   }
   
   public static <T extends Tile> BufferedImage getImage( final T tile, final float scale ) {
-    final TileData data = tile.data;
+    final TileData data = tile.getData();
     final Sheet sheet = data.sheet;
     sheet.setScale( scale );
     
     @ SuppressWarnings( "unchecked" )
-    final Sheet.Layout<? super T> layout = (Layout<? super T>) TILE_LAYOUTS
-        .select( data.type.parent() );
+    final Sheet.Layout<T> layout = (Layout<T>) TILE_LAYOUTS.select( data.type );
     return sheet.getImage( layout.locate( tile ) );
   }
   
@@ -64,7 +62,7 @@ public final class Sheets {
   }
   
   public static void registerTile( final String serial,
-      final Sheet.Layout<Tile> layout ) {
+      final Sheet.Layout<? extends Tile> layout ) {
     TILE_LAYOUTS.register( Ident.fromSerial( serial ), layout );
   }
 }

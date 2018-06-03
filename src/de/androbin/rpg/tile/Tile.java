@@ -1,15 +1,9 @@
 package de.androbin.rpg.tile;
 
-import de.androbin.rpg.event.*;
-
-public class Tile {
-  public final TileData data;
+public abstract class Tile {
+  public String enterEvent;
   
-  public Event.Raw enterEvent;
-  
-  public Tile( final TileData data ) {
-    this.data = data;
-  }
+  public abstract TileData getData();
   
   @ FunctionalInterface
   public interface Builder<D extends TileData> {

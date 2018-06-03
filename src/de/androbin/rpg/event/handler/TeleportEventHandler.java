@@ -4,7 +4,6 @@ import de.androbin.rpg.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.event.Event;
-import de.androbin.rpg.tile.*;
 import de.androbin.rpg.world.*;
 import java.awt.*;
 
@@ -15,25 +14,31 @@ public final class TeleportEventHandler implements Event.Handler<Master, Telepor
     final Ident worldId = event.world;
     final Point pos = event.pos;
     
+    final Spot spot = entity.getSpot();
+    final World srcWorld = spot.world;
+    
     if ( worldId == null ) {
-      final World world = entity.getSpot().world;
-      final Tile tile = world.tiles.get( pos );
-      
-      if ( tile == null || !tile.data.passable ) {
-        return;
-      }
-      
-      final Rectangle target = new Rectangle( pos, entity.data.size );
-      final boolean success = world.entities.tryMove( entity, target );
+      final Rectangle target = new Rectangle( pos, entity.getData().size );
+      final boolean success = srcWorld.entities.tryMove( entity, target );
       
       if ( !success ) {
         return;
       }
       
-      entity.setSpot( new Spot( world, pos ) );
+      entity.setSpot( new Spot( srcWorld, pos ) );
     } else {
-      if ( entity == master.player ) {
-        master.switchWorld( worldId, pos );
+      final World destWorld = master.getWorld( worldId );
+      
+      srcWorld.entities.remove( entity );
+      final boolean success = destWorld.entities.add( entity, pos );
+      
+      if ( !success ) {
+        srcWorld.entities.add( entity, spot.getPos() );
+        return;
+      }
+      
+      if ( entity == master.getPlayer() ) {
+        master.world = destWorld;
       }
     }
   }

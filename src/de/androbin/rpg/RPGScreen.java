@@ -1,10 +1,11 @@
 package de.androbin.rpg;
 
-import de.androbin.mixin.*;
+import de.androbin.mixin.iter.*;
 import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.gfx.*;
+import de.androbin.rpg.world.*;
 import de.androbin.shell.*;
 import de.androbin.shell.gfx.*;
 import de.androbin.shell.input.tee.*;
@@ -17,15 +18,17 @@ public abstract class RPGScreen<M extends Master> extends BasicShell implements 
   public M master;
   private DirectionPair requestDir;
   
-  protected WorldRenderer worldRenderer;
+  protected WorldRenderer<World> worldRenderer;
   protected final Point2D.Float trans;
   protected float scale;
   
   public RPGScreen() {
     keyboardTee.mask = true;
-    keyInputs.add( new KeyInputTee( new MixIterable<>( () -> new PipeIterator<>(
-        master.overlays.iterator(),
-        overlay -> overlay.getInputs().keyboard ) ) ) );
+    keyInputs.add( new KeyInputTee( new MixIterable<>( () -> new FilterIterator<>(
+        new PipeIterator<>(
+            master.overlays.iterator(),
+            overlay -> overlay.getInputs().keyboard ),
+        value -> value != null ) ) ) );
     keyInputs.add( new MoveKeyInput( () -> requestDir, dir -> requestDir = dir ) );
     
     worldRenderer = new SimpleWorldRenderer();
@@ -43,7 +46,7 @@ public abstract class RPGScreen<M extends Master> extends BasicShell implements 
     trans.y = master.camera.calcTranslationY( getHeight(), ph, scale );
   }
   
-  private Rectangle2D.Float getView() {
+  private Rectangle2D.Float calcView() {
     final Dimension size = master.world.size;
     
     final float startY = Math.max( 0f, -trans.y / scale );
@@ -55,58 +58,46 @@ public abstract class RPGScreen<M extends Master> extends BasicShell implements 
     return new Rectangle2D.Float( startX, startY, endX - startX, endY - startY );
   }
   
-  private boolean isAcceptingMoveRequest( final DirectionPair dir ) {
-    final MoveHandle move = master.player.move;
-    final DirectionPair current = move.getCurrent();
-    
-    if ( current == null || dir == null ) {
-      return true;
-    }
-    
-    if ( current.second != null || dir.second != null ) {
-      return true;
-    }
-    
-    if ( current.first != dir.first ) {
-      return true;
-    }
-    
-    return move.getProgress() >= 0.4f;
-  }
-  
   @ Override
   public void render( final Graphics2D g ) {
     g.setColor( Color.BLACK );
     g.fillRect( 0, 0, getWidth(), getHeight() );
     
-    if ( master.world == null ) {
-      return;
-    }
-    
-    g.translate( trans.x, trans.y );
-    worldRenderer.render( g, master.world, getView(), scale );
-    g.translate( -trans.x, -trans.y );
-    
     for ( final Overlay overlay : master.overlays ) {
       overlay.setSize( getWidth(), getHeight() );
-      overlay.render( g );
+    }
+    
+    if ( master.world != null ) {
+      final AffineTransform savedTransform = g.getTransform();
+      g.translate( trans.x, trans.y );
+      
+      final Rectangle2D.Float view = calcView();
+      worldRenderer.render( g, master.world, view, scale );
+      
+      for ( final Overlay overlay : master.overlays ) {
+        overlay.renderWorld( g, view, scale );
+      }
+      
+      g.setTransform( savedTransform );
+    }
+    
+    for ( final Overlay overlay : master.overlays ) {
+      overlay.renderScreen( g );
     }
   }
   
   @ Override
   public void update( final float delta ) {
-    if ( master.player != null ) {
-      final DirectionPair dir = requestDir;
-      
-      if ( isAcceptingMoveRequest( dir ) ) {
-        master.player.move.request( dir );
-      }
+    final Agent player = master.getPlayer();
+    
+    if ( player != null ) {
+      MoveKeyInput.applyRequest( player.move, requestDir );
     }
     
-    final List<Entity> entities = master.world.entities.list();
+    final List<Agent> agents = master.world.entities.listAgents();
     
-    for ( final Entity entity : entities ) {
-      entity.update( delta );
+    for ( final Agent agent : agents ) {
+      agent.update( delta );
     }
     
     Events.QUEUE.process( master );

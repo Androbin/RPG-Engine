@@ -1,5 +1,6 @@
 package de.androbin.rpg.entity;
 
+import de.androbin.mixin.dim.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.dir.*;
 import de.androbin.rpg.event.*;
@@ -37,7 +38,7 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
     final World world = agent.getSpot().world;
     return LoopUtil.and( dir.outer( agent.getBounds() ), pos -> {
       final Tile tile = world.tiles.get( pos );
-      return tile != null && tile.data.passable;
+      return tile != null && tile.getData().passable;
     } );
   }
   
@@ -47,7 +48,7 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
     
     final World world = spot.world;
     
-    final Rectangle target = new Rectangle( spot.getPos(), agent.data.size );
+    final Rectangle target = new Rectangle( spot.getPos(), agent.getData().size );
     world.entities.move( agent, target );
     
     LoopUtil.forEach( dir.inner( agent.getBounds() ), pos -> {

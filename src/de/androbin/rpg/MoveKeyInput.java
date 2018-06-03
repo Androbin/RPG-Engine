@@ -1,6 +1,7 @@
 package de.androbin.rpg;
 
 import de.androbin.rpg.dir.*;
+import de.androbin.rpg.entity.*;
 import de.androbin.shell.input.*;
 import java.util.function.*;
 
@@ -12,6 +13,33 @@ public final class MoveKeyInput implements KeyInput {
       final Consumer<DirectionPair> setter ) {
     this.getter = getter;
     this.setter = setter;
+  }
+  
+  public static boolean applyRequest( final MoveHandle move, final DirectionPair dir ) {
+    if ( checkRequest( move, dir ) ) {
+      move.request( dir );
+      return true;
+    }
+    
+    return false;
+  }
+  
+  public static boolean checkRequest( final MoveHandle move, final DirectionPair dir ) {
+    final DirectionPair current = move.getCurrent();
+    
+    if ( current == null || dir == null ) {
+      return true;
+    }
+    
+    if ( current.second != null || dir.second != null ) {
+      return true;
+    }
+    
+    if ( current.first != dir.first ) {
+      return true;
+    }
+    
+    return move.getProgress() >= 0.4f;
   }
   
   @ Override

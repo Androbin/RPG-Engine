@@ -1,5 +1,6 @@
 package de.androbin.rpg.world;
 
+import de.androbin.mixin.dim.*;
 import de.androbin.rpg.*;
 import java.awt.*;
 
@@ -14,12 +15,11 @@ public class World {
     this.id = id;
     this.size = size;
     
-    tiles = new TileLayer( this );
+    tiles = new TileLayer( size );
     entities = new EntityLayer( this );
   }
   
-  public final boolean checkBounds( final Point pos ) {
-    return pos.x >= 0 && pos.x < size.width
-        && pos.y >= 0 && pos.y < size.height;
+  public boolean checkBounds( final Point pos ) {
+    return StaticUtil.contains( size, pos );
   }
 }

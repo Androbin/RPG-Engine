@@ -5,15 +5,47 @@ import de.androbin.json.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.event.handler.*;
 import java.util.*;
+import java.util.logging.*;
+import java.util.logging.Formatter;
 
 public final class Events {
-  private static final Map<String, Event.Builder> BUILDERS = new HashMap<>();
-  private static final Map<Class<? extends Event>, Event.Handler<? extends Master, ? extends Event>> HANDLERS = new HashMap<>();
+  private static final Map<String, Event.Builder> BUILDERS;
+  private static final Map<Class<? extends Event>, Event.Handler<?, ?>> HANDLERS;
   
-  public static final EventQueue QUEUE = new EventQueue();
+  public static final EventQueue QUEUE;
+  public static final Logger LOGGER;
   
   static {
+    BUILDERS = new HashMap<>();
+    HANDLERS = new HashMap<>();
+    
+    QUEUE = new EventQueue();
+    
+    final Handler logHandler = new ConsoleHandler();
+    logHandler.setFormatter( new Formatter() {
+      @ Override
+      public String format( final LogRecord record ) {
+        final String name = record.getLoggerName();
+        final String level = record.getLevel().getName();
+        final String message = record.getMessage();
+        
+        final String format = "%1$s %2$-7s %3$s\n";
+        return String.format( format, name, level, message );
+      }
+    } );
+    
+    LOGGER = Logger.getLogger( "events" );
+    LOGGER.setUseParentHandlers( false );
+    LOGGER.addHandler( logHandler );
+  }
+  
+  static {
+    Events.BUILDERS.put( "story", StoryEvent.BUILDER );
     Events.BUILDERS.put( "teleport", TeleportEvent.BUILDER );
+    
+    putHandler( BatchEvent.class, new BatchEventHandler() );
+    putHandler( CustomEvent.class, new CustomEventHandler() );
+    putHandler( StoryEvent.class, new StoryEventHandler() );
     putHandler( TeleportEvent.class, new TeleportEventHandler() );
     putHandler( TileEnterEvent.class, new TileEnterEventHandler() );
   }
@@ -48,11 +80,7 @@ public final class Events {
   
   @ SuppressWarnings( "unchecked" )
   public static <M extends Master, E extends Event> void handle( final M master, final E event ) {
-    final String message = event.getMessage();
-    
-    if ( message != null ) {
-      System.out.println( message );
-    }
+    event.log( LOGGER );
     
     if ( HANDLERS.containsKey( event.getClass() ) ) {
       final Event.Handler<M, E> handler = (Event.Handler<M, E>) HANDLERS.get( event.getClass() );
@@ -86,7 +114,7 @@ public final class Events {
       return values -> builder.build( compile( args, values ) );
     } else {
       final String[] events = JSONUtil.readJSON( "event/" + func ).get().asStringArray();
-      return values -> new CustomEvent( func, fill( new Event[ events.length ], i -> {
+      return values -> new BatchEvent( func, fill( new Event[ events.length ], i -> {
         return parse( events[ i ] ).compile( values );
       } ) );
     }

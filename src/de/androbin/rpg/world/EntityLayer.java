@@ -5,19 +5,21 @@ import de.androbin.rpg.entity.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.function.*;
-import java.util.stream.*;
 
-public final class EntityLayer extends Layer {
+public final class EntityLayer {
+  private final World world;
+  
   private final List<Entity> entities;
+  private final List<Agent> agents;
   
   private final SpaceTime<Entity> strong;
   private final SpaceTime<Entity> weak;
   
   public EntityLayer( final World world ) {
-    super( world );
+    this.world = world;
     
     entities = new ArrayList<>();
+    agents = new ArrayList<>();
     
     strong = new SpaceTime<>();
     weak = new SpaceTime<>();
@@ -40,6 +42,12 @@ public final class EntityLayer extends Layer {
     }
     
     entities.add( entity );
+    
+    if ( entity instanceof Agent ) {
+      final Agent agent = (Agent) entity;
+      agents.add( agent );
+    }
+    
     return true;
   }
   
@@ -47,38 +55,24 @@ public final class EntityLayer extends Layer {
     return getSpaceTime( solid ).get( pos );
   }
   
+  public Dimension getSize() {
+    return world.size;
+  }
+  
   private SpaceTime<Entity> getSpaceTime( final boolean solid ) {
     return solid ? strong : weak;
   }
   
   private SpaceTime<Entity> getSpaceTime( final Entity entity ) {
-    return getSpaceTime( entity.data.solid );
-  }
-  
-  public List<Agent> listAgents() {
-    return list( Agent.class );
+    return getSpaceTime( entity.getData().solid );
   }
   
   public List<Entity> list() {
     return Collections.unmodifiableList( entities );
   }
   
-  @ SuppressWarnings( "unchecked" )
-  public <T> List<T> list( final Class<T> type ) {
-    return entities.stream()
-        .filter( entity -> type.isAssignableFrom( entity.getClass() ) )
-        .map( entity -> (T) entity )
-        .collect( Collectors.toList() );
-  }
-  
-  private List<Entity> list( final Predicate<Entity> filter ) {
-    return entities.stream()
-        .filter( filter )
-        .collect( Collectors.toList() );
-  }
-  
-  public List<Entity> list( final boolean solid ) {
-    return list( entity -> entity.data.solid == solid );
+  public List<Agent> listAgents() {
+    return Collections.unmodifiableList( agents );
   }
   
   public void move( final Entity entity, final Rectangle target ) {
@@ -91,9 +85,14 @@ public final class EntityLayer extends Layer {
     }
     
     entities.remove( entity );
-    entity.setSpot( null );
+    
+    if ( entity instanceof Agent ) {
+      final Agent agent = (Agent) entity;
+      agents.remove( agent );
+    }
     
     getSpaceTime( entity ).remove( entity );
+    entity.setSpot( null );
     return true;
   }
   

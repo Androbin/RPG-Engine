@@ -1,17 +1,15 @@
 package de.androbin.rpg;
 
-import de.androbin.mixin.*;
+import de.androbin.mixin.iter.*;
 import java.util.*;
 
 public final class Ident implements Iterable<String> {
   private final String[] path;
-  private final String serial;
-  private final int hash;
+  private String serial;
+  private int hash;
   
-  private Ident( final String[] path, final String serial ) {
+  private Ident( final String[] path ) {
     this.path = path;
-    this.serial = serial;
-    this.hash = serial.hashCode();
   }
   
   public static Ident build( final String[] path ) {
@@ -19,14 +17,7 @@ public final class Ident implements Iterable<String> {
       return null;
     }
     
-    final StringJoiner joiner = new StringJoiner( "/" );
-    
-    for ( final String element : path ) {
-      joiner.add( element );
-    }
-    
-    final String serial = joiner.toString();
-    return new Ident( path, serial );
+    return new Ident( path );
   }
   
   @ Override
@@ -49,6 +40,10 @@ public final class Ident implements Iterable<String> {
   
   @ Override
   public int hashCode() {
+    if ( hash == 0 ) {
+      hash = toString().hashCode();
+    }
+    
     return hash;
   }
   
@@ -61,10 +56,6 @@ public final class Ident implements Iterable<String> {
     return path[ path.length - 1 ];
   }
   
-  public Ident parent() {
-    return range( 0, path.length - 1 );
-  }
-  
   public Iterable<Ident> partial() {
     return new MixIterable<>( PartialIterator::new );
   }
@@ -75,6 +66,16 @@ public final class Ident implements Iterable<String> {
   
   @ Override
   public String toString() {
+    if ( serial == null ) {
+      final StringJoiner joiner = new StringJoiner( "/" );
+      
+      for ( final String element : path ) {
+        joiner.add( element );
+      }
+      
+      serial = joiner.toString();
+    }
+    
     return serial;
   }
   

@@ -2,8 +2,9 @@ package de.androbin.rpg.event;
 
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.tile.*;
+import java.util.logging.*;
 
-public final class TileEnterEvent extends Event {
+public final class TileEnterEvent implements Event {
   public Tile tile;
   public Entity entity;
   
@@ -13,7 +14,7 @@ public final class TileEnterEvent extends Event {
   }
   
   @ Override
-  public String getMessage() {
-    return null;
+  public void log( final Logger logger ) {
+    logger.finest( "tileEnter" );
   }
 }

@@ -1,10 +1,11 @@
 package de.androbin.rpg.event;
 
 import java.awt.*;
+import java.util.logging.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.entity.*;
 
-public final class TeleportEvent extends Event {
+public final class TeleportEvent implements Event {
   public static final Event.Builder BUILDER = args -> {
     final Entity entity = (Entity) args[ 0 ];
     
@@ -38,7 +39,8 @@ public final class TeleportEvent extends Event {
   }
   
   @ Override
-  public String getMessage() {
-    return "teleport { world: '" + world + "', pos: (" + pos.x + ", " + pos.y + ") }";
+  public void log( final Logger logger ) {
+    logger.fine( "teleport { world: '" + world
+        + "', pos: (" + pos.x + ", " + pos.y + ") }" );
   }
 }

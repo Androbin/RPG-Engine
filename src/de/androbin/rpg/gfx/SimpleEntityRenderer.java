@@ -26,9 +26,9 @@ public class SimpleEntityRenderer<E extends Entity> implements EntityRenderer<E>
   }
   
   @ Override
-  public void render( final Graphics2D g, final E entity,
-      final Point2D.Float pos, final float scale ) {
-    final EntityData data = entity.data;
+  public void render( final Graphics2D g, final E entity, final Point2D.Float pos,
+      final Rectangle2D.Float view, final float scale ) {
+    final EntityData data = entity.getData();
     final Dimension rawSize = data.sheet.rawSize;
     
     final BufferedImage image = Sheets.getImage( entity, scale );

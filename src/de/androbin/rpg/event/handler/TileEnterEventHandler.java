@@ -15,12 +15,7 @@ public final class TileEnterEventHandler implements Event.Handler<Master, TileEn
     final Map<String, Object> values = new HashMap<>();
     values.put( "entity", entity );
     
-    if ( tile.data.enterEvent != null ) {
-      Events.QUEUE.enqueue( tile.data.enterEvent.compile( values ) );
-    }
-    
-    if ( tile.enterEvent != null ) {
-      Events.QUEUE.enqueue( tile.enterEvent.compile( values ) );
-    }
+    Events.QUEUE.enqueue( tile.getData().enterEvent, values );
+    Events.QUEUE.enqueue( Events.parse( tile.enterEvent ), values );
   }
 }

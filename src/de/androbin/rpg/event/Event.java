@@ -2,22 +2,23 @@ package de.androbin.rpg.event;
 
 import de.androbin.rpg.*;
 import java.util.*;
+import java.util.logging.*;
 
-public abstract class Event {
-  public abstract String getMessage();
+public interface Event {
+  void log( Logger logger );
   
   @ FunctionalInterface
-  public interface Raw {
+  interface Raw {
     Event compile( Map<String, Object> values );
   }
   
   @ FunctionalInterface
-  public interface Builder {
+  interface Builder {
     Event build( Object[] args );
   }
   
   @ FunctionalInterface
-  public interface Handler<M extends Master, E extends Event> {
+  interface Handler<M extends Master, E extends Event> {
     void handle( M master, E event );
   }
 }

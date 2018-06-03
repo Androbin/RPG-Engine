@@ -1,7 +1,7 @@
 package de.androbin.rpg.pkg;
 
-import java.util.*;
 import de.androbin.rpg.*;
+import java.util.*;
 
 public final class StaticPackager<T> extends AbstractPackager<T> {
   private final Map<Ident, T> map;

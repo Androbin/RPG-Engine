@@ -1,24 +1,21 @@
 package de.androbin.rpg.event;
 
 import de.androbin.rpg.*;
+import java.util.logging.*;
 
-public final class CustomEvent extends Event {
-  public final String name;
-  public final Event[] parts;
+public final class CustomEvent implements Event {
+  public final Handler handler;
   
-  public CustomEvent( final String name, final Event[] parts ) {
-    this.name = name;
-    this.parts = parts;
+  public CustomEvent( final Handler handler ) {
+    this.handler = handler;
   }
   
   @ Override
-  public String getMessage() {
-    return name;
+  public void log( final Logger logger ) {
   }
   
-  public static void handle( final Master master, final CustomEvent event ) {
-    for ( final Event part : event.parts ) {
-      Events.handle( master, part );
-    }
+  @ FunctionalInterface
+  public interface Handler {
+    void handle( Master master );
   }
 }

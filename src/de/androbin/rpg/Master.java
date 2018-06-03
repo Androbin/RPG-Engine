@@ -4,32 +4,22 @@ import de.androbin.rpg.entity.*;
 import de.androbin.rpg.gfx.*;
 import de.androbin.rpg.story.*;
 import de.androbin.rpg.world.*;
-import java.awt.*;
 import java.util.*;
-import java.util.List;
-import java.util.function.*;
 
-public class Master {
+public abstract class Master {
   private final Map<Ident, World> worlds = new HashMap<>();
-  private final Function<Ident, World> worldCreator;
   public World world;
   
   public final StoryState story;
-  public Agent player;
   
   public final Camera camera;
   public final List<Overlay> overlays;
   
-  public Master( final Function<Ident, World> worldCreator, final StoryState story ) {
-    this.worldCreator = worldCreator;
+  public Master( final StoryState story ) {
     this.story = story;
     
     camera = new Camera();
     overlays = new ArrayList<>();
-  }
-  
-  public World getWorld( final Ident id ) {
-    return worlds.computeIfAbsent( id, worldCreator );
   }
   
   public void addOverlay( final Overlay overlay ) {
@@ -37,12 +27,15 @@ public class Master {
     overlays.add( overlay );
   }
   
-  public void switchWorld( final Ident id, final Point pos ) {
-    if ( world != null ) {
-      world.entities.remove( player );
-    }
-    
-    world = getWorld( id );
-    world.entities.add( player, pos );
+  protected abstract World createWorld( Ident id );
+  
+  public abstract Agent getPlayer();
+  
+  public World getWorld( final Ident id ) {
+    return worlds.computeIfAbsent( id, this::createWorld );
+  }
+  
+  public Collection<World> listWorlds() {
+    return worlds.values();
   }
 }
