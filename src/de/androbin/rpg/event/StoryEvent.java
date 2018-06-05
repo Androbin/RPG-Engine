@@ -1,6 +1,5 @@
 package de.androbin.rpg.event;
 
-import de.androbin.rpg.*;
 import java.util.logging.*;
 
 public final class StoryEvent implements Event {
@@ -9,13 +8,9 @@ public final class StoryEvent implements Event {
     return new StoryEvent( id );
   };
   
-  public final Ident id;
+  public final String id;
   
   public StoryEvent( final String id ) {
-    this( Ident.fromSerial( id ) );
-  }
-  
-  public StoryEvent( final Ident id ) {
     this.id = id;
   }
   

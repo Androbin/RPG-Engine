@@ -30,12 +30,17 @@ public final class Tiles {
   }
   
   private static TileData createData( final Ident type ) {
-    final XObject props = JSONUtil.readJSON( "tile/" + type + ".json" ).get().asObject();
+    final XObject props = XUtil.readJSON( "tile/" + type + ".json" ).get().asObject();
     return DATA_BUILDERS.select( type ).build( type, props );
   }
   
   public static TileData getData( final Ident type ) {
     return DATA.computeIfAbsent( type, Tiles::createData );
+  }
+  
+  public static void invalidate() {
+    PACKAGES.invalidate();
+    DATA.clear();
   }
   
   public static <D extends TileData> void register( final String serial,

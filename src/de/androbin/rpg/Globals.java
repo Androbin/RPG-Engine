@@ -16,7 +16,7 @@ public final class Globals {
   }
   
   public static void init( final String path ) {
-    init( JSONUtil.readJSON( path ).get().asObject() );
+    init( XUtil.readJSON( path ).get().asObject() );
   }
   
   public static void init( final XObject config ) {

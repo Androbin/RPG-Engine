@@ -1,12 +1,13 @@
 package de.androbin.rpg.story;
 
+import de.androbin.json.*;
 import de.androbin.rpg.*;
 import java.util.*;
 
-public final class StoryState {
+public final class StoryState implements Pooled {
   private final StoryGraph graph;
-  private final Set<Ident> done;
-  private final List<Ident> active;
+  private final Set<String> done;
+  private final List<String> active;
   
   public StoryState( final StoryGraph graph ) {
     this.graph = graph;
@@ -15,15 +16,11 @@ public final class StoryState {
   }
   
   public boolean check( final String id ) {
-    return check( Ident.fromSerial( id ) );
-  }
-  
-  public boolean check( final Ident id ) {
     return done.contains( id );
   }
   
   private boolean checkDeps( final StoryNode node ) {
-    for ( final Ident dep : node.deps ) {
+    for ( final String dep : node.deps ) {
       if ( !check( dep ) ) {
         return false;
       }
@@ -32,18 +29,39 @@ public final class StoryState {
     return true;
   }
   
-  public void setDone( final String id ) {
-    setDone( Ident.fromSerial( id ) );
+  @ Override
+  public void load( final XArray pool ) {
+    Collection<String> target = done;
+    
+    for ( final XValue value : pool ) {
+      if ( value.isNull() ) {
+        target = active;
+        continue;
+      }
+      
+      target.add( value.asString() );
+    }
   }
   
-  public void setDone( final Ident id ) {
+  @ Override
+  public void save( final List<Object> pool ) {
+    pool.addAll( done );
+    pool.add( null );
+    pool.addAll( active );
+  }
+  
+  public void setDone( final String id ) {
+    if ( done.contains( id ) ) {
+      return;
+    }
+    
     final StoryNode node = graph.getNode( id );
     node.finish();
     
     active.remove( id );
     done.add( id );
     
-    for ( final Ident dep : graph.getDeps( id ) ) {
+    for ( final String dep : graph.getDeps( id ) ) {
       final StoryNode depNode = graph.getNode( dep );
       
       if ( !active.contains( dep ) && checkDeps( depNode ) ) {
@@ -53,9 +71,9 @@ public final class StoryState {
   }
   
   public void update() {
-    final List<Ident> done = new ArrayList<>();
+    final List<String> done = new ArrayList<>();
     
-    for ( final Ident id : active ) {
+    for ( final String id : active ) {
       final StoryNode node = graph.getNode( id );
       
       if ( node.update() ) {
@@ -63,7 +81,7 @@ public final class StoryState {
       }
     }
     
-    for ( final Ident node : done ) {
+    for ( final String node : done ) {
       setDone( node );
     }
   }

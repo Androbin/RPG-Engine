@@ -1,11 +1,10 @@
 package de.androbin.rpg.story;
 
-import de.androbin.rpg.*;
 import java.util.*;
 
 public final class StoryGraph {
-  private final Map<Ident, StoryNode> nodes;
-  private final Map<Ident, List<Ident>> deps;
+  private final Map<String, StoryNode> nodes;
+  private final Map<String, List<String>> deps;
   
   public StoryGraph() {
     nodes = new HashMap<>();
@@ -21,17 +20,17 @@ public final class StoryGraph {
       return;
     }
     
-    for ( final Ident dep : node.deps ) {
+    for ( final String dep : node.deps ) {
       deps.computeIfAbsent( dep, foo -> new ArrayList<>() )
           .add( node.id );
     }
   }
   
-  public List<Ident> getDeps( final Ident id ) {
+  public List<String> getDeps( final String id ) {
     return deps.getOrDefault( id, Collections.emptyList() );
   }
   
-  public StoryNode getNode( final Ident id ) {
+  public StoryNode getNode( final String id ) {
     return nodes.get( id );
   }
 }

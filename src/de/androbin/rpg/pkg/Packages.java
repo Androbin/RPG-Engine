@@ -16,11 +16,15 @@ public final class Packages {
   }
   
   private PackageData createData( final Ident type ) {
-    final XObject props = JSONUtil.readJSONObject( prefix + "/" + type + "/package.json" );
+    final XObject props = XUtil.readJSONObject( prefix + "/" + type + "/package.json" );
     return dataBuilder.build( type, props );
   }
   
   public PackageData getData( final Ident type ) {
     return data.computeIfAbsent( type, this::createData );
+  }
+  
+  public void invalidate() {
+    data.clear();
   }
 }

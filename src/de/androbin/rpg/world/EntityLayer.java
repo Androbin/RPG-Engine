@@ -51,6 +51,16 @@ public final class EntityLayer {
     return true;
   }
   
+  public Entity findById( final int id ) {
+    for ( final Entity entity : entities ) {
+      if ( entity.id == id ) {
+        return entity;
+      }
+    }
+    
+    return null;
+  }
+  
   public Entity get( final boolean solid, final Point pos ) {
     return getSpaceTime( solid ).get( pos );
   }

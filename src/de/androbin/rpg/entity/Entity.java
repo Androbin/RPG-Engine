@@ -4,7 +4,7 @@ import de.androbin.rpg.*;
 import java.awt.*;
 import java.awt.geom.*;
 
-public abstract class Entity {
+public abstract class Entity implements Detailed {
   public final int id;
   private Spot spot;
   

@@ -6,7 +6,7 @@ import de.androbin.rpg.event.*;
 public final class StoryEventHandler implements Event.Handler<Master, StoryEvent> {
   @ Override
   public void handle( final Master master, final StoryEvent event ) {
-    final Ident id = event.id;
+    final String id = event.id;
     master.story.setDone( id );
   }
 }

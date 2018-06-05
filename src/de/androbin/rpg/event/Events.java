@@ -113,7 +113,7 @@ public final class Events {
       final Event.Builder builder = BUILDERS.get( func );
       return values -> builder.build( compile( args, values ) );
     } else {
-      final String[] events = JSONUtil.readJSON( "event/" + func ).get().asStringArray();
+      final String[] events = XUtil.readJSON( "event/" + func ).get().asStringArray();
       return values -> new BatchEvent( func, fill( new Event[ events.length ], i -> {
         return parse( events[ i ] ).compile( values );
       } ) );
