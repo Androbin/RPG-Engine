@@ -1,6 +1,7 @@
 package de.androbin.rpg.event;
 
 import de.androbin.rpg.*;
+import de.androbin.rpg.overlay.*;
 import java.util.logging.*;
 
 public final class CustomEvent implements Event {
@@ -16,6 +17,6 @@ public final class CustomEvent implements Event {
   
   @ FunctionalInterface
   public interface Handler {
-    void handle( Master master );
+    Overlay handle( Master master );
   }
 }

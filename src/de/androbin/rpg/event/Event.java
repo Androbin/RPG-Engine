@@ -1,6 +1,7 @@
 package de.androbin.rpg.event;
 
 import de.androbin.rpg.*;
+import de.androbin.rpg.overlay.*;
 import java.util.*;
 import java.util.logging.*;
 
@@ -19,6 +20,6 @@ public interface Event {
   
   @ FunctionalInterface
   interface Handler<M extends Master, E extends Event> {
-    void handle( M master, E event );
+    Overlay handle( M master, E event );
   }
 }

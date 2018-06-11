@@ -5,6 +5,7 @@ import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.gfx.*;
+import de.androbin.rpg.overlay.*;
 import de.androbin.rpg.world.*;
 import de.androbin.shell.*;
 import de.androbin.shell.gfx.*;

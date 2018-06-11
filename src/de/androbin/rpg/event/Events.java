@@ -4,6 +4,7 @@ import static de.androbin.collection.util.ObjectCollectionUtil.*;
 import de.androbin.json.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.event.handler.*;
+import de.androbin.rpg.overlay.*;
 import java.util.*;
 import java.util.logging.*;
 import java.util.logging.Formatter;
@@ -22,6 +23,7 @@ public final class Events {
     QUEUE = new EventQueue();
     
     final Handler logHandler = new ConsoleHandler();
+    logHandler.setLevel( Level.ALL );
     logHandler.setFormatter( new Formatter() {
       @ Override
       public String format( final LogRecord record ) {
@@ -43,8 +45,8 @@ public final class Events {
     Events.BUILDERS.put( "story", StoryEvent.BUILDER );
     Events.BUILDERS.put( "teleport", TeleportEvent.BUILDER );
     
-    putHandler( BatchEvent.class, new BatchEventHandler() );
     putHandler( CustomEvent.class, new CustomEventHandler() );
+    putHandler( ScriptEvent.class, new ScriptEventHandler() );
     putHandler( StoryEvent.class, new StoryEventHandler() );
     putHandler( TeleportEvent.class, new TeleportEventHandler() );
     putHandler( TileEnterEvent.class, new TileEnterEventHandler() );
@@ -79,13 +81,22 @@ public final class Events {
   }
   
   @ SuppressWarnings( "unchecked" )
-  public static <M extends Master, E extends Event> void handle( final M master, final E event ) {
+  public static <M extends Master, E extends Event> Overlay handle( final M master,
+      final E event ) {
     event.log( LOGGER );
     
-    if ( HANDLERS.containsKey( event.getClass() ) ) {
-      final Event.Handler<M, E> handler = (Event.Handler<M, E>) HANDLERS.get( event.getClass() );
-      handler.handle( master, event );
+    if ( !HANDLERS.containsKey( event.getClass() ) ) {
+      return null;
     }
+    
+    final Event.Handler<M, E> handler = (Event.Handler<M, E>) HANDLERS.get( event.getClass() );
+    final Overlay overlay = handler.handle( master, event );
+    
+    if ( overlay != null ) {
+      master.addOverlay( overlay );
+    }
+    
+    return overlay;
   }
   
   public static Event.Raw parse( final String text ) {
@@ -114,9 +125,8 @@ public final class Events {
       return values -> builder.build( compile( args, values ) );
     } else {
       final String[] events = XUtil.readJSON( "event/" + func ).get().asStringArray();
-      return values -> new BatchEvent( func, fill( new Event[ events.length ], i -> {
-        return parse( events[ i ] ).compile( values );
-      } ) );
+      return values -> new ScriptEvent( func, fill( new Event[ events.length ],
+          i -> parse( events[ i ] ).compile( values ) ) );
     }
   }
 }

@@ -1,4 +1,4 @@
-package de.androbin.rpg;
+package de.androbin.rpg.overlay;
 
 import de.androbin.shell.*;
 import java.awt.*;

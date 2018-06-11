@@ -2,6 +2,7 @@ package de.androbin.rpg;
 
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.gfx.*;
+import de.androbin.rpg.overlay.*;
 import de.androbin.rpg.story.*;
 import de.androbin.rpg.world.*;
 import java.util.*;

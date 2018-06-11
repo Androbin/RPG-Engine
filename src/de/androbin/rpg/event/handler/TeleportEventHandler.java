@@ -4,12 +4,13 @@ import de.androbin.rpg.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.event.Event;
+import de.androbin.rpg.overlay.*;
 import de.androbin.rpg.world.*;
 import java.awt.*;
 
 public final class TeleportEventHandler implements Event.Handler<Master, TeleportEvent> {
   @ Override
-  public void handle( final Master master, final TeleportEvent event ) {
+  public Overlay handle( final Master master, final TeleportEvent event ) {
     final Entity entity = event.entity;
     final Ident worldId = event.world;
     final Point pos = event.pos;
@@ -22,7 +23,7 @@ public final class TeleportEventHandler implements Event.Handler<Master, Telepor
       final boolean success = srcWorld.entities.tryMove( entity, target );
       
       if ( !success ) {
-        return;
+        return null;
       }
       
       entity.setSpot( new Spot( srcWorld, pos ) );
@@ -34,12 +35,14 @@ public final class TeleportEventHandler implements Event.Handler<Master, Telepor
       
       if ( !success ) {
         srcWorld.entities.add( entity, spot.getPos() );
-        return;
+        return null;
       }
       
       if ( entity == master.getPlayer() ) {
         master.world = destWorld;
       }
     }
+    
+    return null;
   }
 }
