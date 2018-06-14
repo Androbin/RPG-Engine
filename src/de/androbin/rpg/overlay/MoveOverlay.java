@@ -3,6 +3,7 @@ package de.androbin.rpg.overlay;
 import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.shell.*;
+import de.androbin.shell.input.*;
 import java.util.*;
 
 public final class MoveOverlay extends AbstractShell implements Overlay {
@@ -12,6 +13,8 @@ public final class MoveOverlay extends AbstractShell implements Overlay {
   public MoveOverlay( final MoveHandle move, final Direction[] dirs ) {
     this.move = move;
     this.dirs = new ArrayDeque<>( Arrays.asList( dirs ) );
+    
+    getInputs().keyboard = KeyInput.MASKING;
   }
   
   @ Override

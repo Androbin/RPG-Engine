@@ -48,6 +48,7 @@ public final class Events {
     Events.BUILDERS.put( "property", PropertyEvent.BUILDER );
     Events.BUILDERS.put( "story", StoryEvent.BUILDER );
     Events.BUILDERS.put( "teleport", TeleportEvent.BUILDER );
+    Events.BUILDERS.put( "wait", WaitEvent.BUILDER );
     
     putHandler( CustomEvent.class, new CustomEventHandler() );
     putHandler( MoveEvent.class, new MoveEventHandler() );
@@ -56,6 +57,7 @@ public final class Events {
     putHandler( StoryEvent.class, new StoryEventHandler() );
     putHandler( TeleportEvent.class, new TeleportEventHandler() );
     putHandler( TileEnterEvent.class, new TileEnterEventHandler() );
+    putHandler( WaitEvent.class, new WaitEventHandler() );
   }
   
   private Events() {
