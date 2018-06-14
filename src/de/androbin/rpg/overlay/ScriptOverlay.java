@@ -3,13 +3,15 @@ package de.androbin.rpg.overlay;
 import de.androbin.rpg.event.*;
 import de.androbin.shell.*;
 import java.util.*;
+import java.util.stream.*;
 
 public final class ScriptOverlay extends AbstractShell implements Overlay {
-  private final Queue<Event> script;
-  private Overlay current;
+  private final Queue<Event[]> script;
+  private List<Overlay> current;
   
-  public ScriptOverlay( final Event ... script ) {
+  public ScriptOverlay( final Event[][] script ) {
     this.script = new ArrayDeque<>( Arrays.asList( script ) );
+    current = Collections.emptyList();
   }
   
   @ Override
@@ -18,16 +20,25 @@ public final class ScriptOverlay extends AbstractShell implements Overlay {
   
   @ Override
   public void update( final float delta ) {
-    if ( current == null ) {
-      if ( script.isEmpty() ) {
-        setRunning( false );
-      } else {
-        Events.QUEUE.enqueue( new CustomEvent( master -> {
-          return current = Events.handle( master, script.remove() );
-        } ) );
-      }
-    } else if ( !current.isRunning() ) {
-      current = null;
+    if ( !current.isEmpty() && current.stream().anyMatch( overlay -> {
+      return overlay.isRunning() && overlay.isActive();
+    } ) ) {
+      return;
     }
+    
+    current.clear();
+    
+    if ( script.isEmpty() ) {
+      setRunning( false );
+      return;
+    }
+    
+    Events.QUEUE.enqueue( new CustomEvent( master -> {
+      current = Stream.of( script.remove() )
+          .map( event -> Events.handle( master, event ) )
+          .filter( Objects::nonNull )
+          .collect( Collectors.toList() );
+      return null;
+    } ) );
   }
 }

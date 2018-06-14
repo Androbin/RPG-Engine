@@ -80,4 +80,13 @@ public final class DirectionPair {
     
     return new DirectionPair( second, first );
   }
+  
+  @ Override
+  public String toString() {
+    if ( second == null ) {
+      return first.toString();
+    } else {
+      return first.toString() + "-" + second.toString();
+    }
+  }
 }

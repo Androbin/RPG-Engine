@@ -10,5 +10,5 @@ Dependencies:
  - IO
  - JSON
  - Math Utils
+ - Mixins
  - Screen System
- - String Utils

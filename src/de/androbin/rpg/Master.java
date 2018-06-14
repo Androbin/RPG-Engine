@@ -14,7 +14,7 @@ public abstract class Master {
   public final StoryState story;
   
   public final Camera camera;
-  public final List<Overlay> overlays;
+  private final List<Overlay> overlays;
   
   public Master( final StoryState story ) {
     this.story = story;
@@ -24,8 +24,22 @@ public abstract class Master {
   }
   
   public void addOverlay( final Overlay overlay ) {
+    if ( overlays.contains( overlay ) ) {
+      return;
+    }
+    
     overlay.setRunning( true );
-    overlays.add( overlay );
+    overlays.add( 0, overlay );
+  }
+  
+  public void cleanOverlays() {
+    for ( final Iterator<Overlay> iter = overlays.iterator(); iter.hasNext(); ) {
+      final Overlay overlay = iter.next();
+      
+      if ( !overlay.isRunning() ) {
+        iter.remove();
+      }
+    }
   }
   
   protected abstract World createWorld( Ident id );
@@ -34,6 +48,10 @@ public abstract class Master {
   
   public World getWorld( final Ident id ) {
     return worlds.computeIfAbsent( id, this::createWorld );
+  }
+  
+  public List<Overlay> listOverlays() {
+    return Collections.unmodifiableList( overlays );
   }
   
   public Collection<World> listWorlds() {

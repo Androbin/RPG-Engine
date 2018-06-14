@@ -12,6 +12,7 @@ import java.util.logging.Formatter;
 public final class Events {
   private static final Map<String, Event.Builder> BUILDERS;
   private static final Map<Class<? extends Event>, Event.Handler<?, ?>> HANDLERS;
+  private static final Map<String, Event.Raw> SCRIPTS;
   
   public static final EventQueue QUEUE;
   public static final Logger LOGGER;
@@ -19,6 +20,7 @@ public final class Events {
   static {
     BUILDERS = new HashMap<>();
     HANDLERS = new HashMap<>();
+    SCRIPTS = new HashMap<>();
     
     QUEUE = new EventQueue();
     
@@ -42,10 +44,14 @@ public final class Events {
   }
   
   static {
+    Events.BUILDERS.put( "move", MoveEvent.BUILDER );
+    Events.BUILDERS.put( "property", PropertyEvent.BUILDER );
     Events.BUILDERS.put( "story", StoryEvent.BUILDER );
     Events.BUILDERS.put( "teleport", TeleportEvent.BUILDER );
     
     putHandler( CustomEvent.class, new CustomEventHandler() );
+    putHandler( MoveEvent.class, new MoveEventHandler() );
+    putHandler( PropertyEvent.class, new PropertyEventHandler() );
     putHandler( ScriptEvent.class, new ScriptEventHandler() );
     putHandler( StoryEvent.class, new StoryEventHandler() );
     putHandler( TeleportEvent.class, new TeleportEventHandler() );
@@ -53,6 +59,30 @@ public final class Events {
   }
   
   private Events() {
+  }
+  
+  private static Event.Raw buildScript( final String func, final XArray script ) {
+    return values -> new ScriptEvent( func, fill( new Event[ script.size() ][], i -> {
+      final XValue value = script.get( i );
+      
+      try {
+        final XArray array = value.asArray();
+        return fill( new Event[ array.size() ], j -> {
+          final XValue value2 = array.get( j );
+          
+          try {
+            final XArray array2 = value2.asArray();
+            return buildScript( null, array2 ).compile( values );
+          } catch ( final ClassCastException e ) {
+            final String event = value2.asString();
+            return parse( event ).compile( values );
+          }
+        } );
+      } catch ( final ClassCastException e ) {
+        final String event = value.asString();
+        return new Event[] { parse( event ).compile( values ) };
+      }
+    } ) );
   }
   
   private static Object[] compile( final String[] args, final Map<String, Object> values ) {
@@ -118,15 +148,18 @@ public final class Events {
       argString = text.substring( l + 1, r );
     }
     
-    final String[] args = argString.split( ",\\s?" );
+    final String[] argSplit = argString.split( "(?<!\\\\)," );
+    final String[] args = fill( new String[ argSplit.length ],
+        i -> argSplit[ i ].replace( "\\,", "," ).trim() );
     
     if ( BUILDERS.containsKey( func ) ) {
       final Event.Builder builder = BUILDERS.get( func );
       return values -> builder.build( compile( args, values ) );
-    } else {
-      final String[] events = XUtil.readJSON( "event/" + func ).get().asStringArray();
-      return values -> new ScriptEvent( func, fill( new Event[ events.length ],
-          i -> parse( events[ i ] ).compile( values ) ) );
     }
+    
+    return SCRIPTS.computeIfAbsent( func, foo -> {
+      final XArray script = XUtil.readJSON( "event/" + func + ".json" ).get().asArray();
+      return buildScript( func, script );
+    } );
   }
 }

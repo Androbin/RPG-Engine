@@ -25,11 +25,12 @@ public abstract class RPGScreen<M extends Master> extends BasicShell implements 
   
   public RPGScreen() {
     keyboardTee.mask = true;
-    keyInputs.add( new KeyInputTee( new MixIterable<>( () -> new FilterIterator<>(
-        new PipeIterator<>(
-            master.overlays.iterator(),
-            overlay -> overlay.getInputs().keyboard ),
-        value -> value != null ) ) ) );
+    keyInputs.add( new KeyInputTee( new MixIterable<>(
+        () -> new FilterIterator<>(
+            new PipeIterator<>(
+                master.listOverlays().iterator(),
+                overlay -> overlay.getInputs().keyboard ),
+            Objects::nonNull ) ) ) );
     keyInputs.add( new MoveKeyInput( () -> requestDir, dir -> requestDir = dir ) );
     
     worldRenderer = new SimpleWorldRenderer();
@@ -64,7 +65,9 @@ public abstract class RPGScreen<M extends Master> extends BasicShell implements 
     g.setColor( Color.BLACK );
     g.fillRect( 0, 0, getWidth(), getHeight() );
     
-    for ( final Overlay overlay : master.overlays ) {
+    final List<Overlay> overlays = master.listOverlays();
+    
+    for ( final Overlay overlay : overlays ) {
       overlay.setSize( getWidth(), getHeight() );
     }
     
@@ -75,14 +78,14 @@ public abstract class RPGScreen<M extends Master> extends BasicShell implements 
       final Rectangle2D.Float view = calcView();
       worldRenderer.render( g, master.world, view, scale );
       
-      for ( final Overlay overlay : master.overlays ) {
+      for ( final Overlay overlay : overlays ) {
         overlay.renderWorld( g, view, scale );
       }
       
       g.setTransform( savedTransform );
     }
     
-    for ( final Overlay overlay : master.overlays ) {
+    for ( final Overlay overlay : overlays ) {
       overlay.renderScreen( g );
     }
   }
@@ -101,20 +104,15 @@ public abstract class RPGScreen<M extends Master> extends BasicShell implements 
       agent.update( delta );
     }
     
-    Events.QUEUE.process( master );
+    for ( final Overlay overlay : master.listOverlays() ) {
+      overlay.update( delta );
+    }
+    
     master.story.update();
+    Events.QUEUE.process( master );
+    master.cleanOverlays();
     
     master.camera.update( delta );
     calcTranslation();
-    
-    for ( final Iterator<Overlay> iter = master.overlays.iterator(); iter.hasNext(); ) {
-      final Overlay overlay = iter.next();
-      
-      if ( overlay.isRunning() ) {
-        overlay.update( delta );
-      } else {
-        iter.remove();
-      }
-    }
   }
 }
