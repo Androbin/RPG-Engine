@@ -38,8 +38,12 @@ public final class TeleportEventHandler implements Event.Handler<Master, Telepor
         return null;
       }
       
-      if ( entity == master.getPlayer() ) {
-        master.world = destWorld;
+      if ( entity instanceof Agent ) {
+        final Agent agent = (Agent) entity;
+        
+        if ( master.isPlayer( agent ) ) {
+          master.world = destWorld;
+        }
       }
     }
     

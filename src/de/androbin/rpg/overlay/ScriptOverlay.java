@@ -6,12 +6,19 @@ import java.util.*;
 import java.util.stream.*;
 
 public final class ScriptOverlay extends AbstractShell implements Overlay {
+  private final boolean masking;
   private final Queue<Event[]> script;
   private List<Overlay> current;
   
-  public ScriptOverlay( final Event[][] script ) {
+  public ScriptOverlay( final boolean masking, final Event[][] script ) {
+    this.masking = masking;
     this.script = new ArrayDeque<>( Arrays.asList( script ) );
     current = Collections.emptyList();
+  }
+  
+  @ Override
+  public boolean isMasking() {
+    return masking;
   }
   
   @ Override

@@ -1,5 +1,6 @@
 package de.androbin.rpg;
 
+import de.androbin.mixin.iter.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.gfx.*;
 import de.androbin.rpg.overlay.*;
@@ -29,7 +30,7 @@ public abstract class Master {
     }
     
     overlay.setRunning( true );
-    overlays.add( 0, overlay );
+    overlays.add( overlay );
   }
   
   public void cleanOverlays() {
@@ -44,14 +45,18 @@ public abstract class Master {
   
   protected abstract World createWorld( Ident id );
   
-  public abstract Agent getPlayer();
-  
   public World getWorld( final Ident id ) {
     return worlds.computeIfAbsent( id, this::createWorld );
   }
   
-  public List<Overlay> listOverlays() {
+  public abstract boolean isPlayer( Agent agent );
+  
+  public Iterable<Overlay> listOverlaysUp() {
     return Collections.unmodifiableList( overlays );
+  }
+  
+  public Iterable<Overlay> listOverlaysDown() {
+    return () -> new ReverseIterator<>( Collections.unmodifiableList( overlays ) );
   }
   
   public Collection<World> listWorlds() {

@@ -1,7 +1,5 @@
 package de.androbin.rpg;
 
-import de.androbin.mixin.iter.*;
-import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.gfx.*;
@@ -12,29 +10,23 @@ import de.androbin.shell.gfx.*;
 import de.androbin.shell.input.tee.*;
 import java.awt.*;
 import java.awt.geom.*;
-import java.util.*;
 import java.util.List;
+import java.util.function.*;
 
-public abstract class RPGScreen<M extends Master> extends BasicShell implements AWTGraphics {
+public abstract class RPGScreen<M extends Master> extends AbstractShell implements AWTGraphics {
   public M master;
-  private DirectionPair requestDir;
   
   protected WorldRenderer<World> worldRenderer;
   protected final Point2D.Float trans;
   protected float scale;
   
   public RPGScreen() {
-    keyboardTee.mask = true;
-    keyInputs.add( new KeyInputTee( new MixIterable<>(
-        () -> new FilterIterator<>(
-            new PipeIterator<>(
-                master.listOverlays().iterator(),
-                overlay -> overlay.getInputs().keyboard ),
-            Objects::nonNull ) ) ) );
-    keyInputs.add( new MoveKeyInput( () -> requestDir, dir -> requestDir = dir ) );
+    // TODO: accumulate keyReleased and mouseReleased
+    final Iterable<Overlay> source = () -> master.listOverlaysDown().iterator();
+    final Predicate<Overlay> mask = overlay -> overlay.isMasking() || overlay.isFreezing();
+    InputTees.putShellTee( getInputs(), source, mask );
     
     worldRenderer = new SimpleWorldRenderer();
-    
     trans = new Point2D.Float();
   }
   
@@ -61,11 +53,15 @@ public abstract class RPGScreen<M extends Master> extends BasicShell implements 
   }
   
   @ Override
+  protected void onResized( final int width, final int height ) {
+  }
+  
+  @ Override
   public void render( final Graphics2D g ) {
     g.setColor( Color.BLACK );
     g.fillRect( 0, 0, getWidth(), getHeight() );
     
-    final List<Overlay> overlays = master.listOverlays();
+    final Iterable<Overlay> overlays = master.listOverlaysUp();
     
     for ( final Overlay overlay : overlays ) {
       overlay.setSize( getWidth(), getHeight() );
@@ -92,20 +88,23 @@ public abstract class RPGScreen<M extends Master> extends BasicShell implements 
   
   @ Override
   public void update( final float delta ) {
-    final Agent player = master.getPlayer();
+    boolean freeze = false;
     
-    if ( player != null ) {
-      MoveKeyInput.applyRequest( player.move, requestDir );
-    }
-    
-    final List<Agent> agents = master.world.entities.listAgents();
-    
-    for ( final Agent agent : agents ) {
-      agent.update( delta );
-    }
-    
-    for ( final Overlay overlay : master.listOverlays() ) {
+    for ( final Overlay overlay : master.listOverlaysDown() ) {
       overlay.update( delta );
+      
+      if ( overlay.isFreezing() ) {
+        freeze = true;
+        break;
+      }
+    }
+    
+    if ( !freeze ) {
+      final List<Agent> agents = master.world.entities.listAgents();
+      
+      for ( final Agent agent : agents ) {
+        agent.update( delta );
+      }
     }
     
     master.story.update();
@@ -114,5 +113,12 @@ public abstract class RPGScreen<M extends Master> extends BasicShell implements 
     
     master.camera.update( delta );
     calcTranslation();
+  }
+  
+  @ Override
+  public void updateUI( final float delta ) {
+    for ( final Overlay overlay : master.listOverlaysUp() ) {
+      overlay.updateUI( delta );
+    }
   }
 }

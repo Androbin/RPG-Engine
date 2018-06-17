@@ -1,6 +1,5 @@
 package de.androbin.rpg;
 
-import de.androbin.mixin.iter.*;
 import java.util.*;
 
 public final class Ident implements Iterable<String> {
@@ -57,7 +56,7 @@ public final class Ident implements Iterable<String> {
   }
   
   public Iterable<Ident> partial() {
-    return new MixIterable<>( PartialIterator::new );
+    return PartialIterator::new;
   }
   
   private Ident range( final int start, final int end ) {

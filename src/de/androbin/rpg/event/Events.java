@@ -12,7 +12,7 @@ import java.util.logging.Formatter;
 public final class Events {
   private static final Map<String, Event.Builder> BUILDERS;
   private static final Map<Class<? extends Event>, Event.Handler<?, ?>> HANDLERS;
-  private static final Map<String, Event.Raw> SCRIPTS;
+  private static final Map<String, ScriptEvent.Static> SCRIPTS;
   
   public static final EventQueue QUEUE;
   public static final Logger LOGGER;
@@ -63,8 +63,8 @@ public final class Events {
   private Events() {
   }
   
-  private static Event.Raw buildScript( final String func, final XArray script ) {
-    return values -> new ScriptEvent( func, fill( new Event[ script.size() ][], i -> {
+  private static Event[][] buildScript( final XArray script, final Map<String, Object> values ) {
+    return fill( new Event[ script.size() ][], i -> {
       final XValue value = script.get( i );
       
       try {
@@ -74,7 +74,7 @@ public final class Events {
           
           try {
             final XArray array2 = value2.asArray();
-            return buildScript( null, array2 ).compile( values );
+            return new ScriptEvent( buildScript( array2, values ) );
           } catch ( final ClassCastException e ) {
             final String event = value2.asString();
             return parse( event ).compile( values );
@@ -84,7 +84,7 @@ public final class Events {
         final String event = value.asString();
         return new Event[] { parse( event ).compile( values ) };
       }
-    } ) );
+    } );
   }
   
   private static Object[] compile( final String[] args, final Map<String, Object> values ) {
@@ -154,14 +154,18 @@ public final class Events {
     final String[] args = fill( new String[ argSplit.length ],
         i -> argSplit[ i ].replace( "\\,", "," ).trim() );
     
-    if ( BUILDERS.containsKey( func ) ) {
-      final Event.Builder builder = BUILDERS.get( func );
-      return values -> builder.build( compile( args, values ) );
+    if ( func.equals( "script" ) ) {
+      final String name = args[ 0 ];
+      final boolean masking = Boolean.parseBoolean( args[ 1 ] );
+      
+      final ScriptEvent.Static raw = SCRIPTS.computeIfAbsent( name, foo -> values -> {
+        final XArray script = XUtil.readJSON( "event/" + name + ".json" ).get().asArray();
+        return buildScript( script, values );
+      } );
+      return values -> new ScriptEvent( name, masking, raw.compile( values ) );
     }
     
-    return SCRIPTS.computeIfAbsent( func, foo -> {
-      final XArray script = XUtil.readJSON( "event/" + func + ".json" ).get().asArray();
-      return buildScript( func, script );
-    } );
+    final Event.Builder builder = BUILDERS.get( func );
+    return values -> builder.build( compile( args, values ) );
   }
 }

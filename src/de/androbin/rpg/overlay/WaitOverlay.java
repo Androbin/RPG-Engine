@@ -1,7 +1,6 @@
 package de.androbin.rpg.overlay;
 
 import de.androbin.shell.*;
-import de.androbin.shell.input.*;
 
 public final class WaitOverlay extends AbstractShell implements Overlay {
   private final float duration;
@@ -9,8 +8,6 @@ public final class WaitOverlay extends AbstractShell implements Overlay {
   
   public WaitOverlay( final float duration ) {
     this.duration = duration;
-    
-    getInputs().keyboard = KeyInput.MASKING;
   }
   
   @ Override

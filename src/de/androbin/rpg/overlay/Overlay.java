@@ -5,6 +5,14 @@ import java.awt.*;
 import java.awt.geom.*;
 
 public interface Overlay extends Shell {
+  default boolean isFreezing() {
+    return false;
+  }
+  
+  default boolean isMasking() {
+    return false;
+  }
+  
   default void renderScreen( Graphics2D g ) {
   }
   
