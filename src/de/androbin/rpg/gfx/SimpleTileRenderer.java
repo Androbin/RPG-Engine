@@ -9,9 +9,9 @@ import de.androbin.rpg.tile.*;
 
 public class SimpleTileRenderer<E extends Tile> implements TileRenderer<E> {
   @ Override
-  public void render( final Graphics2D g, final E tile,
+  public void render( final Graphics2D g, final E tile, final Point spot,
       final Point2D.Float pos, final float scale ) {
-    final BufferedImage image = Sheets.getImage( tile, scale );
+    final BufferedImage image = Sheets.getImage( tile, spot, scale );
     
     final float px = pos.x * scale;
     final float py = pos.y * scale;

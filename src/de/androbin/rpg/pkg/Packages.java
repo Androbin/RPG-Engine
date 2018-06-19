@@ -7,7 +7,7 @@ import java.util.*;
 public final class Packages {
   private final Map<Ident, PackageData> data = new HashMap<>();
   
-  public PackageData.Builder dataBuilder = PackageData::new;
+  public static PackageData.Builder dataBuilder = PackageData::new;
   
   private final String prefix;
   
@@ -16,7 +16,9 @@ public final class Packages {
   }
   
   private PackageData createData( final Ident type ) {
-    final XObject props = XUtil.readJSONObject( prefix + "/" + type + "/package.json" );
+    final XObject props = XUtil.readJSON( prefix + "/" + type + ".json" )
+        .map( XValue::asObject )
+        .orElseGet( () -> XUtil.readJSONObject( prefix + "/" + type + "/package.json" ) );
     return dataBuilder.build( type, props );
   }
   

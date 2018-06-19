@@ -7,8 +7,8 @@ import java.awt.geom.*;
 public interface TileRenderer<T extends Tile> {
   default void render( final Graphics2D g, final T tile,
       final Point pos, final float scale ) {
-    render( g, tile, new Point2D.Float( pos.x, pos.y ), scale );
+    render( g, tile, pos, new Point2D.Float( pos.x, pos.y ), scale );
   }
   
-  void render( Graphics2D g, T tile, Point2D.Float pos, float scale );
+  void render( Graphics2D g, T tile, Point spot, Point2D.Float pos, float scale );
 }

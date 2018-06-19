@@ -6,13 +6,17 @@ import de.androbin.gfx.util.*;
 import de.androbin.rpg.*;
 
 public final class Sheet {
+  public final Dimension size;
+  
   private final BufferedImage[][] raw;
   private final BufferedImage[][] scaled;
   
   public final Dimension rawSize;
   private float scale;
   
-  private Sheet( final BufferedImage[][] images, final Dimension rawSize ) {
+  private Sheet( final Dimension size, final BufferedImage[][] images, final Dimension rawSize ) {
+    this.size = size;
+    
     raw = images;
     scaled = new BufferedImage[ images.length ][ images[ 0 ].length ];
     
@@ -34,7 +38,7 @@ public final class Sheet {
       }
     }
     
-    return new Sheet( images, new Dimension( width, height ) );
+    return new Sheet( size, images, new Dimension( width, height ) );
   }
   
   public BufferedImage getImage( final Point pos ) {
@@ -58,10 +62,5 @@ public final class Sheet {
         scaled[ y ][ x ] = ImageUtil.scaleImage( raw[ y ][ x ], size );
       }
     }
-  }
-  
-  @ FunctionalInterface
-  public interface Layout<O> {
-    Point locate( O object );
   }
 }
