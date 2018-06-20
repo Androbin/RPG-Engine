@@ -49,6 +49,20 @@ public abstract class Master {
     return worlds.computeIfAbsent( id, this::createWorld );
   }
   
+  public void invalidate() {
+    worlds.clear();
+    final World newWorld = getWorld( world.id );
+    
+    for ( final Agent agent : world.entities.listAgents() ) {
+      if ( isPlayer( agent ) ) {
+        newWorld.entities.remove( newWorld.entities.findById( agent.id ) );
+        newWorld.entities.add( agent, agent.getSpot().getPos() );
+      }
+    }
+    
+    world = newWorld;
+  }
+  
   public abstract boolean isPlayer( Agent agent );
   
   public Iterable<Overlay> listOverlaysUp() {

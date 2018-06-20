@@ -52,6 +52,10 @@ public final class EntityLayer {
   }
   
   public Entity findById( final int id ) {
+    if ( id == 0 ) {
+      return null;
+    }
+    
     for ( final Entity entity : entities ) {
       if ( entity.id == id ) {
         return entity;
