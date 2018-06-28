@@ -23,7 +23,7 @@ public final class StaticPackager<T> extends AbstractPackager<T> {
   
   @ Override
   public T getDefault() {
-    return defaultValue;
+    return map.getOrDefault( null, defaultValue );
   }
   
   public void register( final Ident id, final T value ) {

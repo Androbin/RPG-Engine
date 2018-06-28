@@ -11,14 +11,6 @@ public final class Ident implements Iterable<String> {
     this.path = path;
   }
   
-  public static Ident build( final String[] path ) {
-    if ( path == null ) {
-      return null;
-    }
-    
-    return new Ident( path );
-  }
-  
   @ Override
   public boolean equals( final Object obj ) {
     if ( obj instanceof Ident ) {
@@ -34,13 +26,17 @@ public final class Ident implements Iterable<String> {
   }
   
   public static Ident fromSerial( final String serial ) {
-    return build( serial.split( "/" ) );
+    if ( serial == null ) {
+      return null;
+    }
+    
+    return new Ident( serial.split( "/" ) );
   }
   
   @ Override
   public int hashCode() {
     if ( hash == 0 ) {
-      hash = toString().hashCode();
+      hash = Arrays.hashCode( path );
     }
     
     return hash;
@@ -60,7 +56,7 @@ public final class Ident implements Iterable<String> {
   }
   
   private Ident range( final int start, final int end ) {
-    return build( Arrays.copyOfRange( path, start, end ) );
+    return new Ident( Arrays.copyOfRange( path, start, end ) );
   }
   
   @ Override

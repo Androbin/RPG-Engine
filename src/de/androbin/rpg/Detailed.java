@@ -13,6 +13,10 @@ public interface Detailed {
     return details;
   }
   
+  default String save( final boolean pretty ) {
+    return XObject.toString( save(), pretty );
+  }
+  
   default void save( Map<String, Object> details ) {
   }
 }

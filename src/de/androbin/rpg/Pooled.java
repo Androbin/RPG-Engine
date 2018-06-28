@@ -13,6 +13,10 @@ public interface Pooled {
     return pool;
   }
   
+  default String save( final boolean pretty ) {
+    return XArray.toString( save(), pretty );
+  }
+  
   default void save( List<Object> pool ) {
   }
 }

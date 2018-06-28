@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.geom.*;
 
 public abstract class Entity implements Detailed {
-  public final int id;
+  public int id;
   private Spot spot;
   
   public Entity( final int id ) {
