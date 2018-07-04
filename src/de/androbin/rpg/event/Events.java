@@ -48,6 +48,7 @@ public final class Events {
     Events.BUILDERS.put( "property", PropertyEvent.BUILDER );
     Events.BUILDERS.put( "story", StoryEvent.BUILDER );
     Events.BUILDERS.put( "teleport", TeleportEvent.BUILDER );
+    Events.BUILDERS.put( "vision", VisionEvent.BUILDER );
     Events.BUILDERS.put( "wait", WaitEvent.BUILDER );
     
     putHandler( CustomEvent.class, new CustomEventHandler() );
@@ -57,6 +58,7 @@ public final class Events {
     putHandler( StoryEvent.class, new StoryEventHandler() );
     putHandler( TeleportEvent.class, new TeleportEventHandler() );
     putHandler( TileEnterEvent.class, new TileEnterEventHandler() );
+    putHandler( VisionEvent.class, new VisionEventHandler() );
     putHandler( WaitEvent.class, new WaitEventHandler() );
   }
   
@@ -166,6 +168,12 @@ public final class Events {
     }
     
     final Event.Builder builder = BUILDERS.get( func );
+    
+    if ( builder == null ) {
+      System.err.println( "Unknown event type '" + func + "'" );
+      return values -> null;
+    }
+    
     return values -> builder.build( compile( args, values ) );
   }
 }

@@ -1,13 +1,12 @@
 package de.androbin.rpg.event;
 
+import de.androbin.rpg.*;
 import java.awt.*;
 import java.util.logging.*;
-import de.androbin.rpg.*;
-import de.androbin.rpg.entity.*;
 
 public final class TeleportEvent implements Event {
   public static final Event.Builder BUILDER = args -> {
-    final Entity entity = (Entity) args[ 0 ];
+    final Object entity = args[ 0 ];
     
     switch ( args.length ) {
       case 4:
@@ -24,15 +23,15 @@ public final class TeleportEvent implements Event {
     return null;
   };
   
-  public final Entity entity;
+  public final Object entity;
   public final Ident world;
   public final Point pos;
   
-  public TeleportEvent( final Entity entity, final Point pos ) {
+  public TeleportEvent( final Object entity, final Point pos ) {
     this( entity, null, pos );
   }
   
-  public TeleportEvent( final Entity entity, final String world, final Point pos ) {
+  public TeleportEvent( final Object entity, final String world, final Point pos ) {
     this.entity = entity;
     this.world = Ident.fromSerial( world );
     this.pos = pos;

@@ -9,12 +9,10 @@ import de.androbin.rpg.overlay.*;
 public final class PropertyEventHandler implements Event.Handler<Master, PropertyEvent> {
   @ Override
   public Overlay handle( final Master master, final PropertyEvent event ) {
-    final int entityRaw = event.entity;
+    final Entity entity = EventHandlers.getEntity( master, event.entity );
     final XObject details = event.details;
     
-    final Entity entity = master.world.entities.findById( entityRaw );
     entity.load( details );
-    
     return null;
   }
 }

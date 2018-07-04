@@ -11,7 +11,7 @@ import java.awt.*;
 public final class TeleportEventHandler implements Event.Handler<Master, TeleportEvent> {
   @ Override
   public Overlay handle( final Master master, final TeleportEvent event ) {
-    final Entity entity = event.entity;
+    final Entity entity = EventHandlers.getEntity( master, event.entity );
     final Ident worldId = event.world;
     final Point pos = event.pos;
     
