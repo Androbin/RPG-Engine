@@ -29,6 +29,7 @@ public abstract class Master {
       return;
     }
     
+    overlay.attach();
     overlay.setRunning( true );
     overlays.add( overlay );
   }
@@ -39,6 +40,7 @@ public abstract class Master {
       
       if ( !overlay.isRunning() ) {
         iter.remove();
+        overlay.detach();
       }
     }
   }

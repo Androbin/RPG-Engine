@@ -7,12 +7,14 @@ import de.androbin.rpg.event.*;
 import de.androbin.rpg.tile.*;
 import de.androbin.rpg.world.*;
 import java.awt.*;
+import java.util.function.*;
 
 public final class MoveHandle extends Handle<DirectionPair, Void> {
   private final Agent agent;
   private State state;
   
   public float speed;
+  public Predicate<Point> bounds;
   
   public MoveHandle( final Agent agent ) {
     this.agent = agent;
@@ -36,9 +38,10 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
   
   private boolean canMove( final Direction dir ) {
     final World world = agent.getSpot().world;
-    return LoopUtil.and( dir.outer( agent.getBounds() ), pos -> {
+    return LoopUtil.all( dir.outer( agent.getBounds() ), pos -> {
       final Tile tile = world.tiles.get( pos );
-      return tile != null && tile.getData().passable;
+      return tile != null && tile.getData().passable
+          && ( bounds == null || bounds.test( pos ) );
     } );
   }
   
@@ -93,6 +96,7 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
       setCurrent( current.reverse() );
     } else {
       setCurrent( new DirectionPair( current.first ) );
+      request( current.second );
     }
   }
   
@@ -153,20 +157,11 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
   
   public void request( final Direction dir ) {
     if ( dir == null ) {
-      // request( (DirectionPair) null );
+      request( (DirectionPair) null );
       return;
     }
     
     request( new DirectionPair( dir ) );
-  }
-  
-  @ Override
-  public void request( final DirectionPair next ) {
-    if ( next == null ) {
-      return;
-    }
-    
-    super.request( next );
   }
   
   @ Override

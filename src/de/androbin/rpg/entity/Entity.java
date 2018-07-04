@@ -18,6 +18,12 @@ public abstract class Entity implements Detailed {
   
   public abstract EntityData getData();
   
+  public Rectangle2D.Float getFloatBounds() {
+    final Point2D.Float pos = getFloatPos();
+    final Dimension size = getData().size;
+    return new Rectangle2D.Float( pos.x, pos.y, size.width, size.height );
+  }
+  
   public Point2D.Float getFloatPos() {
     final Point pos = spot.getPos();
     return new Point2D.Float( pos.x, pos.y );

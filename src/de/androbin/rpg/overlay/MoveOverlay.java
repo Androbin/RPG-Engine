@@ -24,17 +24,8 @@ public final class MoveOverlay extends AbstractShell implements Overlay {
       return;
     }
     
-    final DirectionPair current = move.getCurrent();
-    final Direction next = dirs.peek();
-    
-    if ( current != null && next != null
-        && current.first != next.opposite()
-        && current.second == next ) {
-      return;
-    }
-    
     if ( dirs.isEmpty() ) {
-      if ( current == null ) {
+      if ( move.getCurrent() == null ) {
         setRunning( false );
       }
     } else {

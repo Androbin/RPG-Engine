@@ -8,7 +8,7 @@ public class Handle<I, O> {
   
   private float progress;
   
-  public BiConsumer<I, Boolean> onPrepare;
+  public Consumer<I> onPrepare;
   public Consumer<I> onHandle;
   public BiConsumer<I, O> onFinish;
   
@@ -96,12 +96,14 @@ public class Handle<I, O> {
         
         if ( success ) {
           setCurrent( next );
-        }
-        
-        next = null;
-        
-        if ( onPrepare != null ) {
-          onPrepare.accept( val, success );
+          next = null;
+          
+          if ( onPrepare != null ) {
+            onPrepare.accept( val );
+          }
+        } else {
+          reset();
+          request( val );
         }
       }
     } else {
