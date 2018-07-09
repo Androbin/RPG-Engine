@@ -18,16 +18,23 @@ public final class MoveEvent implements Event {
   };
   
   public final Object agent;
-  public final Direction[] dirs;
+  public final List<Direction> dirs;
+  public final boolean autoStop;
   
   public MoveEvent( final Object agent, final Direction ... dirs ) {
+    this( agent, Arrays.asList( dirs ), false );
+  }
+  
+  public MoveEvent( final Object agent, final List<Direction> dirs, final boolean autoStop ) {
     this.agent = agent;
     this.dirs = dirs;
+    this.autoStop = autoStop;
   }
   
   @ Override
   public void log( final Logger logger ) {
     logger.finest( "move { agent: " + agent
-        + ", dirs: " + Arrays.toString( dirs ) + " }" );
+        + ", dirs: " + dirs
+        + ", autoStop: " + autoStop + " }" );
   }
 }

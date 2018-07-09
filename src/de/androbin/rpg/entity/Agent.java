@@ -1,8 +1,10 @@
 package de.androbin.rpg.entity;
 
+import de.androbin.json.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.dir.*;
 import java.awt.geom.*;
+import java.util.*;
 
 public abstract class Agent extends Entity {
   public DirectionPair orientation;
@@ -23,7 +25,23 @@ public abstract class Agent extends Entity {
     
     final DirectionPair dir = move.getCurrent();
     final float scalar = move.interpolate();
-    return dir.from( getSpot().getPos(), scalar );
+    return dir.fromAskew( getSpot().getPos(), scalar );
+  }
+  
+  @ Override
+  public void load( final XObject details ) {
+    super.load( details );
+    details.get( "orientation" ).apply(
+        value -> orientation = DirectionPair.parse( value.asString() ) );
+  }
+  
+  @ Override
+  public void save( final Map<String, Object> details ) {
+    super.save( details );
+    
+    if ( orientation != null ) {
+      details.put( "orientation", orientation.toString() );
+    }
   }
   
   @ Override

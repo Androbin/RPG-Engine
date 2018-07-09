@@ -8,10 +8,30 @@ import java.util.*;
 public final class MoveOverlay extends AbstractShell implements Overlay {
   private final MoveHandle move;
   private final Queue<Direction> dirs;
+  private final boolean autoStop;
   
-  public MoveOverlay( final MoveHandle move, final Direction[] dirs ) {
+  public MoveOverlay( final MoveHandle move, final List<Direction> dirs, final boolean autoStop ) {
     this.move = move;
-    this.dirs = new ArrayDeque<>( Arrays.asList( dirs ) );
+    this.dirs = new ArrayDeque<>( dirs );
+    this.autoStop = autoStop;
+  }
+  
+  @ Override
+  public void attach() {
+    if ( autoStop ) {
+      move.onPrepare = ( dir, success ) -> {
+        if ( !success ) {
+          move.reset();
+        }
+      };
+    }
+  }
+  
+  @ Override
+  public void detach() {
+    if ( autoStop ) {
+      move.onPrepare = null;
+    }
   }
   
   @ Override

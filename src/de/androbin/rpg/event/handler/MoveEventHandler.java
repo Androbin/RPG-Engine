@@ -5,13 +5,15 @@ import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.overlay.*;
+import java.util.*;
 
 public final class MoveEventHandler implements Event.Handler<Master, MoveEvent> {
   @ Override
   public Overlay handle( final Master master, final MoveEvent event ) {
     final Agent agent = (Agent) EventHandlers.getEntity( master, event.agent );
-    final Direction[] dirs = event.dirs;
+    final List<Direction> dirs = event.dirs;
+    final boolean autoStop = event.autoStop;
     
-    return new MoveOverlay( agent.move, dirs );
+    return new MoveOverlay( agent.move, dirs, autoStop );
   }
 }

@@ -55,7 +55,9 @@ public final class MoveKeyInput implements KeyInput {
     if ( current == null ) {
       setter.accept( new DirectionPair( dir ) );
     } else if ( current.second == null ) {
-      if ( dir != current.first.opposite() ) {
+      if ( dir == current.first.opposite() ) {
+        setter.accept( new DirectionPair( dir ) );
+      } else {
         setter.accept( new DirectionPair( current.first, dir ) );
       }
     } else if ( dir == current.first.opposite() ) {
