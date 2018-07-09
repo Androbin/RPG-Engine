@@ -10,7 +10,7 @@ public final class Dialog {
   public final List<Choice> choices;
   
   public Dialog( final String id ) {
-    this( Ident.fromSerial( id ) );
+    this( Ident.parse( id ) );
   }
   
   public Dialog( final Ident id ) {

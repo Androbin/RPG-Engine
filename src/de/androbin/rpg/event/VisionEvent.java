@@ -11,7 +11,7 @@ public final class VisionEvent implements Event {
   public final Ident world;
   
   public VisionEvent( final String world ) {
-    this.world = Ident.fromSerial( world );
+    this.world = Ident.parse( world );
   }
   
   @ Override

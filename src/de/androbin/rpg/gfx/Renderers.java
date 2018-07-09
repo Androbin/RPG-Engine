@@ -29,11 +29,11 @@ public final class Renderers {
   
   public static void registerEntity( final String serial,
       final EntityRenderer<? extends Entity> renderer ) {
-    ENTITY_RENDERERS.register( Ident.fromSerial( serial ), renderer );
+    ENTITY_RENDERERS.register( Ident.parse( serial ), renderer );
   }
   
   public static void registerTile( final String serial,
       final TileRenderer<? extends Tile> renderer ) {
-    TILE_RENDERERS.register( Ident.fromSerial( serial ), renderer );
+    TILE_RENDERERS.register( Ident.parse( serial ), renderer );
   }
 }

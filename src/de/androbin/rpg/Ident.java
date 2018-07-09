@@ -25,14 +25,6 @@ public final class Ident implements Iterable<String> {
     return path[ 0 ];
   }
   
-  public static Ident fromSerial( final String serial ) {
-    if ( serial == null ) {
-      return null;
-    }
-    
-    return new Ident( serial.split( "/" ) );
-  }
-  
   @ Override
   public int hashCode() {
     if ( hash == 0 ) {
@@ -49,6 +41,14 @@ public final class Ident implements Iterable<String> {
   
   public String lastElement() {
     return path[ path.length - 1 ];
+  }
+  
+  public static Ident parse( final String serial ) {
+    if ( serial == null ) {
+      return null;
+    }
+    
+    return new Ident( serial.split( "/" ) );
   }
   
   public Iterable<Ident> partial() {

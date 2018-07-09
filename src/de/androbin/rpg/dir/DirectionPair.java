@@ -60,9 +60,18 @@ public final class DirectionPair {
       return first.from( p, scalar );
     }
     
-    return new Point2D.Float(
-        p.x + first.dx * scalar + second.dx * ( scalar - 0.5f ),
-        p.y + first.dy * scalar + second.dy * ( scalar - 0.5f ) );
+    return new Point2D.Float( p.x + dx() * scalar, p.y + dy() * scalar );
+  }
+  
+  public Point2D.Float fromAskew( final Point p, final float scalar ) {
+    if ( second == null ) {
+      return from( p, scalar );
+    }
+    
+    final Point2D.Float q = from( p, scalar );
+    q.x -= second.dx * 0.5f;
+    q.y -= second.dy * 0.5f;
+    return q;
   }
   
   public DirectionPair opposite() {
@@ -71,6 +80,19 @@ public final class DirectionPair {
     }
     
     return new DirectionPair( first.opposite(), second.opposite() );
+  }
+  
+  public static DirectionPair parse( final String text ) {
+    final String[] parts = text.split( "-" );
+    
+    if ( parts.length == 1 ) {
+      return new DirectionPair(
+          Direction.parse( parts[ 0 ] ) );
+    } else {
+      return new DirectionPair(
+          Direction.parse( parts[ 0 ] ),
+          Direction.parse( parts[ 1 ] ) );
+    }
   }
   
   public DirectionPair reverse() {

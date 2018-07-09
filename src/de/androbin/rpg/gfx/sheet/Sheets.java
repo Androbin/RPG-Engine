@@ -58,11 +58,11 @@ public final class Sheets {
   
   public static void registerEntity( final String serial,
       final EntityLayout<?> layout ) {
-    ENTITY_LAYOUTS.register( Ident.fromSerial( serial ), layout );
+    ENTITY_LAYOUTS.register( Ident.parse( serial ), layout );
   }
   
   public static void registerTile( final String serial,
       final TileLayout<?> layout ) {
-    TILE_LAYOUTS.register( Ident.fromSerial( serial ), layout );
+    TILE_LAYOUTS.register( Ident.parse( serial ), layout );
   }
 }

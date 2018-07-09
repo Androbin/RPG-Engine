@@ -53,10 +53,10 @@ public final class Entities {
   
   public static <D extends EntityData> void register( final String serial,
       final Entity.Builder<D> builder ) {
-    BUILDERS.register( Ident.fromSerial( serial ), builder );
+    BUILDERS.register( Ident.parse( serial ), builder );
   }
   
   public static void registerData( final String serial, final EntityData.Builder builder ) {
-    DATA_BUILDERS.register( Ident.fromSerial( serial ), builder );
+    DATA_BUILDERS.register( Ident.parse( serial ), builder );
   }
 }

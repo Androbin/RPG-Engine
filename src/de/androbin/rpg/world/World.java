@@ -22,4 +22,9 @@ public class World {
   public boolean checkBounds( final Point pos ) {
     return StaticUtil.contains( size, pos );
   }
+  
+  @ Override
+  public String toString() {
+    return id.toString();
+  }
 }

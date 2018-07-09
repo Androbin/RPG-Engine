@@ -1,7 +1,9 @@
 package de.androbin.rpg.event;
 
-import java.util.*;
 import de.androbin.rpg.*;
+import de.androbin.rpg.overlay.*;
+import java.util.*;
+import java.util.function.*;
 
 public final class EventQueue {
   private final Queue<Event> queue = new ArrayDeque<>();
@@ -20,6 +22,13 @@ public final class EventQueue {
     }
     
     queue.add( event.compile( values ) );
+  }
+  
+  public void enqueueAwait( final Event event, final Consumer<Overlay> c ) {
+    enqueue( new CustomEvent( master -> {
+      c.accept( Events.handle( master, event ) );
+      return null;
+    } ) );
   }
   
   public void process( final Master master ) {

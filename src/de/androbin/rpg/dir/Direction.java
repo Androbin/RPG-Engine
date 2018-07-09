@@ -89,4 +89,8 @@ public enum Direction {
     
     return null;
   }
+  
+  public static Direction parse( final String text ) {
+    return valueOf( text.toUpperCase() );
+  }
 }

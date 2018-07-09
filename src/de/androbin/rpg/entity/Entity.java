@@ -37,6 +37,11 @@ public abstract class Entity implements Detailed {
     this.spot = spot;
   }
   
+  @ Override
+  public String toString() {
+    return getData().type.toString();
+  }
+  
   @ FunctionalInterface
   public interface Builder<D extends EntityData> {
     Entity build( D data, int id );

@@ -45,10 +45,10 @@ public final class Tiles {
   
   public static <D extends TileData> void register( final String serial,
       final Tile.Builder<D> builder ) {
-    BUILDERS.register( Ident.fromSerial( serial ), builder );
+    BUILDERS.register( Ident.parse( serial ), builder );
   }
   
   public static void registerData( final String serial, final TileData.Builder builder ) {
-    DATA_BUILDERS.register( Ident.fromSerial( serial ), builder );
+    DATA_BUILDERS.register( Ident.parse( serial ), builder );
   }
 }
