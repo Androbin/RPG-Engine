@@ -7,6 +7,7 @@ import de.androbin.rpg.overlay.*;
 import de.androbin.rpg.world.*;
 import de.androbin.shell.*;
 import de.androbin.shell.gfx.*;
+import de.androbin.shell.input.lock.*;
 import de.androbin.shell.input.tee.*;
 import java.awt.*;
 import java.awt.geom.*;
@@ -20,11 +21,14 @@ public abstract class RPGScreen<M extends Master> extends AbstractShell implemen
   protected final Point2D.Float trans;
   protected float scale;
   
+  private boolean silent;
+  
   public RPGScreen() {
     // TODO: accumulate keyReleased and mouseReleased
     final Iterable<Overlay> source = () -> master.listOverlaysDown().iterator();
     final Predicate<Overlay> mask = overlay -> overlay.isMasking() || overlay.isFreezing();
     InputTees.putShellTee( getInputs(), source, mask );
+    InputLocks.apply( getInputs(), () -> !silent );
     
     worldRenderer = new SimpleWorldRenderer();
     trans = new Point2D.Float();
@@ -50,6 +54,16 @@ public abstract class RPGScreen<M extends Master> extends AbstractShell implemen
     final float endX = Math.min( ( getWidth() - trans.x ) / scale, size.width );
     
     return new Rectangle2D.Float( startX, startY, endX - startX, endY - startY );
+  }
+  
+  @ Override
+  public void onAfterResumed() {
+    silent = false;
+  }
+  
+  @ Override
+  public void onBeforePaused() {
+    silent = true;
   }
   
   @ Override
