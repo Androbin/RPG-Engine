@@ -1,7 +1,6 @@
 package de.androbin.rpg.event;
 
 import static de.androbin.collection.util.ObjectCollectionUtil.*;
-import java.util.*;
 import java.util.logging.*;
 
 public final class ScriptEvent implements Event {
@@ -30,10 +29,5 @@ public final class ScriptEvent implements Event {
     } else {
       logger.info( "script { name: '" + name + "' }" );
     }
-  }
-  
-  @ FunctionalInterface
-  interface Static {
-    Event[][] compile( Map<String, Object> values );
   }
 }

@@ -7,11 +7,11 @@ import java.util.logging.*;
 
 public final class MoveEvent implements Event {
   public static final Event.Builder BUILDER = args -> {
-    final Object agent = args[ 0 ];
+    final Object agent = args[ 0 ].raw();
     
-    final Direction[] dirs = fill( new Direction[ args.length - 1 ], i -> {
-      final String name = (String) args[ i + 1 ];
-      return Direction.valueOf( name.toUpperCase() );
+    final String[] dirsRaw = args[ 1 ].asString().split( ", " );
+    final Direction[] dirs = fill( new Direction[ dirsRaw.length ], i -> {
+      return Direction.valueOf( dirsRaw[ i ].toUpperCase() );
     } );
     
     return new MoveEvent( agent, dirs );

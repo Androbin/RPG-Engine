@@ -17,7 +17,7 @@ public class TileData extends Data {
     
     this.passable = props.get( "passable" ).asBoolean( true );
     
-    this.enterEvent = Events.parse( props.get( "enter_event" ).asString() );
+    this.enterEvent = Events.parse( props.get( "enter_event" ).asArray() );
     
     this.sheet = Sheets.createTile( type );
   }

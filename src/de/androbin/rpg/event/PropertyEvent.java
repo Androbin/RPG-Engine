@@ -5,10 +5,8 @@ import java.util.logging.*;
 
 public final class PropertyEvent implements Event {
   public static final Event.Builder BUILDER = args -> {
-    final Object entity = args[ 0 ];
-    
-    final String detailsRaw = (String) args[ 1 ];
-    final XObject details = XUtil.parseJSON( detailsRaw ).asObject();
+    final Object entity = args[ 0 ].raw();
+    final XObject details = args[ 1 ].asObject();
     return new PropertyEvent( entity, details );
   };
   

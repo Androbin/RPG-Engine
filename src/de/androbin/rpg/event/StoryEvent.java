@@ -4,7 +4,7 @@ import java.util.logging.*;
 
 public final class StoryEvent implements Event {
   public static final Event.Builder BUILDER = args -> {
-    final String id = (String) args[ 0 ];
+    final String id = args[ 0 ].asString();
     return new StoryEvent( id );
   };
   

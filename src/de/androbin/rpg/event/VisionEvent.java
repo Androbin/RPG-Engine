@@ -5,7 +5,7 @@ import java.util.logging.*;
 
 public final class VisionEvent implements Event {
   public static final Event.Builder BUILDER = args -> {
-    return new VisionEvent( (String) args[ 0 ] );
+    return new VisionEvent( args[ 0 ].asString() );
   };
   
   public final Ident world;

@@ -1,7 +1,9 @@
 package de.androbin.rpg.tile;
 
+import de.androbin.json.*;
+
 public abstract class Tile {
-  public String enterEvent;
+  public XArray enterEvent;
   
   public abstract TileData getData();
   

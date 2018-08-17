@@ -1,5 +1,6 @@
 package de.androbin.rpg.event;
 
+import de.androbin.json.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.overlay.*;
 import java.util.*;
@@ -15,7 +16,7 @@ public interface Event {
   
   @ FunctionalInterface
   interface Builder {
-    Event build( Object[] args );
+    Event build( XValue[] args );
   }
   
   @ FunctionalInterface

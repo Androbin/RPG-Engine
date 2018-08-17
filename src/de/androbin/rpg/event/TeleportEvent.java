@@ -6,12 +6,10 @@ import java.util.logging.*;
 
 public final class TeleportEvent implements Event {
   public static final Event.Builder BUILDER = args -> {
-    final Object entity = args[ 0 ];
-    final String world = (String) args[ 1 ];
-    final Point pos = new Point(
-        Integer.parseInt( (String) args[ 2 ] ),
-        Integer.parseInt( (String) args[ 3 ] ) );
-    final DirectionPair orientation = DirectionPair.parse( (String) args[ 4 ] );
+    final Object entity = args[ 0 ].raw();
+    final String world = args[ 1 ].asString();
+    final Point pos = new Point( args[ 2 ].asInt(), args[ 3 ].asInt() );
+    final DirectionPair orientation = DirectionPair.parse( args[ 4 ].asString() );
     
     return new TeleportEvent( entity, world, pos, orientation );
   };

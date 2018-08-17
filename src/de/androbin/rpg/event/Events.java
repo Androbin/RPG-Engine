@@ -12,7 +12,7 @@ import java.util.logging.Formatter;
 public final class Events {
   private static final Map<String, Event.Builder> BUILDERS;
   private static final Map<Class<? extends Event>, Event.Handler<?, ?>> HANDLERS;
-  private static final Map<String, ScriptEvent.Static> SCRIPTS;
+  private static final Map<String, XArray> SCRIPTS;
   
   public static final EventQueue QUEUE;
   public static final Logger LOGGER;
@@ -67,41 +67,42 @@ public final class Events {
   
   private static Event[][] buildScript( final XArray script, final Map<String, Object> values ) {
     return fill( new Event[ script.size() ][], i -> {
-      final XValue value = script.get( i );
+      final XArray array = script.get( i ).asArray();
       
-      try {
-        final XArray array = value.asArray();
-        return fill( new Event[ array.size() ], j -> {
-          final XValue value2 = array.get( j );
-          
-          try {
-            final XArray array2 = value2.asArray();
-            return new ScriptEvent( buildScript( array2, values ) );
-          } catch ( final ClassCastException e ) {
-            final String event = value2.asString();
-            return parse( event ).compile( values );
-          }
-        } );
-      } catch ( final ClassCastException e ) {
-        final String event = value.asString();
-        return new Event[] { parse( event ).compile( values ) };
+      if ( array.get( 0 ).raw() instanceof String ) {
+        return new Event[] { parse( array ).compile( values ) };
       }
+      
+      return fill( new Event[ array.size() ], j -> {
+        final XArray array2 = array.get( j ).asArray();
+        
+        if ( array2.get( 0 ).raw() instanceof String ) {
+          return parse( array2 ).compile( values );
+        }
+        
+        return new ScriptEvent( buildScript( array2, values ) );
+      } );
     } );
   }
   
-  private static Object[] compile( final String[] args, final Map<String, Object> values ) {
+  private static XValue[] compile( final XValue[] args, final Map<String, Object> values ) {
     if ( values == null ) {
       return compile( args, Collections.emptyMap() );
     }
     
-    return fill( new Object[ args.length ], i -> {
-      final String arg = args[ i ];
+    return fill( new XValue[ args.length ], i -> {
+      final XValue arg = args[ i ];
       
-      if ( arg.startsWith( "$" ) ) {
-        return values.getOrDefault( arg.substring( 1 ), null );
-      } else {
-        return arg;
+      try {
+        final String argString = arg.asString();
+        
+        if ( argString.startsWith( "$" ) ) {
+          return new XValue( values.getOrDefault( argString.substring( 1 ), null ) );
+        }
+      } catch ( final ClassCastException ignore ) {
       }
+      
+      return arg;
     } );
   }
   
@@ -138,33 +139,25 @@ public final class Events {
       return null;
     }
     
-    final String func;
-    final String argString;
-    
-    final int l = text.indexOf( '(' );
-    
-    if ( l == -1 ) {
-      func = text;
-      argString = "";
-    } else {
-      final int r = text.lastIndexOf( ')' );
-      func = text.substring( 0, l );
-      argString = text.substring( l + 1, r );
+    return parse( XUtil.parseJSON( text ).asArray() );
+  }
+  
+  public static Event.Raw parse( final XArray array ) {
+    if ( array == null || array.size() == 0 ) {
+      return null;
     }
     
-    final String[] argSplit = argString.split( "(?<!\\\\)," );
-    final String[] args = fill( new String[ argSplit.length ],
-        i -> argSplit[ i ].replace( "\\,", "," ).trim() );
+    final String func = array.get( 0 ).asString();
+    final XValue[] args = fill( new XValue[ array.size() - 1 ], i -> array.get( i + 1 ) );
     
     if ( func.equals( "script" ) ) {
-      final String name = args[ 0 ];
-      final boolean masking = Boolean.parseBoolean( args[ 1 ] );
+      final String name = args[ 0 ].asString();
+      final boolean masking = args[ 1 ].asBoolean();
       
-      final ScriptEvent.Static raw = SCRIPTS.computeIfAbsent( name, foo -> values -> {
-        final XArray script = XUtil.readJSON( "event/" + name + ".json" ).get().asArray();
-        return buildScript( script, values );
+      final XArray script = SCRIPTS.computeIfAbsent( name, foo -> {
+        return XUtil.readJSON( "event/" + name + ".json" ).get().asArray();
       } );
-      return values -> new ScriptEvent( name, masking, raw.compile( values ) );
+      return values -> new ScriptEvent( name, masking, buildScript( script, values ) );
     }
     
     final Event.Builder builder = BUILDERS.get( func );

@@ -4,7 +4,7 @@ import java.util.logging.*;
 
 public final class WaitEvent implements Event {
   public static final Event.Builder BUILDER = args -> {
-    final float duration = Float.parseFloat( (String) args[ 0 ] );
+    final float duration = args[ 0 ].asFloat();
     return new WaitEvent( duration );
   };
   
