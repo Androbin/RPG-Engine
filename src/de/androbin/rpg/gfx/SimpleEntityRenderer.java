@@ -19,7 +19,7 @@ public class SimpleEntityRenderer<E extends Entity> implements EntityRenderer<E>
     final float width = rawSize.width / res;
     final float height = rawSize.height / res;
     
-    final float x = pos.x - data.sheetDX / res;
+    final float x = pos.x + ( size.width - width ) * 0.5f - data.sheetDX / res;
     final float y = pos.y + size.height - height - data.sheetDY / res;
     
     return new Rectangle2D.Float( x, y, width, height );

@@ -4,11 +4,10 @@
 Dependencies:
  - App Shell
  - App Shell AWT
- - 2D Game Engine
  - Collection Utils
+ - Functions
  - GFX
  - IO
  - JSON
  - Math Utils
  - Mixins
- - Screen System
