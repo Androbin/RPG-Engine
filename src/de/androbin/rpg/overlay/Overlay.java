@@ -1,5 +1,6 @@
 package de.androbin.rpg.overlay;
 
+import de.androbin.rpg.*;
 import de.androbin.shell.*;
 import java.awt.*;
 import java.awt.geom.*;
@@ -11,12 +12,8 @@ public interface Overlay extends Shell {
   default void detach() {
   }
   
-  default boolean isFreezing() {
-    return false;
-  }
-  
-  default boolean isMasking() {
-    return false;
+  default Intervention getIntervention() {
+    return Intervention.TRANSPARENT;
   }
   
   default void renderScreen( Graphics2D g ) {

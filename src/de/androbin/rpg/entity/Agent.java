@@ -51,7 +51,7 @@ public abstract class Agent extends Entity {
     move.reset();
   }
   
-  public void update( final float delta ) {
+  public void update( final float delta, final boolean passive ) {
     move.update( delta );
   }
 }

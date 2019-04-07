@@ -1,24 +1,27 @@
 package de.androbin.rpg.overlay;
 
+import de.androbin.rpg.*;
 import de.androbin.rpg.event.*;
 import de.androbin.shell.*;
 import java.util.*;
 import java.util.stream.*;
 
 public final class ScriptOverlay extends AbstractShell implements Overlay {
-  private final boolean masking;
   private final Queue<Event[]> script;
   private List<Overlay> current;
   
-  public ScriptOverlay( final boolean masking, final Event[][] script ) {
-    this.masking = masking;
+  private final Intervention intervention;
+  
+  public ScriptOverlay( final Event[][] script, final Intervention intervention ) {
     this.script = new ArrayDeque<>( Arrays.asList( script ) );
     current = Collections.emptyList();
+    
+    this.intervention = intervention;
   }
   
   @ Override
-  public boolean isMasking() {
-    return masking;
+  public Intervention getIntervention() {
+    return intervention;
   }
   
   @ Override

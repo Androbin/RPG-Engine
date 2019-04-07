@@ -152,12 +152,12 @@ public final class Events {
     
     if ( func.equals( "script" ) ) {
       final String name = args[ 0 ].asString();
-      final boolean masking = args[ 1 ].asBoolean();
+      final Intervention intervention = Intervention.valueOf( args[ 1 ].asString().toUpperCase() );
       
       final XArray script = SCRIPTS.computeIfAbsent( name, foo -> {
         return XUtil.readJSON( "event/" + name + ".json" ).get().asArray();
       } );
-      return values -> new ScriptEvent( name, masking, buildScript( script, values ) );
+      return values -> new ScriptEvent( name, buildScript( script, values ), intervention );
     }
     
     final Event.Builder builder = BUILDERS.get( func );

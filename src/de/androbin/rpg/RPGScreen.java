@@ -26,7 +26,7 @@ public abstract class RPGScreen<M extends Master> extends AbstractShell implemen
   public RPGScreen() {
     // TODO: accumulate keyReleased and mouseReleased
     final Iterable<Overlay> source = () -> master.listOverlaysDown().iterator();
-    final Predicate<Overlay> mask = overlay -> overlay.isMasking() || overlay.isFreezing();
+    final Predicate<Overlay> mask = overlay -> overlay.getIntervention().masking;
     InputTees.putShellTee( getInputs(), source, mask );
     InputLocks.apply( getInputs(), () -> !silent );
     
@@ -107,18 +107,16 @@ public abstract class RPGScreen<M extends Master> extends AbstractShell implemen
     for ( final Overlay overlay : master.listOverlaysDown() ) {
       overlay.update( delta );
       
-      if ( overlay.isFreezing() ) {
+      if ( overlay.getIntervention().freezing ) {
         freeze = true;
         break;
       }
     }
     
-    if ( !freeze ) {
-      final List<Agent> agents = master.world.entities.listAgents();
-      
-      for ( final Agent agent : agents ) {
-        agent.update( delta );
-      }
+    final List<Agent> agents = master.world.entities.listAgents();
+    
+    for ( final Agent agent : agents ) {
+      agent.update( delta, freeze );
     }
     
     master.story.update();

@@ -7,9 +7,9 @@ import de.androbin.rpg.overlay.*;
 public final class ScriptEventHandler implements Event.Handler<Master, ScriptEvent> {
   @ Override
   public Overlay handle( final Master master, final ScriptEvent event ) {
-    final boolean masking = event.masking;
     final Event[][] script = event.script;
+    final Intervention intervention = event.intervention;
     
-    return new ScriptOverlay( masking, script );
+    return new ScriptOverlay( script, intervention );
   }
 }
