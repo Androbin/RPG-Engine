@@ -1,9 +1,9 @@
 package de.androbin.rpg.world;
 
+import de.androbin.util.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import javafx.util.*;
 
 public final class SpaceTime<T> {
   private final List<Pair<T, Rectangle>> map = new ArrayList<>();
@@ -18,7 +18,7 @@ public final class SpaceTime<T> {
   
   private Pair<T, Rectangle> find( final T o ) {
     for ( final Pair<T, Rectangle> pair : map ) {
-      if ( pair.getKey() == o ) {
+      if ( pair.first == o ) {
         return pair;
       }
     }
@@ -28,7 +28,7 @@ public final class SpaceTime<T> {
   
   private Pair<T, Rectangle> find( final Point pos ) {
     for ( final Pair<T, Rectangle> pair : map ) {
-      if ( pair.getValue().contains( pos ) ) {
+      if ( pair.second.contains( pos ) ) {
         return pair;
       }
     }
@@ -38,12 +38,12 @@ public final class SpaceTime<T> {
   
   public Rectangle get( final T o ) {
     final Pair<T, Rectangle> pair = find( o );
-    return pair == null ? null : pair.getValue();
+    return pair == null ? null : pair.second;
   }
   
   public T get( final Point pos ) {
     final Pair<T, Rectangle> pair = find( pos );
-    return pair == null ? null : pair.getKey();
+    return pair == null ? null : pair.first;
   }
   
   private void remove( final Pair<T, Rectangle> pair ) {
@@ -64,12 +64,12 @@ public final class SpaceTime<T> {
   
   public void set( final T o, final Rectangle target ) {
     final Pair<T, Rectangle> pair = find( o );
-    pair.getValue().setBounds( target );
+    pair.second.setBounds( target );
   }
   
   public boolean tryAdd( final T o, final Rectangle bounds ) {
     for ( final Pair<T, Rectangle> pair : map ) {
-      if ( pair.getValue().intersects( bounds ) ) {
+      if ( pair.second.intersects( bounds ) ) {
         return false;
       }
     }
@@ -82,9 +82,9 @@ public final class SpaceTime<T> {
     Rectangle current = null;
     
     for ( final Pair<T, Rectangle> pair : map ) {
-      if ( pair.getKey() == o ) {
-        current = pair.getValue();
-      } else if ( pair.getValue().intersects( target ) ) {
+      if ( pair.first == o ) {
+        current = pair.second;
+      } else if ( pair.second.intersects( target ) ) {
         return false;
       }
     }
