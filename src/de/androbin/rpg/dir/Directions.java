@@ -55,6 +55,32 @@ public final class Directions {
     return KEY_MAPPINGS.getOrDefault( keycode, null );
   }
   
+  public static DirectionPair follow( final float dx, final float dy ) {
+    Direction dirX = null;
+    
+    if ( dx >= 1f ) {
+      dirX = Direction.RIGHT;
+    } else if ( dx <= -1f ) {
+      dirX = Direction.LEFT;
+    }
+    
+    Direction dirY = null;
+    
+    if ( dy >= 1f ) {
+      dirY = Direction.DOWN;
+    } else if ( dy <= -1f ) {
+      dirY = Direction.UP;
+    }
+    
+    if ( dirX != null ) {
+      return new DirectionPair( dirX, dirY );
+    } else if ( dirY != null ) {
+      return new DirectionPair( dirY );
+    }
+    
+    return null;
+  }
+  
   public static Direction valueOf( final String name ) {
     return name == null ? null : Direction.valueOf( name.toUpperCase() );
   }
