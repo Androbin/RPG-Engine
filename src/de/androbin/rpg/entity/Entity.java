@@ -12,16 +12,14 @@ public abstract class Entity implements Detailed {
     this.id = id;
   }
   
-  public final Rectangle getBounds() {
-    return new Rectangle( spot.getPos(), getData().size );
+  public final Bounds getBounds() {
+    return new Bounds( spot.getPos(), getData().shape );
   }
   
   public abstract EntityData getData();
   
-  public Rectangle2D.Float getFloatBounds() {
-    final Point2D.Float pos = getFloatPos();
-    final Dimension size = getData().size;
-    return new Rectangle2D.Float( pos.x, pos.y, size.width, size.height );
+  public Bounds.Float getFloatBounds() {
+    return new Bounds.Float( getFloatPos(), getData().shape );
   }
   
   public Point2D.Float getFloatPos() {

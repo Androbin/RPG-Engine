@@ -12,7 +12,7 @@ public class SimpleEntityRenderer<E extends Entity> implements EntityRenderer<E>
   @ Override
   public Rectangle2D.Float getBounds( final EntityData data, final Point2D.Float pos,
       final Dimension rawSize ) {
-    final Dimension size = data.size;
+    final Dimension size = data.shape.getSize();
     
     final float res = Globals.get().res;
     

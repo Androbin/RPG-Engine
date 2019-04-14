@@ -19,11 +19,12 @@ public abstract class Agent extends Entity {
   
   @ Override
   public Point2D.Float getFloatPos() {
-    if ( move.getCurrent() == null ) {
+    final DirectionPair dir = move.getCurrent();
+    
+    if ( dir == null ) {
       return super.getFloatPos();
     }
     
-    final DirectionPair dir = move.getCurrent();
     final float scalar = move.interpolate();
     return dir.fromAskew( getSpot().getPos(), scalar );
   }

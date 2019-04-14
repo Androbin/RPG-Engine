@@ -89,7 +89,7 @@ public final class EntityLayer {
     return Collections.unmodifiableList( agents );
   }
   
-  public void move( final Entity entity, final Rectangle target ) {
+  public void move( final Entity entity, final Bounds target ) {
     getSpaceTime( entity ).set( entity, target );
   }
   
@@ -110,7 +110,7 @@ public final class EntityLayer {
     return true;
   }
   
-  public boolean tryMove( final Entity entity, final Rectangle target ) {
+  public boolean tryMove( final Entity entity, final Bounds target ) {
     return getSpaceTime( entity ).trySet( entity, target );
   }
 }

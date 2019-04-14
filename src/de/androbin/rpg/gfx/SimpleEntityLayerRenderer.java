@@ -11,8 +11,8 @@ public class SimpleEntityLayerRenderer implements EntityLayerRenderer {
   public void render( final Graphics2D g, final EntityLayer entities,
       final Rectangle2D.Float view, final float scale ) {
     final Comparator<Entity> comp = ( a, b ) -> {
-      final Rectangle boundsA = a.getBounds();
-      final Rectangle boundsB = b.getBounds();
+      final Rectangle boundsA = a.getBounds().getBounds();
+      final Rectangle boundsB = b.getBounds().getBounds();
       
       return Float.compare(
           boundsA.y + boundsA.height + ( a.getData().solid ? 0.5f : 0f ),

@@ -1,12 +1,12 @@
 package de.androbin.rpg.entity;
 
-import de.androbin.mixin.dim.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.dir.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.tile.*;
 import de.androbin.rpg.world.*;
 import java.awt.*;
+import java.util.List;
 import java.util.function.*;
 
 public final class MoveHandle extends Handle<DirectionPair, Void> {
@@ -38,7 +38,7 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
   
   private boolean canMove( final Direction dir ) {
     final World world = agent.getSpot().world;
-    return LoopUtil.all( dir.outer( agent.getBounds() ), pos -> {
+    return agent.getBounds().outer( dir ).stream().allMatch( pos -> {
       final Tile tile = world.tiles.get( pos );
       return tile != null && tile.getData().passable
           && ( bounds == null || bounds.test( pos ) );
@@ -47,14 +47,14 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
   
   private void contract( final Direction dir ) {
     final Spot spot = agent.getSpot();
-    spot.move( dir );
-    
     final World world = spot.world;
     
-    final Rectangle target = new Rectangle( spot.getPos(), agent.getData().size );
-    world.entities.move( agent, target );
+    spot.move( dir );
+    world.entities.move( agent, agent.getBounds() );
     
-    LoopUtil.forEach( dir.inner( agent.getBounds() ), pos -> {
+    final List<Point> inner = agent.getBounds().inner( dir );
+    
+    inner.forEach( pos -> {
       final Tile tile = world.tiles.get( pos );
       Events.QUEUE.enqueue( new TileEnterEvent( tile, agent ) );
     } );
@@ -66,7 +66,7 @@ public final class MoveHandle extends Handle<DirectionPair, Void> {
     }
     
     final World world = agent.getSpot().world;
-    final Rectangle target = dir.expand( agent.getBounds() );
+    final Bounds target = agent.getBounds().expand( dir );
     return world.entities.tryMove( agent, target );
   }
   

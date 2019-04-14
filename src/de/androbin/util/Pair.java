@@ -1,8 +1,8 @@
 package de.androbin.util;
 
 public final class Pair<T, S> {
-  public final T first;
-  public final S second;
+  public T first;
+  public S second;
   
   public Pair( final T first, final S second ) {
     this.first = first;

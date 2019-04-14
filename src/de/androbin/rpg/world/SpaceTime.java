@@ -1,23 +1,24 @@
 package de.androbin.rpg.world;
 
+import de.androbin.rpg.*;
 import de.androbin.util.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
 public final class SpaceTime<T> {
-  private final List<Pair<T, Rectangle>> map = new ArrayList<>();
+  private final List<Pair<T, Bounds>> map = new ArrayList<>();
   
-  private void add( final Pair<T, Rectangle> pair ) {
+  private void add( final Pair<T, Bounds> pair ) {
     map.add( pair );
   }
   
-  public void add( final T o, final Rectangle bounds ) {
+  public void add( final T o, final Bounds bounds ) {
     add( new Pair<>( o, bounds ) );
   }
   
-  private Pair<T, Rectangle> find( final T o ) {
-    for ( final Pair<T, Rectangle> pair : map ) {
+  private Pair<T, Bounds> find( final T o ) {
+    for ( final Pair<T, Bounds> pair : map ) {
       if ( pair.first == o ) {
         return pair;
       }
@@ -26,8 +27,8 @@ public final class SpaceTime<T> {
     return null;
   }
   
-  private Pair<T, Rectangle> find( final Point pos ) {
-    for ( final Pair<T, Rectangle> pair : map ) {
+  private Pair<T, Bounds> find( final Point pos ) {
+    for ( final Pair<T, Bounds> pair : map ) {
       if ( pair.second.contains( pos ) ) {
         return pair;
       }
@@ -36,17 +37,17 @@ public final class SpaceTime<T> {
     return null;
   }
   
-  public Rectangle get( final T o ) {
-    final Pair<T, Rectangle> pair = find( o );
+  public Bounds get( final T o ) {
+    final Pair<T, Bounds> pair = find( o );
     return pair == null ? null : pair.second;
   }
   
   public T get( final Point pos ) {
-    final Pair<T, Rectangle> pair = find( pos );
+    final Pair<T, Bounds> pair = find( pos );
     return pair == null ? null : pair.first;
   }
   
-  private void remove( final Pair<T, Rectangle> pair ) {
+  private void remove( final Pair<T, Bounds> pair ) {
     if ( pair == null ) {
       return;
     }
@@ -62,13 +63,12 @@ public final class SpaceTime<T> {
     remove( find( pos ) );
   }
   
-  public void set( final T o, final Rectangle target ) {
-    final Pair<T, Rectangle> pair = find( o );
-    pair.second.setBounds( target );
+  public void set( final T o, final Bounds target ) {
+    find( o ).second = target;
   }
   
-  public boolean tryAdd( final T o, final Rectangle bounds ) {
-    for ( final Pair<T, Rectangle> pair : map ) {
+  public boolean tryAdd( final T o, final Bounds bounds ) {
+    for ( final Pair<T, Bounds> pair : map ) {
       if ( pair.second.intersects( bounds ) ) {
         return false;
       }
@@ -78,12 +78,12 @@ public final class SpaceTime<T> {
     return true;
   }
   
-  public boolean trySet( final T o, final Rectangle target ) {
-    Rectangle current = null;
+  public boolean trySet( final T o, final Bounds target ) {
+    Pair<T, Bounds> current = null;
     
-    for ( final Pair<T, Rectangle> pair : map ) {
+    for ( final Pair<T, Bounds> pair : map ) {
       if ( pair.first == o ) {
-        current = pair.second;
+        current = pair;
       } else if ( pair.second.intersects( target ) ) {
         return false;
       }
@@ -93,7 +93,7 @@ public final class SpaceTime<T> {
       return false;
     }
     
-    current.setBounds( target );
+    current.second = target;
     return true;
   }
 }
