@@ -30,7 +30,7 @@ public final class ScriptOverlay extends AbstractShell implements Overlay {
   
   @ Override
   public void update( final float delta ) {
-    if ( !current.isEmpty() && current.stream().anyMatch( overlay -> {
+    if ( current.stream().anyMatch( overlay -> {
       return overlay.isRunning() && overlay.isActive();
     } ) ) {
       return;

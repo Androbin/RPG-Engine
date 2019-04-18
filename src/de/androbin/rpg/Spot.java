@@ -1,7 +1,7 @@
 package de.androbin.rpg;
 
-import de.androbin.rpg.dir.*;
 import de.androbin.rpg.world.*;
+import de.androbin.space.*;
 import java.awt.*;
 
 public final class Spot {

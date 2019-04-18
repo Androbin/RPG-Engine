@@ -152,7 +152,7 @@ public final class Events {
     
     if ( func.equals( "script" ) ) {
       final String name = args[ 0 ].asString();
-      final Intervention intervention = Intervention.valueOf( args[ 1 ].asString().toUpperCase() );
+      final Intervention intervention = Intervention.parse( args[ 1 ].asString() );
       
       final XArray script = SCRIPTS.computeIfAbsent( name, foo -> {
         return XUtil.readJSON( "event/" + name + ".json" ).get().asArray();

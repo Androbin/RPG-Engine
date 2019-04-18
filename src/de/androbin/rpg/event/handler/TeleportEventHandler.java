@@ -1,11 +1,11 @@
 package de.androbin.rpg.event.handler;
 
 import de.androbin.rpg.*;
-import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.event.Event;
 import de.androbin.rpg.overlay.*;
+import de.androbin.rpg.space.*;
 import de.androbin.rpg.world.*;
 import java.awt.*;
 

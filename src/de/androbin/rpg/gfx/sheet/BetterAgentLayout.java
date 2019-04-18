@@ -1,7 +1,7 @@
 package de.androbin.rpg.gfx.sheet;
 
-import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
+import de.androbin.rpg.space.*;
 import java.awt.*;
 
 public final class BetterAgentLayout implements EntityLayout<Agent> {

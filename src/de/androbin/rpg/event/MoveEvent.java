@@ -1,7 +1,7 @@
 package de.androbin.rpg.event;
 
 import static de.androbin.collection.util.ObjectCollectionUtil.*;
-import de.androbin.rpg.dir.*;
+import de.androbin.space.*;
 import java.util.*;
 import java.util.logging.*;
 
@@ -11,7 +11,7 @@ public final class MoveEvent implements Event {
     
     final String[] dirsRaw = args[ 1 ].asString().split( ", " );
     final Direction[] dirs = fill( new Direction[ dirsRaw.length ], i -> {
-      return Direction.valueOf( dirsRaw[ i ].toUpperCase() );
+      return Direction.parse( dirsRaw[ i ] );
     } );
     
     return new MoveEvent( agent, dirs );

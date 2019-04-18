@@ -1,12 +1,12 @@
 package de.androbin.rpg.gfx;
 
 import static de.androbin.gfx.util.GraphicsUtil.*;
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
 import de.androbin.rpg.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.gfx.sheet.*;
+import java.awt.*;
+import java.awt.geom.*;
+import java.awt.image.*;
 
 public class SimpleEntityRenderer<E extends Entity> implements EntityRenderer<E> {
   @ Override

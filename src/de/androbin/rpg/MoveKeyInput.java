@@ -1,8 +1,9 @@
 package de.androbin.rpg;
 
-import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
+import de.androbin.rpg.space.*;
 import de.androbin.shell.input.*;
+import de.androbin.space.*;
 import java.util.function.*;
 
 public final class MoveKeyInput implements KeyInput {

@@ -1,8 +1,8 @@
 package de.androbin.rpg.overlay;
 
 import de.androbin.rpg.*;
-import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
+import de.androbin.rpg.space.*;
 import de.androbin.shell.*;
 import java.util.function.*;
 

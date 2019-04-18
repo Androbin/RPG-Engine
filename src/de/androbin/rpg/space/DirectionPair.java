@@ -1,5 +1,6 @@
-package de.androbin.rpg.dir;
+package de.androbin.rpg.space;
 
+import de.androbin.space.*;
 import java.awt.*;
 import java.awt.geom.*;
 

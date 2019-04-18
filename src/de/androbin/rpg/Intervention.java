@@ -10,4 +10,8 @@ public enum Intervention {
     this.freezing = freezing;
     this.masking = masking;
   }
+  
+  public static Intervention parse( final String text ) {
+    return valueOf( text.toUpperCase() );
+  }
 }

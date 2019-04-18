@@ -1,6 +1,6 @@
 package de.androbin.rpg.event;
 
-import de.androbin.rpg.dir.*;
+import de.androbin.rpg.space.*;
 import java.awt.*;
 import java.util.logging.*;
 

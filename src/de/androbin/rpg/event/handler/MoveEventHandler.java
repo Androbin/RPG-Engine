@@ -1,10 +1,10 @@
 package de.androbin.rpg.event.handler;
 
 import de.androbin.rpg.*;
-import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.event.*;
 import de.androbin.rpg.overlay.*;
+import de.androbin.space.*;
 import java.util.*;
 
 public final class MoveEventHandler implements Event.Handler<Master, MoveEvent> {

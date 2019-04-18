@@ -1,6 +1,7 @@
 package de.androbin.rpg.entity;
 
 import de.androbin.rpg.*;
+import de.androbin.space.*;
 import java.awt.*;
 import java.awt.geom.*;
 

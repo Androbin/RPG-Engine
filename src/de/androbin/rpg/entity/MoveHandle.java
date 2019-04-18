@@ -1,10 +1,11 @@
 package de.androbin.rpg.entity;
 
 import de.androbin.rpg.*;
-import de.androbin.rpg.dir.*;
 import de.androbin.rpg.event.*;
+import de.androbin.rpg.space.*;
 import de.androbin.rpg.tile.*;
 import de.androbin.rpg.world.*;
+import de.androbin.space.*;
 import java.awt.*;
 import java.util.List;
 import java.util.function.*;

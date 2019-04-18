@@ -1,8 +1,8 @@
 package de.androbin.rpg.overlay;
 
-import de.androbin.rpg.dir.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.shell.*;
+import de.androbin.space.*;
 import java.util.*;
 
 public final class MoveOverlay extends AbstractShell implements Overlay {
