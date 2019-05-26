@@ -3,7 +3,6 @@ package de.androbin.rpg.space;
 import de.androbin.space.*;
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 import java.util.stream.*;
 
 public final class SpaceTime<T> {
@@ -25,22 +24,18 @@ public final class SpaceTime<T> {
     return filter( pos ).findAny().orElse( null );
   }
   
-  public List<T> getAll( final Point pos ) {
-    return filter( pos ).collect( Collectors.toList() );
-  }
-  
-  public List<T> getAll( final Rectangle window ) {
-    return filter( Bounds.rect( window ) ).collect( Collectors.toList() );
-  }
-  
-  private Stream<T> filter( final Bounds bounds ) {
+  public Stream<T> filter( final Bounds bounds ) {
     return space.filter( bounds.getBounds() )
         .filter( o -> boundsCache.get( o ).intersects( bounds ) );
   }
   
-  private Stream<T> filter( final Point pos ) {
+  public Stream<T> filter( final Point pos ) {
     return space.filter( pos )
         .filter( o -> boundsCache.get( o ).contains( pos ) );
+  }
+  
+  public Stream<T> filter( final Rectangle window ) {
+    return filter( Bounds.rect( window ) );
   }
   
   public void remove( final T o ) {
@@ -50,6 +45,10 @@ public final class SpaceTime<T> {
   public void set( final T o, final Bounds bounds ) {
     space.set( o, boundsCache.get( o ).getBounds(), bounds.getBounds() );
     boundsCache.put( o, bounds );
+  }
+  
+  public Stream<T> stream() {
+    return space.stream();
   }
   
   public boolean tryAdd( final T o, final Bounds bounds ) {
@@ -62,7 +61,7 @@ public final class SpaceTime<T> {
   }
   
   public boolean trySet( final T o, final Bounds bounds ) {
-    if ( filter( bounds ).findAny().isPresent() ) {
+    if ( filter( bounds ).filter( o2 -> o2 != o ).findAny().isPresent() ) {
       return false;
     }
     

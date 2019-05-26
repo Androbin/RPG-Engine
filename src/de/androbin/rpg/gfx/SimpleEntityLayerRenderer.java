@@ -19,8 +19,8 @@ public class SimpleEntityLayerRenderer implements EntityLayerRenderer {
           boundsB.y + boundsB.height + ( b.getData().solid ? 0.5f : 0f ) );
     };
     
-    entities.list()
-        .stream()
+    // entities.filter( LoopUtil.clip( view ) )
+    entities.stream()
         .sorted( comp )
         .forEachOrdered( entity -> {
           final EntityRenderer<Entity> renderer = Renderers.getRenderer( entity );

@@ -7,11 +7,12 @@ import de.androbin.space.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.stream.*;
 
 public final class EntityLayer {
   private final World world;
   
-  private final List<Entity> entities;
+  private final Map<Integer, Entity> ids;
   private final List<Agent> agents;
   
   private final SpaceTime<Entity> strong;
@@ -20,7 +21,7 @@ public final class EntityLayer {
   public EntityLayer( final World world ) {
     this.world = world;
     
-    entities = new ArrayList<>();
+    ids = new HashMap<>();
     agents = new ArrayList<>();
     
     strong = new SpaceTime<>();
@@ -43,7 +44,9 @@ public final class EntityLayer {
       return false;
     }
     
-    entities.add( entity );
+    if ( entity.id != 0 ) {
+      ids.put( entity.id, entity );
+    }
     
     if ( entity instanceof Agent ) {
       final Agent agent = (Agent) entity;
@@ -53,18 +56,12 @@ public final class EntityLayer {
     return true;
   }
   
+  public Stream<Entity> filter( final Rectangle window ) {
+    return strong.filter( window );
+  }
+  
   public Entity findById( final int id ) {
-    if ( id == 0 ) {
-      return null;
-    }
-    
-    for ( final Entity entity : entities ) {
-      if ( entity.id == id ) {
-        return entity;
-      }
-    }
-    
-    return null;
+    return ids.get( id );
   }
   
   public Entity get( final boolean solid, final Point pos ) {
@@ -83,10 +80,6 @@ public final class EntityLayer {
     return getSpaceTime( entity.getData().solid );
   }
   
-  public List<Entity> list() {
-    return Collections.unmodifiableList( entities );
-  }
-  
   public List<Agent> listAgents() {
     return Collections.unmodifiableList( agents );
   }
@@ -100,7 +93,9 @@ public final class EntityLayer {
       return false;
     }
     
-    entities.remove( entity );
+    if ( entity.id != 0 ) {
+      ids.remove( entity.id );
+    }
     
     if ( entity instanceof Agent ) {
       final Agent agent = (Agent) entity;
@@ -110,6 +105,10 @@ public final class EntityLayer {
     getSpaceTime( entity ).remove( entity );
     entity.setSpot( null );
     return true;
+  }
+  
+  public Stream<Entity> stream() {
+    return Stream.concat( strong.stream(), weak.stream() );
   }
   
   public boolean tryMove( final Entity entity, final Bounds target ) {
